@@ -20,7 +20,6 @@ export default function DashboardPage() {
     analysis,
     isLoading,
     isRefreshing,
-    isError,
     error,
     refreshAnalysis,
   } = useFinancialAnalysis(selectedMonth);

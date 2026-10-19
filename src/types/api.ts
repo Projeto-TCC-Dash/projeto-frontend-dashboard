@@ -120,11 +120,20 @@ export interface FinancialAnalysis {
 // ==========================================
 // CHATBOT ASSISTENTE (SSE - Feature Futura)
 // ==========================================
+export type ChatMessageStatus =
+  | 'sending'
+  | 'streaming'
+  | 'complete'
+  | 'interrupted'
+  | 'error';
+
 export interface ChatMessage {
   id?: string;
   role: 'user' | 'model';
   content: string;
   timestamp?: string;
+  status?: ChatMessageStatus;
+  error?: string;
 }
 
 export interface ChatStreamChunk {

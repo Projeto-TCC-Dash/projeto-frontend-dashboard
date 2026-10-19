@@ -27,6 +27,58 @@ interface SliceData {
   endAngle: number;
 }
 
+function computeDonutSlices(
+  activeCategories: CategoryMetric[],
+  totalExpenses: number,
+  center: number,
+  outerRadius: number,
+  innerRadius: number
+): SliceData[] {
+  let cumulativeAngle = -Math.PI / 2; // Start from top (12 o'clock)
+
+  return activeCategories.map((item) => {
+    const proportion = totalExpenses > 0 ? item.amount / totalExpenses : 0;
+    const sliceAngle = proportion * 2 * Math.PI;
+    const startAngle = cumulativeAngle;
+    const endAngle = cumulativeAngle + sliceAngle;
+    cumulativeAngle = endAngle;
+
+    // Handle single 100% item full circle edge case
+    const isFullCircle = proportion >= 0.999;
+    const effectiveEndAngle = isFullCircle ? startAngle + 2 * Math.PI - 0.0001 : endAngle;
+
+    const x1 = center + outerRadius * Math.cos(startAngle);
+    const y1 = center + outerRadius * Math.sin(startAngle);
+    const x2 = center + outerRadius * Math.cos(effectiveEndAngle);
+    const y2 = center + outerRadius * Math.sin(effectiveEndAngle);
+
+    const x3 = center + innerRadius * Math.cos(effectiveEndAngle);
+    const y3 = center + innerRadius * Math.sin(effectiveEndAngle);
+    const x4 = center + innerRadius * Math.cos(startAngle);
+    const y4 = center + innerRadius * Math.sin(startAngle);
+
+    const largeArcFlag = sliceAngle > Math.PI ? 1 : 0;
+
+    const path = [
+      `M ${x1} ${y1}`,
+      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+      `L ${x3} ${y3}`,
+      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
+      "Z",
+    ].join(" ");
+
+    return {
+      category: item.category,
+      amount: item.amount,
+      percentage: item.percentage,
+      color: getCategoryColor(item.category),
+      path,
+      startAngle,
+      endAngle,
+    };
+  });
+}
+
 export function CategoryDonutChart({
   categories,
   month,
@@ -73,49 +125,7 @@ export function CategoryDonutChart({
   const outerRadius = 100;
   const innerRadius = 65;
 
-  let cumulativeAngle = -Math.PI / 2; // Start from top (12 o'clock)
-
-  const slices: SliceData[] = activeCategories.map((item) => {
-    const proportion = totalExpenses > 0 ? item.amount / totalExpenses : 0;
-    const sliceAngle = proportion * 2 * Math.PI;
-    const startAngle = cumulativeAngle;
-    const endAngle = cumulativeAngle + sliceAngle;
-    cumulativeAngle = endAngle;
-
-    // Handle single 100% item full circle edge case
-    const isFullCircle = proportion >= 0.999;
-    const effectiveEndAngle = isFullCircle ? startAngle + 2 * Math.PI - 0.0001 : endAngle;
-
-    const x1 = center + outerRadius * Math.cos(startAngle);
-    const y1 = center + outerRadius * Math.sin(startAngle);
-    const x2 = center + outerRadius * Math.cos(effectiveEndAngle);
-    const y2 = center + outerRadius * Math.sin(effectiveEndAngle);
-
-    const x3 = center + innerRadius * Math.cos(effectiveEndAngle);
-    const y3 = center + innerRadius * Math.sin(effectiveEndAngle);
-    const x4 = center + innerRadius * Math.cos(startAngle);
-    const y4 = center + innerRadius * Math.sin(startAngle);
-
-    const largeArcFlag = sliceAngle > Math.PI ? 1 : 0;
-
-    const path = [
-      `M ${x1} ${y1}`,
-      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-      `L ${x3} ${y3}`,
-      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
-      "Z",
-    ].join(" ");
-
-    return {
-      category: item.category,
-      amount: item.amount,
-      percentage: item.percentage,
-      color: getCategoryColor(item.category),
-      path,
-      startAngle,
-      endAngle,
-    };
-  });
+  const slices = computeDonutSlices(activeCategories, totalExpenses, center, outerRadius, innerRadius);
 
   const activeSliceInfo = slices.find((s) => s.category === hoveredCategory) || null;
 
