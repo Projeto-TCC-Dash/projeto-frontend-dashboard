@@ -1,21 +1,15 @@
 <!--
 Sync Impact Report:
-- Version change: initial scaffold [CONSTITUTION_VERSION] -> 1.0.0
+- Version change: 1.0.0 -> 1.1.0
 - List of modified principles:
-  - Replaced template placeholders with 6 core principles:
-    - [PRINCIPLE_1_NAME] -> I. TypeScript Estrito e Zero "any"
-    - [PRINCIPLE_2_NAME] -> II. Clean Code, Componentização e Respeito ao Contexto Existente
-    - [PRINCIPLE_3_NAME] -> III. Gestão de Estado de IA e UX Resiliente BYOK (Bring Your Own Key)
-    - [PRINCIPLE_4_NAME] -> IV. Consumo de Streaming em Tempo Real (Server-Sent Events)
-    - [PRINCIPLE_5_NAME] -> V. Camada de Dados Reativa com Cache Inteligente (TanStack Query)
-    - Added PRINCIPLE_6 -> VI. Segurança no Cliente e Privacidade por Design
+  - Added VII. Testes Automatizados Obrigatórios (Vitest & Testing Library)
 - Added sections:
-  - Arquitetura e Stack Técnica
-  - Padrões de Desenvolvimento e Validação de Qualidade
+  - Updated Arquitetura e Stack Técnica com stack de testes (Vitest + React Testing Library)
+  - Updated Padrões de Desenvolvimento com portão mandatória de testes (pnpm test)
 - Governance:
-  - Added amendment procedure, semantic versioning policy, and compliance review rules.
+  - Incremented MINOR version per semver policy (new core principle addition).
 - Follow-up TODOs:
-  - None. All placeholders resolved based on frontend.md and repository package.json inspection.
+  - None.
 -->
 
 # Constituição da Plataforma de Inteligência Financeira - Frontend
@@ -55,6 +49,11 @@ Sync Impact Report:
 - É PROIBIDO registrar dados pessoais identificáveis (PII), senhas, tokens ou chaves em chamadas de `console.log`.
 - O upload de extratos (.ofx e .csv) DEVE validar no lado do cliente a extensão do arquivo e o tamanho máximo permitido (10MB) antes do envio.
 
+### VII. Testes Automatizados Obrigatórios (Vitest & Testing Library)
+- Todo novo componente de formulário, hook customizado e módulo utilitário DEVE conter testes unitários e de integração automatizados com Vitest e Testing Library.
+- As mutações e validações de regras de negócio DEVEM ser cobertas com cenários de sucesso e caminhos de erro antes da homologação da entrega.
+- Testes automatizados DEVEM ser executáveis localmente e no pipeline de integração contínua através do comando `pnpm test`.
+
 ## Arquitetura e Stack Técnica
 
 - **Runtime & Framework**: Next.js 16 (App Router) e React 19 conforme definido no `package.json`.
@@ -62,11 +61,13 @@ Sync Impact Report:
 - **Estilização & Componentes**: Tailwind CSS v4, `@base-ui/react`, Lucide Icons, Shadcn e suporte a tema dark/light (`next-themes`).
 - **Gerenciamento de Estado de Servidor**: TanStack Query (`@tanstack/react-query`) para caching, sincronização e refetch reativo.
 - **Comunicação em Tempo Real**: Streams SSE nativos com `ReadableStream` e decodificação progressiva UTF-8 sem dependências externas pesadas.
+- **Testes Automatizados**: Vitest e React Testing Library (`@testing-library/react`) configurados com ambiente DOM (`happy-dom` ou `jsdom`) para execução de testes unitários e testes de integração de componentes e hooks.
 - **Tipagens e Contratos Canônicos**: Centralizados em `src/types/api.ts` cobrindo Usuário, Autenticação, Transações, Métricas Financeiras e Chunks de Chat.
 
 ## Padrões de Desenvolvimento e Validação de Qualidade
 
 - **Validação Estática**: Todo código produzido DEVE compilar com sucesso via `pnpm typecheck` (`tsc --noEmit`) e passar pelas regras de lint configuradas no projeto (`pnpm lint`).
+- **Validação de Testes**: Todo novo módulo ou funcionalidade DEVE ser submetido à validação de testes automatizados via `pnpm test`, sendo reprovada qualquer entrega que contenha quebras de testes existentes ou novas funcionalidades críticas sem cobertura.
 - **Formatação de Código**: Manter conformidade com as regras do Prettier (`pnpm format`).
 - **Isolamento de Domínio**: Componentes de interface localizados em `components/`, hooks em `hooks/`, serviços de API em `services/`, tipos em `types/` e utilitários em `lib/` ou `utils/`.
 - **Tratamento de Exceções**: Todas as rotas de chamada externa DEVEM conter tratamento de erro amigável na interface com toasts informativos ou banners de fallback.
@@ -83,4 +84,4 @@ Sync Impact Report:
   - **MINOR**: Inclusão de novos princípios, seções ou expansões materiais das diretrizes.
   - **PATCH**: Refinamentos textuais, esclarecimentos e correções sem impacto nas regras de governança.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
+**Version**: 1.1.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
