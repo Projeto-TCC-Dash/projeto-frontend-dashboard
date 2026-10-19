@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
@@ -10,7 +11,15 @@ interface DialogProps {
   children: React.ReactNode;
 }
 
+const emptySubscribe = () => () => {};
+
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
+  const isClient = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && open) {
@@ -29,19 +38,20 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
     };
   }, [open, onOpenChange]);
 
-  if (!open) return null;
+  if (!open || !isClient) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
       {/* Content wrapper */}
-      <div className="relative z-50 w-full max-w-lg p-4">{children}</div>
-    </div>
+      <div className="relative z-50 w-full max-w-lg">{children}</div>
+    </div>,
+    document.body
   );
 }
 
@@ -57,7 +67,7 @@ export function DialogContent({
   return (
     <div
       className={cn(
-        "relative w-full rounded-xl border border-border bg-background p-6 shadow-xl transition-all",
+        "relative w-full max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl transition-all",
         className
       )}
     >
