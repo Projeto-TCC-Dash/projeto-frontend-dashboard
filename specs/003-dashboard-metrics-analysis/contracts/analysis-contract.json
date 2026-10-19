@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FinancialAnalysisAPIContract",
+  "description": "Contrato canônico para os endpoints de análise financeira e diagnóstico mensal por IA",
+  "endpoints": {
+    "getMonthlyAnalysis": {
+      "method": "GET",
+      "path": "/api/analysis/:month",
+      "headers": {
+        "Authorization": {
+          "type": "string",
+          "description": "Bearer token JWT do usuário autenticado",
+          "required": true,
+          "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+      },
+      "params": {
+        "month": {
+          "type": "string",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "description": "Mês de competência no formato YYYY-MM",
+          "required": true,
+          "example": "2026-10"
+        }
+      },
+      "query": {
+        "forceRefresh": {
+          "type": "boolean",
+          "description": "Se verdadeiro, força o recálculo e a geração de novo parecer por IA ignorando o cache",
+          "required": false,
+          "default": false,
+          "example": true
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Análise financeira obtida com sucesso",
+          "schema": {
+            "type": "object",
+            "required": [
+              "cached",
+              "month",
+              "diagnosis",
+              "recommendations",
+              "metrics",
+              "generatedAt",
+              "expiresAt"
+            ],
+            "properties": {
+              "cached": {
+                "type": "boolean",
+                "description": "Indica se o diagnóstico foi recuperado de cache de 24h"
+              },
+              "month": {
+                "type": "string",
+                "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+                "example": "2026-10"
+              },
+              "diagnosis": {
+                "type": "string",
+                "description": "Parecer analítico formatado em Markdown gerado pelo Gemini",
+                "example": "### Visão Geral do Mês\n\nNo mês de outubro de 2026, seu resultado financeiro foi **positivo** com superávit de **R$ 2.450,00**.\n\n- Sua taxa de poupança atingiu **32.7%**, acima da meta de 20% recomendada.\n- As despesas concentraram-se principalmente em **Moradia** e **Alimentação**."
+              },
+              "recommendations": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "Mantenha a reserva de emergência aportando o excedente deste mês em renda fixa de liquidez diária.",
+                  "Avalie a possibilidade de renegociar contratos de serviços fixos para reduzir custos em Moradia.",
+                  "Acompanhe os gastos com alimentação fora do domicílio na próxima semana."
+                ]
+              },
+              "metrics": {
+                "type": "object",
+                "required": [
+                  "totalIncome",
+                  "totalExpenses",
+                  "netBalance",
+                  "savingsRate",
+                  "topCategories"
+                ],
+                "properties": {
+                  "totalIncome": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 7500.00
+                  },
+                  "totalExpenses": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 5050.00
+                  },
+                  "netBalance": {
+                    "type": "number",
+                    "example": 2450.00
+                  },
+                  "savingsRate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "example": 32.7
+                  },
+                  "topCategories": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["category", "amount", "percentage"],
+                      "properties": {
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "Alimentação",
+                            "Transporte",
+                            "Moradia",
+                            "Saúde",
+                            "Lazer",
+                            "Educação",
+                            "Receita",
+                            "Outros",
+                            "Não Categorizado"
+                          ],
+                          "example": "Moradia"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "minimum": 0,
+                          "example": 2200.00
+                        },
+                        "percentage": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "example": 43.56
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "generatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2026-10-19T14:30:00.000Z"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2026-10-20T14:30:00.000Z"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Não autenticado ou token ausente/inválido",
+          "schema": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string", "example": "Token de autenticação inválido ou ausente." }
+            }
+          }
+        },
+        "403": {
+          "description": "Chave de IA não configurada (recurso de IA bloqueado)",
+          "schema": {
+            "type": "object",
+            "required": ["message", "code"],
+            "properties": {
+              "message": { "type": "string", "example": "Chave de API do Gemini não configurada." },
+              "code": { "type": "string", "example": "AI_KEY_NOT_CONFIGURED" }
+            }
+          }
+        },
+        "429": {
+          "description": "Taxa limite da API excedida",
+          "schema": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string", "example": "Muitas requisições. Aguarde antes de recalcular o diagnóstico." }
+            }
+          }
+        },
+        "503": {
+          "description": "Serviço de IA upstream (Google AI Studio) sob alta demanda",
+          "schema": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string", "example": "O serviço de IA está temporariamente sobrecarregado. Tente novamente em instantes." }
+            }
+          }
+        }
+      }
+    }
+  }
+}
