@@ -128,3 +128,14 @@
 3. User Story 2 → Shell responsivo com tema claro/escuro.
 4. User Story 3 → Onboarding obrigatório e gestão BYOK com tratamento de alta demanda.
 5. Polish → Verificação estrita de TypeScript e testes fim a fim.
+
+
+---
+
+## Phase 7: Convergence
+
+**Purpose**: Resolver lacunas identificadas pela auditoria de conformidade com a Constituição v1.1.0 (Princípio VII).
+
+- [X] T026 [CRITICAL] Configurar runner de testes Vitest, ambiente DOM e script `pnpm test` no `package.json` e `vitest.config.ts` per Constitution VII (missing)
+- [X] T027 [CRITICAL] [P] Implementar testes unitários para schemas Zod e cliente HTTP em `lib/validations/auth.test.ts`, `lib/validations/ai-key.test.ts` e `lib/api-client.test.ts` per Constitution VII (missing)
+- [X] T028 [CRITICAL] Implementar testes automatizados para hooks de autenticação e gestão de chave BYOK em `hooks/use-auth.test.tsx` e `hooks/use-ai-key.test.ts` per Constitution VII (missing)
