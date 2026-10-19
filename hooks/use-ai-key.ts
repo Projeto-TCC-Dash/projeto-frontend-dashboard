@@ -10,15 +10,12 @@ export function useAiKey() {
   const queryClient = useQueryClient();
   const { user, updateUser } = useAuth();
 
-  const [lastStatus, setLastStatus] = React.useState<AiKeyOperationalStatus>(() => {
-    return user?.hasAiKey ? "ACTIVE_VERIFIED" : "NOT_CONFIGURED";
-  });
+  const [lastVerifiedStatus, setLastVerifiedStatus] =
+    React.useState<AiKeyOperationalStatus | null>(null);
 
-  React.useEffect(() => {
-    if (!user?.hasAiKey) {
-      setLastStatus("NOT_CONFIGURED");
-    }
-  }, [user?.hasAiKey]);
+  const currentStatus: AiKeyOperationalStatus = !user?.hasAiKey
+    ? "NOT_CONFIGURED"
+    : lastVerifiedStatus || "ACTIVE_VERIFIED";
 
   const mutation = useMutation<SetApiKeyResponse, Error, SetAiKeyDTO>({
     mutationFn: async ({ apiKey }) => {
@@ -30,7 +27,7 @@ export function useAiKey() {
           ? "ACTIVE_PROVISIONAL_DEMAND"
           : "ACTIVE_VERIFIED";
 
-      setLastStatus(operationalStatus);
+      setLastVerifiedStatus(operationalStatus);
 
       // Atualiza o estado global do usuário para hasAiKey: true
       updateUser({ hasAiKey: true });
@@ -47,7 +44,7 @@ export function useAiKey() {
     isError: mutation.isError,
     error: mutation.error,
     data: mutation.data,
-    status: lastStatus,
-    setStatus: setLastStatus,
+    status: currentStatus,
+    setStatus: setLastVerifiedStatus,
   };
 }

@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAiKey } from "@/hooks/use-ai-key";
 import { Badge } from "@/components/ui/badge";
 import { AiKeyModal } from "./ai-key-modal";
-import { Sparkles, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 
 export function AiKeyStatusBadge() {
   const { user } = useAuth();

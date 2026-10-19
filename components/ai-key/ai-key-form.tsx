@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useAiKey } from "@/hooks/use-ai-key";
-import { aiKeySchema, type AiKeyFormData } from "@/lib/validations/ai-key";
+import { aiKeySchema } from "@/lib/validations/ai-key";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExternalLink, Eye, EyeOff, Loader2, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
