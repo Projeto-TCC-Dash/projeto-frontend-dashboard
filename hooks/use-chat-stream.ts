@@ -292,8 +292,21 @@ export function useChatStream(): UseChatStreamReturn {
             return { ...prev, messages: updated };
           });
         } else {
-          const failureMessage =
-            err instanceof Error ? err.message : "Falha na conexão com o assistente financeiro.";
+          let failureMessage = "Falha na conexão com o assistente financeiro.";
+          if (err instanceof Error) {
+            const lower = err.message.toLowerCase();
+            if (
+              lower.includes("load failed") ||
+              lower.includes("failed to fetch") ||
+              lower.includes("network") ||
+              lower.includes("networkerror")
+            ) {
+              failureMessage =
+                "Não foi possível conectar ao assistente financeiro. Verifique se o servidor está ativo e tente novamente.";
+            } else {
+              failureMessage = err.message;
+            }
+          }
           setError(failureMessage);
           setSession((prev) => {
             const updated = [...prev.messages];
