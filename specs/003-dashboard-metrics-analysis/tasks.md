@@ -10,10 +10,10 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 **Purpose**: Inicialização de utilitários de formatação, sanitização de Markdown e estrutura de diretórios do dashboard
 
-- [ ] T001 Criar estrutura de diretórios para a feature de dashboard em `components/dashboard/`
-- [ ] T002 Implementar e expandir utilitários de formatação em `lib/formatters.ts` (`formatCurrencyBRL`, `formatPercentage`, `formatMonthYear`, e `calculateSavingsRate` com tratamento de receitas zeradas e fixação em 0.0% com flag de déficit quando despesas > receitas)
-- [ ] T003 [P] Criar testes unitários para os formatadores e cálculo de taxa de poupança/déficit em `lib/formatters.test.ts`
-- [ ] T004 [P] Implementar renderizador seguro e sanitizado de Markdown para o parecer analítico em `lib/markdown-renderer.tsx` suportando títulos, listas e ênfases
+- [X] T001 Criar estrutura de diretórios para a feature de dashboard em `components/dashboard/`
+- [X] T002 Implementar e expandir utilitários de formatação em `lib/formatters.ts` (`formatCurrencyBRL`, `formatPercentage`, `formatMonthYear`, e `calculateSavingsRate` com tratamento de receitas zeradas e fixação em 0.0% com flag de déficit quando despesas > receitas)
+- [X] T003 [P] Criar testes unitários para os formatadores e cálculo de taxa de poupança/déficit em `lib/formatters.test.ts`
+- [X] T004 [P] Implementar renderizador seguro e sanitizado de Markdown para o parecer analítico em `lib/markdown-renderer.tsx` suportando títulos, listas e ênfases
 
 ---
 
@@ -23,8 +23,8 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 **⚠️ CRITICAL**: Nenhuma User Story pode ser iniciada antes da conclusão e validação desta fase foundational.
 
-- [ ] T005 Implementar hook customizado `useFinancialAnalysis` em `hooks/use-financial-analysis.ts` utilizando TanStack Query com chave `['analysis', month]`, consumindo `GET /api/analysis/:month`, e disponibilizando função `refreshAnalysis()` com chamada a `GET /api/analysis/:month?forceRefresh=true` e invalidação de cache
-- [ ] T006 [P] Criar testes automatizados para `useFinancialAnalysis` em `hooks/use-financial-analysis.test.tsx` com cenários de carregamento, sucesso com cache, recálculo via `forceRefresh=true` e tratamento de erros 403 e 503
+- [X] T005 Implementar hook customizado `useFinancialAnalysis` em `hooks/use-financial-analysis.ts` utilizando TanStack Query com chave `['analysis', month]`, consumindo `GET /api/analysis/:month`, e disponibilizando função `refreshAnalysis()` com chamada a `GET /api/analysis/:month?forceRefresh=true` e invalidação de cache
+- [X] T006 [P] Criar testes automatizados para `useFinancialAnalysis` em `hooks/use-financial-analysis.test.tsx` com cenários de carregamento, sucesso com cache, recálculo via `forceRefresh=true` e tratamento de erros 403 e 503
 
 **Checkpoint**: Base foundational pronta — a implementação das User Stories pode iniciar sequencialmente ou em paralelo.
 
@@ -38,13 +38,13 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T007 [P] [US1] Criar testes de componente para o cartão de métricas em `components/dashboard/metric-card.test.tsx` cobrindo superávit, déficit, badge de alerta e estado de esqueleto (skeleton)
+- [X] T007 [P] [US1] Criar testes de componente para o cartão de métricas em `components/dashboard/metric-card.test.tsx` cobrindo superávit, déficit, badge de alerta e estado de esqueleto (skeleton)
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Implementar componente de cartão de métrica individual `MetricCard` em `components/dashboard/metric-card.tsx` com suporte a variantes semânticas (verde positivo, vermelho/alerta negativo, neutro), ícone, indicador de tendência e skeleton
-- [ ] T009 [US1] Implementar componente de grid responsivo `MetricCardsGrid` em `components/dashboard/metric-cards-grid.tsx` renderizando os cartões de Receitas Totais, Despesas Totais, Saldo Líquido e Taxa de Poupança com regras de déficit
-- [ ] T010 [US1] Integrar os cards de métricas na página principal do dashboard em `app/(dashboard)/page.tsx` conectando o hook `useFinancialAnalysis` para o mês corrente
+- [X] T008 [P] [US1] Implementar componente de cartão de métrica individual `MetricCard` em `components/dashboard/metric-card.tsx` com suporte a variantes semânticas (verde positivo, vermelho/alerta negativo, neutro), ícone, indicador de tendência e skeleton
+- [X] T009 [US1] Implementar componente de grid responsivo `MetricCardsGrid` em `components/dashboard/metric-cards-grid.tsx` renderizando os cartões de Receitas Totais, Despesas Totais, Saldo Líquido e Taxa de Poupança com regras de déficit
+- [X] T010 [US1] Integrar os cards de métricas na página principal do dashboard em `app/(dashboard)/page.tsx` conectando o hook `useFinancialAnalysis` para o mês corrente
 
 **Checkpoint**: User Story 1 (MVP) completamente funcional e testável de forma autônoma.
 
@@ -58,13 +58,13 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T011 [P] [US2] Criar testes de componente para o gráfico de categorias em `components/dashboard/category-donut-chart.test.tsx` cobrindo cálculo proporcional de arcos SVG, exibição de tooltips, interação de clique drill-down e empty state
+- [X] T011 [P] [US2] Criar testes de componente para o gráfico de categorias em `components/dashboard/category-donut-chart.test.tsx` cobrindo cálculo proporcional de arcos SVG, exibição de tooltips, interação de clique drill-down e empty state
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Implementar componente de legenda descritiva de categorias `CategoryChartLegend` em `components/dashboard/category-chart-legend.tsx` exibindo indicadores coloridos, nomes das categorias, montantes em BRL e percentuais
-- [ ] T013 [US2] Implementar componente de gráfico de rosca nativo SVG `CategoryDonutChart` em `components/dashboard/category-donut-chart.tsx` com cálculo vetorial de fatias, eventos de hover para tooltip, redirecionamento via `router.push('/transactions?month=...&category=...')` e empty state ilustrado
-- [ ] T014 [US2] Conectar o gráfico de distribuição de categorias `CategoryDonutChart` no layout responsivo da página em `app/(dashboard)/page.tsx`
+- [X] T012 [P] [US2] Implementar componente de legenda descritiva de categorias `CategoryChartLegend` em `components/dashboard/category-chart-legend.tsx` exibindo indicadores coloridos, nomes das categorias, montantes em BRL e percentuais
+- [X] T013 [US2] Implementar componente de gráfico de rosca nativo SVG `CategoryDonutChart` em `components/dashboard/category-donut-chart.tsx` com cálculo vetorial de fatias, eventos de hover para tooltip, redirecionamento via `router.push('/transactions?month=...&category=...')` e empty state ilustrado
+- [X] T014 [US2] Conectar o gráfico de distribuição de categorias `CategoryDonutChart` no layout responsivo da página em `app/(dashboard)/page.tsx`
 
 **Checkpoint**: User Stories 1 e 2 totalmente funcionais e integradas de forma independente.
 
@@ -78,13 +78,13 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T015 [P] [US3] Criar testes de componente para o diagnóstico de IA em `components/dashboard/ai-diagnosis-card.test.tsx` cobrindo renderização de Markdown, lista de recomendações, botão de recálculo, fallback BYOK e tratamento de erros 429/503
+- [X] T015 [P] [US3] Criar testes de componente para o diagnóstico de IA em `components/dashboard/ai-diagnosis-card.test.tsx` cobrindo renderização de Markdown, lista de recomendações, botão de recálculo, fallback BYOK e tratamento de erros 429/503
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] Implementar componente de diagnóstico com IA `AiDiagnosisCard` em `components/dashboard/ai-diagnosis-card.tsx` com renderização rica em Markdown do parecer, badge de cache 24h, bloco de recomendações acionáveis e botão "Recalcular Diagnóstico" com spinner
-- [ ] T017 [US3] Integrar o tratamento de resiliência BYOK no `AiDiagnosisCard` exibindo banner educativo e gatilho para o modal `AiKeyModal` quando `user.hasAiKey === false`, além de tratamento para erros 429 e 503 com opção de retentativa
-- [ ] T018 [US3] Conectar o card de diagnóstico `AiDiagnosisCard` na página principal do dashboard em `app/(dashboard)/page.tsx`
+- [X] T016 [P] [US3] Implementar componente de diagnóstico com IA `AiDiagnosisCard` em `components/dashboard/ai-diagnosis-card.tsx` com renderização rica em Markdown do parecer, badge de cache 24h, bloco de recomendações acionáveis e botão "Recalcular Diagnóstico" com spinner
+- [X] T017 [US3] Integrar o tratamento de resiliência BYOK no `AiDiagnosisCard` exibindo banner educativo e gatilho para o modal `AiKeyModal` quando `user.hasAiKey === false`, além de tratamento para erros 429 e 503 com opção de retentativa
+- [X] T018 [US3] Conectar o card de diagnóstico `AiDiagnosisCard` na página principal do dashboard em `app/(dashboard)/page.tsx`
 
 **Checkpoint**: User Stories 1, 2 e 3 funcionando harmoniosamente e com resiliência BYOK.
 
@@ -98,13 +98,13 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T019 [P] [US4] Criar testes de componente para o seletor de mês em `components/dashboard/month-selector.test.tsx` cobrindo avanço, recuo de mês e formatação amigável da competência
+- [X] T019 [P] [US4] Criar testes de componente para o seletor de mês em `components/dashboard/month-selector.test.tsx` cobrindo avanço, recuo de mês e formatação amigável da competência
 
 ### Implementation for User Story 4
 
-- [ ] T020 [P] [US4] Implementar componente de seleção de mês `MonthSelector` em `components/dashboard/month-selector.tsx` com botões anterior/próximo e label de mês por extenso
-- [ ] T021 [US4] Implementar cabeçalho do painel `DashboardHeader` em `components/dashboard/dashboard-header.tsx` integrando o `MonthSelector`, badge visual de IA ativa e botão de acesso rápido para importar extratos
-- [ ] T022 [US4] Integrar a sincronização de competência mensal na página orquestradora em `app/(dashboard)/page.tsx`, alimentando reativamente os componentes filhos com o mês ativo
+- [X] T020 [P] [US4] Implementar componente de seleção de mês `MonthSelector` em `components/dashboard/month-selector.tsx` com botões anterior/próximo e label de mês por extenso
+- [X] T021 [US4] Implementar cabeçalho do painel `DashboardHeader` em `components/dashboard/dashboard-header.tsx` integrando o `MonthSelector`, badge visual de IA ativa e botão de acesso rápido para importar extratos
+- [X] T022 [US4] Integrar a sincronização de competência mensal na página orquestradora em `app/(dashboard)/page.tsx`, alimentando reativamente os componentes filhos com o mês ativo
 
 **Checkpoint**: Todas as 4 User Stories integradas, testadas e completamente funcionais.
 
@@ -114,9 +114,9 @@ Este documento estabelece o plano detalhado e sequencial de tarefas atômicas pa
 
 **Purpose**: Validação de qualidade, acessibilidade e conformidade mandatória com a Constituição do Projeto
 
-- [ ] T023 [P] Validar atributos de acessibilidade ARIA nos cartões de métricas, gráfico vetorial SVG e parecer analítico
-- [ ] T024 [P] Executar suíte completa de testes automatizados via `pnpm test` e validação estática de tipos via `pnpm typecheck`
-- [ ] T025 Executar o roteiro de validação interativa manual documentado em `quickstart.md` para homologação final da entrega
+- [X] T023 [P] Validar atributos de acessibilidade ARIA nos cartões de métricas, gráfico vetorial SVG e parecer analítico
+- [X] T024 [P] Executar suíte completa de testes automatizados via `pnpm test` e validação estática de tipos via `pnpm typecheck`
+- [X] T025 Executar o roteiro de validação interativa manual documentado em `quickstart.md` para homologação final da entrega
 
 ---
 
