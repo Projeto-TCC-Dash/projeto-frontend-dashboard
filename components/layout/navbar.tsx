@@ -7,6 +7,7 @@ import { Sparkles, LayoutDashboard, ReceiptText, BotMessageSquare, Menu, X } fro
 import { ThemeToggle } from "./theme-toggle";
 import { UserNav } from "./user-nav";
 import { AiKeyStatusBadge } from "@/components/ai-key/ai-key-status-badge";
+import { useChatDrawer } from "@/components/chat/chat-drawer-context";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const { toggleDrawer } = useChatDrawer();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   return (
@@ -58,6 +60,18 @@ export function Navbar() {
 
         {/* Lado Direito: Status da IA, Tema e Usuário */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {pathname !== "/chat" && (
+            <button
+              type="button"
+              onClick={toggleDrawer}
+              aria-label="Abrir consultor financeiro"
+              data-testid="navbar-chat-drawer-button"
+              className="hidden sm:flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+              title="Abrir Consultor IA"
+            >
+              <BotMessageSquare className="size-4.5" />
+            </button>
+          )}
           <AiKeyStatusBadge />
           <ThemeToggle />
           <UserNav />
