@@ -117,7 +117,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
               <button
                 type="button"
                 onClick={onRetry}
-                className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors font-medium cursor-pointer shadow-xs"
+                className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-destructive text-white hover:bg-destructive/90 transition-colors font-medium cursor-pointer shadow-xs"
                 data-testid="message-retry-button"
               >
                 <RefreshCw className="size-3" />

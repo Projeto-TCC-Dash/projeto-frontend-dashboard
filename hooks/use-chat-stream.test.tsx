@@ -140,6 +140,26 @@ describe("hooks/use-chat-stream", () => {
     expect(lastMsg.status).toBe("error");
   });
 
+  it("deve mapear erros de rede brutos do navegador como 'Load failed' para mensagem amigável", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Load failed"));
+
+    const { result } = renderHook(() => useChatStream());
+
+    await act(async () => {
+      await result.current.sendMessage("Pergunta com falha de rede");
+    });
+
+    expect(result.current.isStreaming).toBe(false);
+    expect(result.current.error).toBe(
+      "Não foi possível conectar ao assistente financeiro. Verifique se o servidor está ativo e tente novamente."
+    );
+    const lastMsg = result.current.messages[result.current.messages.length - 1];
+    expect(lastMsg.status).toBe("error");
+    expect(lastMsg.error).toBe(
+      "Não foi possível conectar ao assistente financeiro. Verifique se o servidor está ativo e tente novamente."
+    );
+  });
+
   it("deve limpar o histórico e resetar sessionId via clearChat", async () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream<Uint8Array>({
