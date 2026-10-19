@@ -12,7 +12,12 @@
    ```bash
    pnpm install
    ```
-2. Verifique se a compilação estática TypeScript e os testes existentes passam sem erros:
+2. Certifique-se de que o arquivo `.env.local` esteja configurado com a URL do backend:
+   ```bash
+   cp .env.example .env.local
+   # NEXT_PUBLIC_API_URL=http://localhost:3000
+   ```
+3. Verifique se a compilação estática TypeScript e os testes existentes passam sem erros:
    ```bash
    pnpm typecheck
    pnpm test

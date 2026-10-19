@@ -161,7 +161,8 @@ export function useChatStream(): UseChatStreamReturn {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const response = await fetch("/api/chat/stream", {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+        const response = await fetch(`${baseUrl}/api/chat/stream`, {
           method: "POST",
           headers,
           body: JSON.stringify({
