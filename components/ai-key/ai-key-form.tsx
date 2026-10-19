@@ -28,7 +28,8 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
     setFieldError(null);
     setResultMessage(null);
 
-    const validation = aiKeySchema.safeParse({ apiKey });
+    const cleanApiKey = apiKey.trim().replace(/^["']|["']$/g, "");
+    const validation = aiKeySchema.safeParse({ apiKey: cleanApiKey });
     if (!validation.success) {
       setFieldError(validation.error.issues[0]?.message || "Chave de API inválida");
       return;
