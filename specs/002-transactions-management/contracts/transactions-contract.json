@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransactionsContract",
+  "description": "Especificação dos contratos de listagem, upload de extratos, edição manual e categorização em lote",
+  "endpoints": {
+    "list": {
+      "method": "GET",
+      "path": "/api/transactions",
+      "description": "Lista transações financeiras filtradas por mês de competência, categoria e origem",
+      "queryParams": {
+        "type": "object",
+        "required": ["month"],
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$",
+            "description": "Mês de competência no formato YYYY-MM"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "Alimentação",
+              "Transporte",
+              "Moradia",
+              "Saúde",
+              "Lazer",
+              "Educação",
+              "Receita",
+              "Outros",
+              "Não Categorizado"
+            ],
+            "description": "Filtro opcional por categoria canônica"
+          },
+          "source": {
+            "type": "string",
+            "enum": ["OFX", "CSV", "SEED"],
+            "description": "Filtro opcional por origem"
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Lista de transações retornada com sucesso",
+          "body": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "externalId",
+                "rawDescription",
+                "cleanDescription",
+                "amount",
+                "date",
+                "category",
+                "source"
+              ],
+              "properties": {
+                "id": { "type": "string" },
+                "externalId": { "type": "string" },
+                "rawDescription": { "type": "string" },
+                "cleanDescription": { "type": "string" },
+                "amount": { "type": "number" },
+                "date": { "type": "string", "format": "date-time" },
+                "category": {
+                  "type": "string",
+                  "enum": [
+                    "Alimentação",
+                    "Transporte",
+                    "Moradia",
+                    "Saúde",
+                    "Lazer",
+                    "Educação",
+                    "Receita",
+                    "Outros",
+                    "Não Categorizado"
+                  ]
+                },
+                "source": { "type": "string", "enum": ["OFX", "CSV", "SEED"] }
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Token JWT ausente ou expirado",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "upload": {
+      "method": "POST",
+      "path": "/api/transactions/upload",
+      "description": "Realiza upload de extrato bancário nos formatos .ofx ou .csv via multipart/form-data",
+      "contentType": "multipart/form-data",
+      "request": {
+        "type": "object",
+        "required": ["file"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "description": "Arquivo único nos formatos .ofx ou .csv, tamanho máximo 10MB"
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Extrato processado com sucesso",
+          "body": {
+            "type": "object",
+            "required": ["totalExtracted", "imported", "duplicatesIgnored"],
+            "properties": {
+              "totalExtracted": { "type": "integer", "minimum": 0 },
+              "imported": { "type": "integer", "minimum": 0 },
+              "duplicatesIgnored": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "400": {
+          "description": "Arquivo ausente, corrompido, formato incompatível ou acima de 10MB",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "401": {
+          "description": "Não autorizado",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "update": {
+      "method": "PATCH",
+      "path": "/api/transactions/:id",
+      "description": "Edita pontualmente a descrição limpa e/ou a categoria de uma transação",
+      "request": {
+        "type": "object",
+        "properties": {
+          "cleanDescription": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Nova descrição amigável"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "Alimentação",
+              "Transporte",
+              "Moradia",
+              "Saúde",
+              "Lazer",
+              "Educação",
+              "Receita",
+              "Outros",
+              "Não Categorizado"
+            ],
+            "description": "Nova categoria canônica"
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Transação atualizada com sucesso",
+          "body": {
+            "type": "object",
+            "required": [
+              "id",
+              "externalId",
+              "rawDescription",
+              "cleanDescription",
+              "amount",
+              "date",
+              "category",
+              "source"
+            ],
+            "properties": {
+              "id": { "type": "string" },
+              "externalId": { "type": "string" },
+              "rawDescription": { "type": "string" },
+              "cleanDescription": { "type": "string" },
+              "amount": { "type": "number" },
+              "date": { "type": "string", "format": "date-time" },
+              "category": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "400": {
+          "description": "Dados de edição inválidos ou categoria desconhecida",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "404": {
+          "description": "Transação não encontrada",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "categorize": {
+      "method": "POST",
+      "path": "/api/transactions/categorize",
+      "description": "Dispara categorização em lote por inteligência artificial para todas as transações não categorizadas da conta",
+      "responses": {
+        "200": {
+          "description": "Lote de categorização processado com sucesso",
+          "body": {
+            "type": "object",
+            "required": ["uniqueMerchantsAnalyzed", "transactionsUpdated"],
+            "properties": {
+              "uniqueMerchantsAnalyzed": { "type": "integer", "minimum": 0 },
+              "transactionsUpdated": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "403": {
+          "description": "Chave de IA do Google AI Studio ausente ou não configurada (BYOK)",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "429": {
+          "description": "Cota ou taxa de requisições excedida na chave do Google AI Studio",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "503": {
+          "description": "Alta demanda temporária upstream no modelo de linguagem",
+          "body": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
