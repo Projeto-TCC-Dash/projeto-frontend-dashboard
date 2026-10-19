@@ -8,6 +8,16 @@
 
 **Input**: User description: "Criar painel conversacional de consultoria financeira virtual consumindo POST /api/chat/stream em tempo real via Server-Sent Events (SSE), com histórico de mensagens, efeito de digitação progressiva, sugestões de perguntas rápidas baseadas no orçamento do mês e botão de interrupção da resposta."
 
+## Clarifications
+
+### Session 2026-10-19
+
+- Q: Como o painel conversacional do consultor financeiro deve ser disponibilizado e acessado na interface da aplicação? (FR-001) → A: Modelo Híbrido: Gaveta lateral (Drawer) expansível acessível globalmente (botão/ícone no cabeçalho ou barra de navegação) para consultas ágeis sem sair da tela atual + tela dedicada (/chat) para sessões profundas em tela cheia.
+- Q: Como deve funcionar a persistência do histórico de mensagens e do identificador de sessão (`sessionId`) no navegador? (FR-011) → A: Armazenamento em Sessão (`sessionStorage`): Preserva o histórico e o `sessionId` durante navegação entre rotas e recarregamentos da aba (F5), mas encerra e limpa os dados ao fechar a aba/navegador ou acionar "Nova consulta", resguardando a privacidade de dados financeiros em ambientes compartilhados.
+- Q: Quando e onde as sugestões de perguntas rápidas (chips de atalho) devem ser exibidas dentro do painel conversacional? (FR-008) → A: Estado Inicial/Vazio: Exibidos em destaque na área central quando a conversa não possuir mensagens (ou estiver recém-iniciada); recolhidos automaticamente após o primeiro envio para priorizar a leitura do histórico, e reapresentados ao acionar "Nova consulta".
+- Q: Como a competência financeira (mês de referência) deve ser transmitida ao consultor financeiro durante as interações? (FR-003) → A: Mês Corrente Implícito no Servidor: O frontend transmite apenas `{ message, sessionId }` no corpo de `POST /api/chat/stream`, mantendo o payload canônico e minimalista, enquanto o backend assume o contexto e as métricas do mês civil atual do servidor.
+- Q: Quando ocorre um erro transitório durante a transmissão (como HTTP 429 de taxa ou 503 de sobrecarga upstream), como a mensagem de erro e a ação de reenvio devem ser apresentadas na interface? (FR-015) → A: Embutido na Bolha da Mensagem: O erro e o botão "Tentar novamente" são exibidos diretamente dentro do cartão/bolha da resposta na linha do tempo do chat, preservando o contexto exato e a cronologia do diálogo.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Diálogo Conversacional com Streaming em Tempo Real e Digitação Progressiva (Priority: P1)
@@ -95,21 +105,21 @@ Como uma pessoa usuária, desejo manter o histórico da conversa enquanto navego
 
 ### Functional Requirements
 
-- **FR-001**: O sistema DEVE fornecer uma interface conversacional de consultoria financeira acessível via gaveta lateral (drawer) e/ou rota dedicada, permitindo interação por texto com o assistente virtual.
+- **FR-001**: O sistema DEVE fornecer uma interface conversacional de consultoria financeira no modelo híbrido, disponibilizando tanto uma gaveta lateral (Drawer) expansível acessível globalmente a partir do cabeçalho/barra de navegação quanto uma tela/rota dedicada (`/chat`) com layout em tela cheia.
 - **FR-002**: O sistema DEVE validar o status de chave de inteligência artificial (`hasAiKey`) do usuário antes de permitir envios, apresentando estado informativo com gatilho para o modal de cadastro de chave caso o usuário ainda não possua chave ativa.
-- **FR-003**: O sistema DEVE consumir o endpoint de mensagens em fluxo contínuo (`POST /api/chat/stream`) transmitindo a mensagem do usuário e o identificador de sessão ativo (`sessionId`).
+- **FR-003**: O sistema DEVE consumir o endpoint de mensagens em fluxo contínuo (`POST /api/chat/stream`) transmitindo no payload minimalista `{ message, sessionId }`, mantendo o contexto financeiro do mês corrente resolvido pelo backend no servidor.
 - **FR-004**: O sistema DEVE processar os eventos Server-Sent Events (SSE) decodificando progressivamente os fragmentos de texto em tempo real sem travar a navegação da aplicação.
 - **FR-005**: O sistema DEVE renderizar a resposta do assistente de maneira progressiva com efeito visual de digitação contínua, anexando cada novo fragmento recebido sem remontar ou re-renderizar a lista de mensagens anteriores.
 - **FR-006**: O sistema DEVE disponibilizar um botão de interrupção imediata ("Parar resposta" / "Cancelar geração") visível durante todo o período em que um fluxo estiver ativo.
 - **FR-007**: Ao acionar o botão de interrupção, o sistema DEVE abortar imediatamente a conexão em andamento através de sinal de cancelamento de requisição, mantendo todo o conteúdo parcial já recebido no histórico da conversa.
-- **FR-008**: O sistema DEVE disponibilizar chips interativos de perguntas rápidas contextualmente construídos a partir das métricas e categorias do mês orçamentário ativo (ex: categoria de maior gasto, taxa de poupança, transações atípicas).
+- **FR-008**: O sistema DEVE disponibilizar chips interativos de perguntas rápidas exibidos em destaque na área inicial/vazia da conversa, contextualmente construídos a partir das métricas e categorias do mês orçamentário ativo (ex: categoria de maior gasto, taxa de poupança, transações atípicas), recolhendo-os após o primeiro envio e reapresentando-os ao reiniciar a consulta.
 - **FR-009**: Ao selecionar um chip de pergunta rápida, o sistema DEVE disparar o envio do respectivo texto como uma nova mensagem do usuário para o assistente, desabilitando temporariamente os demais chips.
 - **FR-010**: O sistema DEVE exibir alternativas de perguntas gerais de educação financeira quando o usuário não possuir movimentações registradas no mês selecionado.
-- **FR-011**: O sistema DEVE manter o histórico de mensagens da conversa durante a sessão do usuário, exibindo papéis claramente diferenciados (usuário e modelo/assistente) com respectivos carimbos de data/hora.
-- **FR-012**: O sistema DEVE oferecer ação explícita para o usuário reiniciar ou limpar a conversa ("Nova consulta" / "Limpar histórico"), gerando um novo identificador de sessão.
+- **FR-011**: O sistema DEVE manter o histórico de mensagens e o `sessionId` no armazenamento de sessão do navegador (`sessionStorage`), preservando o estado do diálogo durante a navegação entre rotas e atualizações de página na mesma aba, exibindo papéis claramente diferenciados (usuário e modelo/assistente) com carimbos de data/hora.
+- **FR-012**: O sistema DEVE oferecer ação explícita para o usuário reiniciar ou limpar a conversa ("Nova consulta" / "Limpar histórico"), descartando os dados do `sessionStorage` e gerando um novo identificador de sessão.
 - **FR-013**: O sistema DEVE interpretar e formatar adequadamente respostas retornadas em Markdown, suportando listas, ênfases (negrito/itálico), tabelas e formatação de valores monetários.
 - **FR-014**: O sistema DEVE manter rolagem automática acompanhando os novos fragmentos de texto emitidos, pausando o acompanhamento se o usuário rolar intencionalmente para cima para reler trechos anteriores.
-- **FR-015**: O sistema DEVE capturar e tratar de maneira amigável erros de transmissão (incluindo 429 para limite de requisições, 503 para sobrecarga de provedor upstream e falhas de rede), exibindo opções de reenvio ("Tentar novamente").
+- **FR-015**: O sistema DEVE capturar e tratar de maneira amigável erros de transmissão (incluindo 429 para limite de requisições, 503 para sobrecarga de provedor upstream e falhas de rede), exibindo a mensagem explicativa e o botão de reenvio ("Tentar novamente") embutidos diretamente na bolha de resposta da respectiva mensagem no chat.
 
 ---
 
