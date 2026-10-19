@@ -8,6 +8,12 @@ describe("aiKeySchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("deve validar chave do Google AI Studio contendo pontos (formato AQ....)", () => {
+    const keyWithDot = "AQ.Ab8RN6JinQIp-O7aWhoDnYdhbm9sq6RdJNJVOVrZ3-ElnkbyDQ";
+    const result = aiKeySchema.safeParse({ apiKey: keyWithDot });
+    expect(result.success).toBe(true);
+  });
+
   it("deve rejeitar chave com menos de 20 caracteres", () => {
     const shortKey = "AIzaSyCurta";
     const result = aiKeySchema.safeParse({ apiKey: shortKey });
