@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ChatStreamAPIContract",
+  "description": "Contrato canônico para o endpoint de consultoria financeira virtual com streaming Server-Sent Events (SSE)",
+  "endpoints": {
+    "postChatStream": {
+      "method": "POST",
+      "path": "/api/chat/stream",
+      "headers": {
+        "Authorization": {
+          "type": "string",
+          "description": "Bearer token JWT do usuário autenticado",
+          "required": true,
+          "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        },
+        "Content-Type": {
+          "type": "string",
+          "enum": ["application/json"],
+          "required": true
+        },
+        "Accept": {
+          "type": "string",
+          "enum": ["text/event-stream"],
+          "required": false,
+          "default": "text/event-stream"
+        }
+      },
+      "requestBody": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Mensagem ou dúvida em linguagem natural enviada pela pessoa usuária",
+            "example": "Como posso reduzir meus gastos em Alimentação este mês?"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identificador único da sessão conversacional persistente no cliente",
+            "example": "4a123f89-8d1e-4509-9f20-22c7a5293411"
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Fluxo contínuo de eventos Server-Sent Events (SSE) transmitido com sucesso",
+          "contentType": "text/event-stream",
+          "eventFormat": "data: {JSON}\\n\\n",
+          "chunkSchema": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Fragmento incremental de texto da resposta",
+                "example": "Para reduzir seus gastos..."
+              },
+              "done": {
+                "type": "boolean",
+                "description": "Indica o término do stream da resposta",
+                "example": true
+              },
+              "sessionId": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Identificador da sessão confirmado pelo servidor"
+              },
+              "error": {
+                "type": "string",
+                "description": "Mensagem descritiva de erro ocorrido durante a geração"
+              },
+              "code": {
+                "type": "string",
+                "description": "Código canônico de erro (ex: RATE_LIMIT_EXCEEDED)"
+              },
+              "statusCode": {
+                "type": "integer",
+                "description": "Código de status HTTP equivalente"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Não autenticado ou token JWT ausente/expirado",
+          "schema": {
+            "type": "object",
+            "required": ["statusCode", "error", "message"],
+            "properties": {
+              "statusCode": { "type": "integer", "example": 401 },
+              "error": { "type": "string", "example": "Unauthorized" },
+              "message": { "type": "string", "example": "Token ausente ou expirado" }
+            }
+          }
+        },
+        "403": {
+          "description": "Chave de inteligência artificial (BYOK) não cadastrada pelo usuário",
+          "schema": {
+            "type": "object",
+            "required": ["statusCode", "error", "message"],
+            "properties": {
+              "statusCode": { "type": "integer", "example": 403 },
+              "error": { "type": "string", "example": "Forbidden" },
+              "message": { "type": "string", "example": "Chave de API do Google Gemini não configurada" }
+            }
+          }
+        },
+        "429": {
+          "description": "Limite de requisições excedido no provedor de IA",
+          "schema": {
+            "type": "object",
+            "required": ["statusCode", "error", "message"],
+            "properties": {
+              "statusCode": { "type": "integer", "example": 429 },
+              "error": { "type": "string", "example": "Too Many Requests" },
+              "message": { "type": "string", "example": "Limite de cota da API temporariamente atingido. Tente novamente em instantes." }
+            }
+          }
+        },
+        "503": {
+          "description": "Serviço upstream do Google AI Studio com alta demanda temporária",
+          "schema": {
+            "type": "object",
+            "required": ["statusCode", "error", "message"],
+            "properties": {
+              "statusCode": { "type": "integer", "example": 503 },
+              "error": { "type": "string", "example": "Service Unavailable" },
+              "message": { "type": "string", "example": "O modelo está com alta demanda momentânea. Tente novamente." }
+            }
+          }
+        }
+      }
+    }
+  }
+}
