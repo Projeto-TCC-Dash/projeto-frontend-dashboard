@@ -88,6 +88,7 @@ Como um usuário navegando pelo sistema, quero ter acesso direto à página de C
 - **Falha de Conectividade ou Erro de Servidor**: Em caso de erro na obtenção da lista de contas ou durante operações de criação/edição/exclusão, o sistema deve apresentar estado de erro com mensagem explicativa e botão para tentar novamente, sem travar a interface.
 - **Formato Inválido de Cor Hexadecimal**: Se o usuário inserir manualmente um código de cor inválido, a interface deve validar o formato hexadecimal padrão (#RRGGBB) antes da submissão.
 - **Valores Extremos de Saldo**: O sistema deve comportar formatação e exibição de saldos de zero até valores de dezenas de milhões de reais sem quebra visual de layout ou sobreposição de texto em telas menores.
+- **Tentativa de Exclusão da Única Conta Ativa**: O sistema proíbe a remoção da única conta ativa restante do usuário; a interface intercepta a mensagem do backend e a exibe contextualmente no corpo do diálogo de exclusão sem fechar a janela.
 
 ## Requirements *(mandatory)*
 
