@@ -220,3 +220,71 @@ export interface ChatStreamChunk {
   code?: string;
   statusCode?: number;
 }
+
+// ==========================================
+// GESTÃO MULTICONTA E CARTÕES DE CRÉDITO (Feature 006)
+// ==========================================
+export const ACCOUNT_TYPES = [
+  'CHECKING',
+  'CREDIT_CARD',
+  'INVESTMENT',
+  'CASH',
+  'OTHER',
+] as const;
+
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  CHECKING: 'Conta Corrente',
+  CREDIT_CARD: 'Cartão de Crédito',
+  INVESTMENT: 'Investimentos',
+  CASH: 'Dinheiro em Espécie',
+  OTHER: 'Outras Contas',
+};
+
+export const ACCOUNT_TYPE_ICONS: Record<AccountType, string> = {
+  CHECKING: 'Landmark',
+  CREDIT_CARD: 'CreditCard',
+  INVESTMENT: 'TrendingUp',
+  CASH: 'Banknote',
+  OTHER: 'Wallet',
+};
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  balance: number;
+  initialBalance: number;
+  institution?: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AccountsOverview {
+  accounts: Account[];
+  netWorth: number;
+}
+
+export interface CreateAccountDTO {
+  name: string;
+  type: AccountType;
+  initialBalance?: number;
+  institution?: string;
+  color?: string;
+}
+
+export interface UpdateAccountDTO {
+  name?: string;
+  type?: AccountType;
+  initialBalance?: number;
+  institution?: string;
+  color?: string;
+}
+
+export interface DeleteAccountParams {
+  id: string;
+  cascade?: boolean;
+}
+

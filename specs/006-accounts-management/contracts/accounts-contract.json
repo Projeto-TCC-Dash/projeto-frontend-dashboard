@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AccountsManagementContract",
+  "description": "Contratos de interface da API de Gestão Multiconta e Cartões de Crédito",
+  "definitions": {
+    "AccountType": {
+      "type": "string",
+      "enum": ["CHECKING", "CREDIT_CARD", "INVESTMENT", "CASH", "OTHER"]
+    },
+    "Account": {
+      "type": "object",
+      "required": ["id", "name", "type", "balance", "initialBalance", "color", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "type": { "$ref": "#/definitions/AccountType" },
+        "balance": { "type": "number" },
+        "initialBalance": { "type": "number" },
+        "institution": { "type": "string", "maxLength": 50 },
+        "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "AccountsOverviewResponse": {
+      "type": "object",
+      "required": ["accounts", "netWorth"],
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Account" }
+        },
+        "netWorth": { "type": "number" }
+      }
+    },
+    "CreateAccountRequest": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "type": { "$ref": "#/definitions/AccountType" },
+        "initialBalance": { "type": "number" },
+        "institution": { "type": "string", "maxLength": 50 },
+        "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+      }
+    },
+    "UpdateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "type": { "$ref": "#/definitions/AccountType" },
+        "initialBalance": { "type": "number" },
+        "institution": { "type": "string", "maxLength": 50 },
+        "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+      }
+    },
+    "DeleteAccountQuery": {
+      "type": "object",
+      "properties": {
+        "cascade": { "type": "boolean" }
+      }
+    }
+  },
+  "endpoints": {
+    "getAccounts": {
+      "method": "GET",
+      "path": "/api/accounts",
+      "response": { "$ref": "#/definitions/AccountsOverviewResponse" }
+    },
+    "createAccount": {
+      "method": "POST",
+      "path": "/api/accounts",
+      "body": { "$ref": "#/definitions/CreateAccountRequest" },
+      "response": { "$ref": "#/definitions/Account" }
+    },
+    "updateAccount": {
+      "method": "PATCH",
+      "path": "/api/accounts/:id",
+      "body": { "$ref": "#/definitions/UpdateAccountRequest" },
+      "response": { "$ref": "#/definitions/Account" }
+    },
+    "deleteAccount": {
+      "method": "DELETE",
+      "path": "/api/accounts/:id",
+      "query": { "$ref": "#/definitions/DeleteAccountQuery" },
+      "response": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}
