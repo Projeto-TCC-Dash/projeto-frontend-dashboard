@@ -90,7 +90,12 @@ export async function apiRequest<T>(
   const token = getStoredToken();
   const headers = new Headers(options.headers || {});
 
-  if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+  if (
+    options.body !== undefined &&
+    options.body !== null &&
+    !headers.has("Content-Type") &&
+    !(options.body instanceof FormData)
+  ) {
     headers.set("Content-Type", "application/json");
   }
 

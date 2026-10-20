@@ -63,6 +63,27 @@ describe("apiClient HTTP Request Execution", () => {
     expect(requestHeaders.get("Authorization")).toBe("Bearer token-seguro-jwt");
   });
 
+  it("não deve definir cabeçalho Content-Type em requisições DELETE ou GET sem corpo", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ "content-type": "application/json" }),
+      json: async () => ({ success: true }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiClient.delete("/api/accounts/123?cascade=true");
+    const deleteHeaders = fetchMock.mock.calls[0]?.[1]?.headers as Headers;
+    expect(deleteHeaders.has("Content-Type")).toBe(false);
+
+    await apiClient.get("/api/accounts");
+    const getHeaders = fetchMock.mock.calls[1]?.[1]?.headers as Headers;
+    expect(getHeaders.has("Content-Type")).toBe(false);
+
+    await apiClient.post("/api/accounts", { name: "Teste" });
+    const postHeaders = fetchMock.mock.calls[2]?.[1]?.headers as Headers;
+    expect(postHeaders.get("Content-Type")).toBe("application/json");
+  });
+
   it("deve lançar ApiClientError com mensagem do backend em caso de falha HTTP", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
