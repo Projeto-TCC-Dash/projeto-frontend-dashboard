@@ -8,6 +8,14 @@
 
 **Input**: User description: "Criar módulo de gestão de contas e cartões em /accounts consumindo GET /api/accounts, POST /api/accounts, PATCH /api/accounts/:id e DELETE /api/accounts/:id, exibindo cards de saldo por tipo, card de patrimônio líquido consolidado, modal de criação/edição com seletor de cor e diálogo de exclusão segura com suporte a cascade."
 
+## Clarifications
+
+### Session 2026-10-19
+
+- Q: Como as contas devem ser estruturadas e organizadas visualmente na página `/accounts`? → A: Seções verticais temáticas separadas por tipo de conta (Contas Correntes, Cartões de Crédito, Investimentos, Dinheiro em Espécie, Outras), cada uma exibindo seus respectivos cards e o subtotal financeiro acumulado daquela categoria.
+- Q: O campo de saldo inicial (`initialBalance`) deve poder ser alterado durante a edição de uma conta existente? → A: Sempre editável: o usuário pode alterar o saldo inicial tanto na criação quanto na edição da conta, recalculando o saldo atual com base no novo ponto de partida.
+- Q: Como a interface deve se comportar quando o usuário tentar excluir uma conta com transações vinculadas sem marcar a opção de exclusão em cascata? → A: Diálogo adaptativo: o diálogo de confirmação permanece aberto, exibe um alerta de erro contextual explicando que há transações vinculadas e destaca visualmente o checkbox de cascata para que o usuário possa marcar e reconfirmar no mesmo fluxo.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visão Consolidada do Patrimônio Líquido e Listagem de Contas (Priority: P1)
@@ -38,7 +46,7 @@ Como um usuário que abriu uma nova conta bancária ou deseja ajustar os dados d
 
 1. **Given** a página de contas aberta, **When** o usuário clica em "Nova Conta", **Then** uma janela modal de cadastro é exibida contendo campos para nome da conta, instituição financeira, seletor de tipo de conta (`Conta Corrente`, `Cartão de Crédito`, `Investimentos`, `Dinheiro`, `Outro`), saldo inicial em reais e uma paleta de cores pré-definidas complementada por seletor de cor hexadecimal livre.
 2. **Given** o formulário de cadastro preenchido com dados válidos, **When** o usuário confirma a criação, **Then** a modal é fechada, a nova conta é imediatamente incorporada à lista e ao cálculo do patrimônio líquido, e uma notificação de sucesso é apresentada.
-3. **Given** um card de conta existente, **When** o usuário clica na ação "Editar", **Then** a janela modal é aberta pré-preenchida com os dados atuais da conta (nome, instituição, tipo e cor de identificação), permitindo ajustes e salvamento imediato sem recarregamento de página.
+3. **Given** um card de conta existente, **When** o usuário clica na ação "Editar", **Then** a janela modal é aberta pré-preenchida com os dados atuais da conta (nome, instituição, tipo, saldo inicial e cor de identificação), permitindo ajustes e salvamento imediato sem recarregamento de página.
 
 ---
 
@@ -54,7 +62,7 @@ Como um usuário que deseja encerrar o controle de uma conta ou remover um regis
 
 1. **Given** um card de conta na listagem, **When** o usuário clica no botão "Excluir", **Then** o sistema exibe um diálogo de confirmação advertindo que a ação é destrutiva e apresentando uma opção de exclusão em cascata ("Excluir também todas as transações associadas a esta conta").
 2. **Given** uma conta sem transações vinculadas, **When** o usuário confirma a exclusão com a opção de cascata desmarcada, **Then** a conta é excluída com sucesso, removida da tela e uma mensagem de confirmação é exibida.
-3. **Given** uma conta que possui transações vinculadas, **When** o usuário tenta excluir com a opção de cascata desmarcada e a operação é rejeitada pelo sistema de segurança, **Then** um alerta explicativo é exibido informando que a conta possui lançamentos associados e sugerindo a exclusão em cascata ou a reatribuição prévia das transações.
+3. **Given** uma conta que possui transações vinculadas, **When** o usuário tenta excluir com a opção de cascata desmarcada e a operação é rejeitada pelo backend, **Then** o diálogo de confirmação permanece aberto, exibe um alerta de erro contextual explicando que há transações vinculadas e destaca visualmente o checkbox de cascata para que o usuário possa marcar e reconfirmar no mesmo fluxo.
 4. **Given** uma conta com transações vinculadas, **When** o usuário marca a opção de exclusão em cascata e confirma, **Then** a conta e todos os seus lançamentos vinculados são removidos e o patrimônio líquido é recalculado instantaneamente.
 
 ---
@@ -87,14 +95,14 @@ Como um usuário navegando pelo sistema, quero ter acesso direto à página de C
 
 - **FR-001**: O sistema DEVE fornecer rota dedicada `/accounts` acessível por link fixo na barra lateral de navegação (Sidebar) e no menu de navegação móvel.
 - **FR-002**: O sistema DEVE exibir em destaque o Patrimônio Líquido Total do usuário, calculado a partir da consolidação de todas as contas ativas cadastradas.
-- **FR-003**: O sistema DEVE apresentar a listagem de contas agrupadas ou discriminadas pelos cinco tipos canônicos: Conta Corrente (`CHECKING`), Cartão de Crédito (`CREDIT_CARD`), Investimentos (`INVESTMENT`), Dinheiro em Espécie (`CASH`) e Outras Contas (`OTHER`).
+- **FR-003**: O sistema DEVE organizar a página `/accounts` em seções verticais temáticas dedicadas para cada um dos cinco tipos canônicos (`Conta Corrente`, `Cartão de Crédito`, `Investimentos`, `Dinheiro em Espécie` e `Outras Contas`), exibindo em cada seção os cards das contas correspondentes e o subtotal parcial acumulado daquela categoria.
 - **FR-004**: Cada card de conta na listagem DEVE exibir: nome/apelido da conta, nome da instituição financeira, etiqueta ou ícone do tipo de conta, saldo atual formatado em BRL, indicador de cor personalizado e ações de edição e exclusão.
 - **FR-005**: O sistema DEVE permitir a criação de novas contas através de janela modal, exigindo preenchimento de nome, seleção do tipo de conta e permitindo definir saldo inicial, instituição e cor de identificação visual.
 - **FR-006**: O sistema DEVE oferecer paleta pré-definida de cores recomendadas para as contas, além de controle para escolha livre de cor hexadecimal.
-- **FR-007**: O sistema DEVE permitir a edição dos metadados de qualquer conta existente (nome, instituição, tipo de conta e cor) através de modal pré-preenchida.
+- **FR-007**: O sistema DEVE permitir a edição de todos os dados de qualquer conta existente (nome, instituição, tipo de conta, saldo inicial e cor) através de modal pré-preenchida, recalculando dinamicamente o saldo correspondente.
 - **FR-008**: O sistema DEVE fornecer diálogo de confirmação seguro antes de realizar a exclusão de qualquer conta, alertando explicitamente sobre o impacto irreversível da ação.
 - **FR-009**: O diálogo de confirmação de exclusão DEVE conter controle opcional (checkbox) para exclusão em cascata de todas as transações associadas à conta a ser removida.
-- **FR-010**: Se o usuário solicitar a exclusão de uma conta com lançamentos associados sem selecionar a opção de cascata, o sistema DEVE interceptar a rejeição e orientar o usuário de forma amigável sobre a necessidade de cascata ou reatribuição prévia.
+- **FR-010**: Se o usuário solicitar a exclusão de uma conta com lançamentos associados sem selecionar a opção de cascata, o sistema DEVE manter o diálogo de confirmação aberto, exibir mensagem de erro explicativa contextual e destacar visualmente o controle de cascata para possibilitar reenvio imediato.
 - **FR-011**: O sistema DEVE atualizar reativamente os dados em tela e recalcular o Patrimônio Líquido Total imediatamente após qualquer operação de criação, edição ou exclusão de conta, sem exigir recarregamento da página pelo navegador.
 - **FR-012**: O sistema DEVE exibir estado vazio explicativo com chamada para ação ("Criar Primeira Conta") caso o usuário não possua contas cadastradas.
 
