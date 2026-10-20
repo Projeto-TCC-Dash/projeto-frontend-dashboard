@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Wallet,
   ReceiptText,
   UserCheck,
   BotMessageSquare,
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 export const SIDEBAR_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/accounts", label: "Contas e Cartões", icon: Wallet },
   { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
   { href: "/settings/profile", label: "Perfil Financeiro", icon: UserCheck },
   { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },

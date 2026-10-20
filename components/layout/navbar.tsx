@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, LayoutDashboard, ReceiptText, BotMessageSquare, UserCheck, Menu, X } from "lucide-react";
+import { Sparkles, LayoutDashboard, Wallet, ReceiptText, BotMessageSquare, UserCheck, Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { UserNav } from "./user-nav";
 import { AiKeyStatusBadge } from "@/components/ai-key/ai-key-status-badge";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/accounts", label: "Contas", icon: Wallet },
   { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
   { href: "/settings/profile", label: "Perfil & Metas", icon: UserCheck },
   { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },
