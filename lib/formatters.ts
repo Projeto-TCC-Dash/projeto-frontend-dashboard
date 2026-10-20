@@ -113,3 +113,35 @@ export function calculateSavingsRate(
     statusLabel: "Superávit orçamentário",
   };
 }
+
+/**
+ * Converte string digitada pelo usuário em moeda BRL (ex: "1.500,50" ou "R$ 1.500,50")
+ * para número de ponto flutuante (ex: 1500.5). Retorna undefined se vazio.
+ */
+export function parseBrlToNumber(value: string | number | undefined | null): number | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === "number") return isNaN(value) ? undefined : value;
+
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  // Remove símbolos de moeda, espaços e pontos separadores de milhar
+  const sanitized = trimmed
+    .replace(/[R$\s]/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+
+  const num = parseFloat(sanitized);
+  return isNaN(num) ? undefined : num;
+}
+
+/**
+ * Formata um número ou string numérica para exibição amigável em campo monetário BRL.
+ */
+export function formatBrlCurrency(amount: number | undefined | null): string {
+  if (amount === undefined || amount === null || isNaN(amount)) return "";
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(amount);
+}
