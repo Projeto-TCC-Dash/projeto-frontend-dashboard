@@ -28,6 +28,7 @@ export default function TransactionsPage() {
     month: getCurrentYearMonth(),
     category: undefined,
     source: undefined,
+    accountId: undefined,
   });
 
   const [uploadSummary, setUploadSummary] = React.useState<UploadTransactionsResponse | null>(null);
@@ -50,15 +51,16 @@ export default function TransactionsPage() {
     month: string;
     category?: Category;
     source?: TransactionSource;
+    accountId?: string;
   }) => {
     setFilters(newFilters);
   };
 
-  const handleFileSelected = async (file: File) => {
+  const handleFileSelected = async (file: File, accountId?: string) => {
     setUploadError(null);
     setUploadSummary(null);
     try {
-      const summary = await upload(file);
+      const summary = await upload({ file, accountId });
       setUploadSummary(summary);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao processar o extrato.";
@@ -187,6 +189,7 @@ export default function TransactionsPage() {
         month={filters.month}
         category={filters.category}
         source={filters.source}
+        accountId={filters.accountId}
         onFilterChange={handleFilterChange}
       />
 

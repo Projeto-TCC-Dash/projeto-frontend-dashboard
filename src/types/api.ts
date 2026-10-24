@@ -1,5 +1,5 @@
 // ==========================================
-// CATEGORIAS CANÔNICAS (9 Categorias Oficiais)
+// CATEGORIAS CANÔNICAS (11 Categorias Oficiais)
 // ==========================================
 export const CANONICAL_CATEGORIES = [
   'Alimentação',
@@ -9,6 +9,8 @@ export const CANONICAL_CATEGORIES = [
   'Lazer',
   'Educação',
   'Receita',
+  'Pagamento de Fatura',
+  'Investimentos',
   'Outros',
   'Não Categorizado',
 ] as const;
@@ -137,8 +139,15 @@ export interface UpdateFinancialProfileDTO {
 }
 
 // ==========================================
-// TRANSAÇÕES (Features Futuras)
+// TRANSAÇÕES
 // ==========================================
+export interface TransactionAccountSummary {
+  id: string;
+  name: string;
+  color?: string;
+  institution?: string;
+}
+
 export interface Transaction {
   id: string;
   externalId: string;
@@ -148,6 +157,8 @@ export interface Transaction {
   date: string; // ISO 8601 UTC
   category: Category;
   source: TransactionSource;
+  accountId?: string;
+  account?: TransactionAccountSummary;
 }
 
 export interface UploadTransactionsResponse {
@@ -159,6 +170,14 @@ export interface UploadTransactionsResponse {
 export interface UpdateTransactionDTO {
   category?: Category;
   cleanDescription?: string;
+  accountId?: string | null;
+}
+
+export interface TransactionFilterParams {
+  month?: string;
+  category?: Category;
+  source?: TransactionSource;
+  accountId?: string;
 }
 
 export interface CategorizeResponse {

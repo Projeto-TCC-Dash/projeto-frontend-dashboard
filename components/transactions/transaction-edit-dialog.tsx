@@ -5,6 +5,7 @@ import { Loader2, Info } from "lucide-react";
 import { Transaction, Category, CANONICAL_CATEGORIES, UpdateTransactionDTO } from "@/src/types/api";
 import { formatCurrencyBRL } from "@/lib/formatters";
 import { updateTransactionSchema } from "@/lib/validations/transaction";
+import { useAccounts } from "@/hooks/use-accounts";
 import {
   Dialog,
   DialogContent,
@@ -40,15 +41,23 @@ function TransactionEditForm({
     transaction.cleanDescription || transaction.rawDescription
   );
   const [category, setCategory] = React.useState<Category>(transaction.category);
+  const [accountId, setAccountId] = React.useState<string>(
+    transaction.accountId || transaction.account?.id || ""
+  );
   const [validationError, setValidationError] = React.useState<string | null>(null);
+
+  const { accounts } = useAccounts();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
 
+    const cleanAccountId = accountId.trim() ? accountId.trim() : null;
+
     const parsed = updateTransactionSchema.safeParse({
       cleanDescription,
       category,
+      accountId: cleanAccountId,
     });
 
     if (!parsed.success) {
@@ -60,6 +69,7 @@ function TransactionEditForm({
     onSave({
       cleanDescription: cleanDescription.trim(),
       category,
+      accountId: cleanAccountId,
     });
   };
 
@@ -128,6 +138,29 @@ function TransactionEditForm({
             {CANONICAL_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label
+            htmlFor="edit-account"
+            className="text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Conta Bancária
+          </label>
+          <select
+            id="edit-account"
+            value={accountId}
+            onChange={(e) => setAccountId(e.target.value)}
+            disabled={isSaving}
+            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          >
+            <option value="">Nenhuma conta vinculada</option>
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id}>
+                {acc.name} ({acc.institution})
               </option>
             ))}
           </select>

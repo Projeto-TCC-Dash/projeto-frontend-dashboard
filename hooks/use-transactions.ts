@@ -8,6 +8,7 @@ export interface TransactionFilters {
   month: string;
   category?: Category;
   source?: TransactionSource;
+  accountId?: string;
 }
 
 export function useTransactions(filters: TransactionFilters) {
@@ -17,6 +18,7 @@ export function useTransactions(filters: TransactionFilters) {
       month: filters.month,
       category: filters.category,
       source: filters.source,
+      accountId: filters.accountId,
     },
   ] as const;
 
@@ -27,6 +29,7 @@ export function useTransactions(filters: TransactionFilters) {
         month: filters.month,
         category: filters.category,
         source: filters.source,
+        accountId: filters.accountId,
       };
 
       return apiClient.get<Transaction[]>("/api/transactions", { params });
