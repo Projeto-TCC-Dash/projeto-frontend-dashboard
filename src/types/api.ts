@@ -62,6 +62,17 @@ export interface AuthSession {
   isLoading: boolean;
 }
 
+export const APP_ROUTES = {
+  DASHBOARD: '/',
+  ACCOUNTS: '/accounts',
+  TRANSACTIONS: '/transactions',
+  METAS: '/settings/metas',
+  PROFILE: '/settings/profile',
+  SECURITY: '/settings/security',
+  EXPORT: '/settings/export',
+  CHAT: '/chat',
+} as const;
+
 // ==========================================
 // PERFIL FINANCEIRO DO USUÁRIO (ONBOARDING)
 // ==========================================
@@ -124,11 +135,68 @@ export interface FinancialProfile {
   updatedAt?: string;
 }
 
+export interface UserSecuritySettings {
+  twoFactorEnabled: boolean;
+  hasLocalPassword: boolean;
+  googleLinked: boolean;
+  googleEmail?: string;
+  googleLinkedAt?: string;
+}
+
 export interface UserProfileResponse {
   id: string;
   email: string;
+  name?: string;
+  avatarUrl?: string | null;
   hasAiKey: boolean;
+  security?: UserSecuritySettings;
   financialProfile?: FinancialProfile;
+  createdAt?: string;
+}
+
+export interface UpdateUserProfileDTO {
+  name?: string;
+}
+
+export interface UnifiedIdentityDraft {
+  name: string;
+  pendingAvatarFile: File | null;
+  pendingAvatarPreview: string | null;
+  pendingAvatarRemove: boolean;
+  isDirty: boolean;
+  validationError?: string | null;
+}
+
+export interface UserProfileIdentityFormProps {
+  initialName?: string;
+  email: string;
+  avatarUrl?: string | null;
+  onSubmit: (payload: {
+    name?: string;
+    avatarFile?: File | null;
+    removeAvatar?: boolean;
+  }) => Promise<void>;
+  isPending?: boolean;
+}
+
+export interface Request2FAResponse {
+  message: string;
+  expiresInSeconds: number;
+}
+
+export interface Confirm2FADTO {
+  code: string;
+}
+
+export interface Disable2FADTO {
+  password?: string;
+  code?: string;
+}
+
+export interface TwoFactorActionResponse {
+  success: boolean;
+  message: string;
+  twoFactorEnabled: boolean;
 }
 
 export interface UpdateFinancialProfileDTO {
@@ -178,6 +246,18 @@ export interface TransactionFilterParams {
   category?: Category;
   source?: TransactionSource;
   accountId?: string;
+}
+
+export const EXPORT_FORMATS = ['csv', 'xlsx', 'pdf'] as const;
+export type ExportFormat = (typeof EXPORT_FORMATS)[number];
+
+export interface ExportFilterParams {
+  format: ExportFormat;
+  month?: string;
+  startDate?: string;
+  endDate?: string;
+  accountId?: string;
+  category?: Category;
 }
 
 export interface CategorizeResponse {

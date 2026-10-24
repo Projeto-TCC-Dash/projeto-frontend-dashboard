@@ -219,3 +219,27 @@ export function computeEmergencyReserveGuideline(
     regimeLabel,
   };
 }
+
+/**
+ * Resolve a URL de avatar para garantir que URLs relativas do backend
+ * sejam prefixadas com a URL base da API (NEXT_PUBLIC_API_URL).
+ */
+export function resolveAvatarUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("blob:") ||
+    trimmed.startsWith("data:")
+  ) {
+    return trimmed;
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  const cleanBase = baseUrl.replace(/\/+$/, "");
+  const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return `${cleanBase}${cleanPath}`;
+}

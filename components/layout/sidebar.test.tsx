@@ -17,11 +17,14 @@ describe("Sidebar Component", () => {
     expect(screen.getByText("Dashboard")).toBeDefined();
     expect(screen.getByText("Contas e Cartões")).toBeDefined();
     expect(screen.getByText("Extratos & Transações")).toBeDefined();
-    expect(screen.getByText("Perfil Financeiro")).toBeDefined();
+    expect(screen.getByText("Perfil e Metas")).toBeDefined();
     expect(screen.getByText("Consultor IA")).toBeDefined();
 
     const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i });
     expect(accountsLink.getAttribute("href")).toBe("/accounts");
+
+    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i });
+    expect(goalsLink.getAttribute("href")).toBe("/settings/metas");
   });
 
   it("deve destacar visualmente o link de 'Contas e Cartões' quando a rota ativa for '/accounts'", () => {
@@ -30,5 +33,13 @@ describe("Sidebar Component", () => {
 
     const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i });
     expect(accountsLink.className).toContain("bg-primary/10 text-primary font-semibold");
+  });
+
+  it("deve destacar visualmente o link de 'Perfil e Metas' quando a rota ativa for '/settings/metas'", () => {
+    currentPathname = "/settings/metas";
+    render(<Sidebar />);
+
+    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i });
+    expect(goalsLink.className).toContain("bg-primary/10 text-primary font-semibold");
   });
 });

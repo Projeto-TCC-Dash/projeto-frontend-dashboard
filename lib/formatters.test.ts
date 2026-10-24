@@ -10,6 +10,7 @@ import {
   parseBrlToNumber,
   formatBrlCurrency,
   computeEmergencyReserveGuideline,
+  resolveAvatarUrl,
 } from "./formatters";
 
 describe("formatters", () => {
@@ -212,6 +213,32 @@ describe("formatters", () => {
       expect(guideline.minAmount).toBe(0);
       expect(guideline.maxAmount).toBe(0);
       expect(guideline.formattedAmountRange).toBe("");
+    });
+  });
+
+  describe("resolveAvatarUrl", () => {
+    it("retorna null se a url for nula ou vazia", () => {
+      expect(resolveAvatarUrl(null)).toBeNull();
+      expect(resolveAvatarUrl(undefined)).toBeNull();
+      expect(resolveAvatarUrl("")).toBeNull();
+      expect(resolveAvatarUrl("   ")).toBeNull();
+    });
+
+    it("retorna a URL original se for absoluta (http, https, blob ou data)", () => {
+      expect(resolveAvatarUrl("http://cdn.exemplo.com/avatar.jpg")).toBe("http://cdn.exemplo.com/avatar.jpg");
+      expect(resolveAvatarUrl("https://storage.exemplo.com/avatar.png")).toBe("https://storage.exemplo.com/avatar.png");
+      expect(resolveAvatarUrl("blob:http://localhost:3000/123")).toBe("blob:http://localhost:3000/123");
+      expect(resolveAvatarUrl("data:image/png;base64,abc")).toBe("data:image/png;base64,abc");
+    });
+
+    it("prefixa URLs relativas com NEXT_PUBLIC_API_URL", () => {
+      const prev = process.env.NEXT_PUBLIC_API_URL;
+      process.env.NEXT_PUBLIC_API_URL = "http://localhost:3000";
+
+      expect(resolveAvatarUrl("/uploads/avatar.jpg")).toBe("http://localhost:3000/uploads/avatar.jpg");
+      expect(resolveAvatarUrl("uploads/avatar.jpg")).toBe("http://localhost:3000/uploads/avatar.jpg");
+
+      process.env.NEXT_PUBLIC_API_URL = prev;
     });
   });
 });

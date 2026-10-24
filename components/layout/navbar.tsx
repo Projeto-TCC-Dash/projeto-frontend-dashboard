@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Contas", icon: Wallet },
-  { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
-  { href: "/settings/profile", label: "Perfil & Metas", icon: UserCheck },
-  { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },
+  { href: "/transactions", label: "Extratos", icon: ReceiptText },
+  { href: "/settings/metas", label: "Metas", icon: UserCheck },
+  { href: "/chat", label: "Consultor", icon: BotMessageSquare },
 ];
 
 export function Navbar() {
@@ -62,7 +62,7 @@ export function Navbar() {
 
         {/* Lado Direito: Status da IA, Tema e Usuário */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {pathname !== "/chat" && (
+          {/* {pathname !== "/chat" && (
             <button
               type="button"
               onClick={toggleDrawer}
@@ -71,9 +71,9 @@ export function Navbar() {
               className="hidden sm:flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
               title="Abrir Consultor IA"
             >
-              <BotMessageSquare className="size-4.5" />
+             <BotMessageSquare className="size-4.5" />
             </button>
-          )}
+          )} */}
           <AiKeyStatusBadge />
           <ThemeToggle />
           <UserNav />

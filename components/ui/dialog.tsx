@@ -55,21 +55,25 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
   );
 }
 
+export interface DialogContentProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  onClose?: () => void;
+}
+
 export function DialogContent({
   className,
   children,
   onClose,
-}: {
-  className?: string;
-  children: React.ReactNode;
-  onClose?: () => void;
-}) {
+  ...props
+}: DialogContentProps) {
   return (
     <div
       className={cn(
         "relative w-full max-h-[90vh] overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl transition-all",
         className
       )}
+      {...props}
     >
       {onClose && (
         <button

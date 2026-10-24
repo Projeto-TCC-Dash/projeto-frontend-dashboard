@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { updateFinancialProfileSchema } from './profile';
+import {
+  updateFinancialProfileSchema,
+  updateUserProfileSchema,
+  avatarFileSchema,
+  validateAvatarFile,
+  confirm2FASchema,
+  disable2FASchema,
+} from './profile';
 
 describe('updateFinancialProfileSchema', () => {
   it('deve validar com sucesso um payload vazio (todos os campos opcionais)', () => {
@@ -60,5 +67,93 @@ describe('updateFinancialProfileSchema', () => {
       riskProfile: 'SUPER_RISK',
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('updateUserProfileSchema', () => {
+  it('deve aceitar um nome válido com 2 ou mais caracteres', () => {
+    const result = updateUserProfileSchema.safeParse({ name: 'Maria Silva' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.name).toBe('Maria Silva');
+    }
+  });
+
+  it('deve rejeitar nome menor que 2 caracteres ou apenas espaços', () => {
+    const result = updateUserProfileSchema.safeParse({ name: ' a ' });
+    expect(result.success).toBe(false);
+  });
+
+  it('deve rejeitar nome com mais de 100 caracteres', () => {
+    const result = updateUserProfileSchema.safeParse({ name: 'a'.repeat(101) });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('avatarFileSchema e validateAvatarFile', () => {
+  it('deve aceitar arquivo de imagem válido <= 5MB', () => {
+    const file = new File(['image bytes'], 'avatar.png', { type: 'image/png' });
+    const result = avatarFileSchema.safeParse(file);
+    expect(result.success).toBe(true);
+
+    const validation = validateAvatarFile(file);
+    expect(validation.valid).toBe(true);
+  });
+
+  it('deve aceitar imagens nos formatos jpeg, png e webp', () => {
+    const jpg = new File(['dummy'], 'photo.jpg', { type: 'image/jpeg' });
+    const webp = new File(['dummy'], 'photo.webp', { type: 'image/webp' });
+
+    expect(avatarFileSchema.safeParse(jpg).success).toBe(true);
+    expect(avatarFileSchema.safeParse(webp).success).toBe(true);
+  });
+
+  it('deve rejeitar arquivo maior que 5MB', () => {
+    const largeFile = new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'big.png', {
+      type: 'image/png',
+    });
+    const result = avatarFileSchema.safeParse(largeFile);
+    expect(result.success).toBe(false);
+
+    const validation = validateAvatarFile(largeFile);
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('5MB');
+  });
+
+  it('deve rejeitar formato de arquivo não suportado', () => {
+    const textFile = new File(['hello'], 'document.pdf', {
+      type: 'application/pdf',
+    });
+    const result = avatarFileSchema.safeParse(textFile);
+    expect(result.success).toBe(false);
+
+    const validation = validateAvatarFile(textFile);
+    expect(validation.valid).toBe(false);
+    expect(validation.error).toContain('Formato de imagem inválido');
+  });
+});
+
+describe('confirm2FASchema', () => {
+  it('deve validar com sucesso código de exatamente 6 dígitos numéricos', () => {
+    const result = confirm2FASchema.safeParse({ code: '123456' });
+    expect(result.success).toBe(true);
+  });
+
+  it('deve rejeitar código com menos ou mais de 6 dígitos ou contendo letras', () => {
+    expect(confirm2FASchema.safeParse({ code: '12345' }).success).toBe(false);
+    expect(confirm2FASchema.safeParse({ code: '1234567' }).success).toBe(false);
+    expect(confirm2FASchema.safeParse({ code: '12345a' }).success).toBe(false);
+  });
+});
+
+describe('disable2FASchema', () => {
+  it('deve aceitar formulário de desativação opcional', () => {
+    const result = disable2FASchema.safeParse({});
+    expect(result.success).toBe(true);
+  });
+
+  it('deve validar código de 6 dígitos se fornecido', () => {
+    expect(disable2FASchema.safeParse({ code: '654321' }).success).toBe(true);
+    expect(disable2FASchema.safeParse({ code: 'abc' }).success).toBe(false);
   });
 });
