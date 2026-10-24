@@ -1,13 +1,14 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 1.1.0 -> 1.2.0
 - List of modified principles:
-  - Added VII. Testes Automatizados Obrigatórios (Vitest & Testing Library)
+  - Added VIII. Gestão de Identidade, Autenticação Multifator (2FA) e Segurança de Sessão
+  - Added IX. Manipulação Segura de Mídias, Validação de Arquivos e Exportação
 - Added sections:
-  - Updated Arquitetura e Stack Técnica com stack de testes (Vitest + React Testing Library)
-  - Updated Padrões de Desenvolvimento com portão mandatória de testes (pnpm test)
+  - Updated Arquitetura e Stack Técnica com suporte a uploads multipart, Blobs e exportações (CSV, PDF, XLSX)
+  - Updated Padrões de Desenvolvimento com regras de portais para modais de confirmação crítica
 - Governance:
-  - Incremented MINOR version per semver policy (new core principle addition).
+  - Incremented MINOR version per semver policy (new core principles and capability expansions).
 - Follow-up TODOs:
   - None.
 -->
@@ -26,7 +27,7 @@ Sync Impact Report:
 - **Baseline do Projeto**: A IA e os desenvolvedores DEVEM obrigatoriamente inspecionar e respeitar o esqueleto pré-existente e as versões já instaladas no `package.json` (Next.js 16, React 19, Tailwind CSS v4, Lucide React, Shadcn). É proibido impor versões conflitantes ou reescrever a base do projeto. Novas dependências devem ser adicionadas apenas se essenciais e totalmente compatíveis.
 - **Single Responsibility Principle (SRP)**: Componentes visuais DEVEM se preocupar estritamente com renderização, acessibilidade e interatividade de interface. Lógica de negócios, chamadas de API e manipulação de estado complexo DEVEM residir isoladas em **Custom Hooks**.
 - **KISS (Keep It Simple, Stupid) & DRY (Don't Repeat Yourself)**: Evitar abstrações prematuras e acoplamento desnecessário. Criar componentes utilitários apenas quando houver duplicidade real de interface comprovada.
-- **Nomenclatura Significativa**: Variáveis, funções e componentes DEVEM ter nomes descritivos e autoexplicativos em inglês técnico padrão (ex: `useFinancialAnalysis`, `TransactionEditModal`, `CategoryDonutChart`).
+- **Nomenclatura Significativa**: Variáveis, funções e componentes DEVEM ter nomes descritivos e autoexplicativos em inglês técnico padrão (ex: `useFinancialAnalysis`, `TransactionEditModal`, `CategoryDonutChart`, `UserAvatarUploader`).
 - **Funções Pequenas e Puras**: Funções utilitárias e formatadores de moeda, porcentagem e data DEVEM ser puras, determinísticas e testáveis unitariamente de forma isolada.
 
 ### III. Gestão de Estado de IA e UX Resiliente BYOK (Bring Your Own Key)
@@ -42,7 +43,7 @@ Sync Impact Report:
 
 ### V. Camada de Dados Reativa com Cache Inteligente (TanStack Query)
 - Todas as operações de leitura (`GET`) DEVEM utilizar TanStack Query com políticas de cache explícitas (`staleTime`, `gcTime`).
-- Mutações (`POST`, `PATCH`, `PUT`) DEVEM disparar invalidação direcionada das chaves de query afetadas (`invalidateQueries`), mantendo o dashboard sincronizado sem recarregamento completo de página.
+- Mutações (`POST`, `PATCH`, `PUT`, `DELETE`) DEVEM disparar invalidação direcionada das chaves de query afetadas (`invalidateQueries`), mantendo o dashboard sincronizado sem recarregamento completo de página.
 
 ### VI. Segurança no Cliente e Privacidade por Design
 - Tokens JWT DEVEM ser armazenados de forma centralizada e anexados automaticamente nas requisições protegidas (`Authorization: Bearer <token>`).
@@ -54,6 +55,24 @@ Sync Impact Report:
 - As mutações e validações de regras de negócio DEVEM ser cobertas com cenários de sucesso e caminhos de erro antes da homologação da entrega.
 - Testes automatizados DEVEM ser executáveis localmente e no pipeline de integração contínua através do comando `pnpm test`.
 
+### VIII. Gestão de Identidade, Autenticação Multifator (2FA) e Segurança de Sessão
+- **Salvaguarda Contra Orfandade de Autenticação**: A interface DEVE impedir a desvinculação de conta externa (ex: Google OAuth) se esta for o único meio de autenticação ativo do usuário (sem senha cadastrada), prevenindo bloqueio permanente de acesso.
+- **Fluxo Robusto de 2FA**:
+  - A ativação do 2FA via e-mail DEVE exigir a confirmação bem-sucedida de um desafio OTP de 6 dígitos antes de marcar o status como ativo na interface.
+  - A desativação do 2FA DEVE exigir confirmação de segurança (diálogo com senha ou código de confirmação) para evitar desativação acidental ou não autorizada.
+- **Encerramento Seguro de Sessão (Logout)**:
+  - O logout DEVE invocar a rota de revogação de sessão no servidor (`POST /api/auth/logout`), expurgar tokens locais em cookies e `localStorage`, limpar os caches do TanStack Query e redirecionar imediatamente o usuário para `/login`.
+
+### IX. Manipulação Segura de Mídias, Validação de Arquivos e Exportação
+- **Upload e Gestão de Avatar**:
+  - Validação estrita no cliente de tamanho máximo (até 5MB) e tipos MIME autorizados (`image/jpeg`, `image/png`, `image/webp`).
+  - Preview imediato no navegador com liberação de recursos temporários (`URL.revokeObjectURL`) ao desmontar ou trocar de imagem.
+  - Fallback determinístico para avatar com iniciais do nome do usuário quando não houver foto cadastrada ou após a exclusão do avatar.
+- **Central de Exportação de Relatórios**:
+  - Download de arquivos (CSV, PDF, XLSX) gerados pelo backend via streams/Blobs binários utilizando o nome de arquivo canônico retornado nos headers (`Content-Disposition`) ou fallback determinístico formatado com data.
+  - Liberação mandatória de memória chamando `URL.revokeObjectURL` após o acionamento do elemento de download âncora.
+  - Bloqueio contra múltiplos cliques concorrentes com indicadores visuais de loading/progresso durante a geração do arquivo.
+
 ## Arquitetura e Stack Técnica
 
 - **Runtime & Framework**: Next.js 16 (App Router) e React 19 conforme definido no `package.json`.
@@ -61,13 +80,15 @@ Sync Impact Report:
 - **Estilização & Componentes**: Tailwind CSS v4, `@base-ui/react`, Lucide Icons, Shadcn e suporte a tema dark/light (`next-themes`).
 - **Gerenciamento de Estado de Servidor**: TanStack Query (`@tanstack/react-query`) para caching, sincronização e refetch reativo.
 - **Comunicação em Tempo Real**: Streams SSE nativos com `ReadableStream` e decodificação progressiva UTF-8 sem dependências externas pesadas.
+- **Mídias e Arquivos**: Suporte nativo a uploads multipart com validação client-side, manipulação de `Blob` para downloads e controle estrito de memória (`URL.createObjectURL` / `URL.revokeObjectURL`).
 - **Testes Automatizados**: Vitest e React Testing Library (`@testing-library/react`) configurados com ambiente DOM (`happy-dom` ou `jsdom`) para execução de testes unitários e testes de integração de componentes e hooks.
-- **Tipagens e Contratos Canônicos**: Centralizados em `src/types/api.ts` cobrindo Usuário, Autenticação, Transações, Métricas Financeiras e Chunks de Chat.
+- **Tipagens e Contratos Canônicos**: Centralizados em `src/types/api.ts` cobrindo Usuário, Autenticação, 2FA, Sessão, Exportações, Transações, Métricas Financeiras e Chunks de Chat.
 
 ## Padrões de Desenvolvimento e Validação de Qualidade
 
 - **Validação Estática**: Todo código produzido DEVE compilar com sucesso via `pnpm typecheck` (`tsc --noEmit`) e passar pelas regras de lint configuradas no projeto (`pnpm lint`).
 - **Validação de Testes**: Todo novo módulo ou funcionalidade DEVE ser submetido à validação de testes automatizados via `pnpm test`, sendo reprovada qualquer entrega que contenha quebras de testes existentes ou novas funcionalidades críticas sem cobertura.
+- **Portais para Diálogos Críticos**: Todos os modais (`Dialog`, `AlertDialog`) de exclusão de mídias, confirmação de desativação de 2FA e logout DEVEM renderizar via `createPortal(..., document.body)` para evitar problemas de sobreposição e herança de estilos CSS.
 - **Formatação de Código**: Manter conformidade com as regras do Prettier (`pnpm format`).
 - **Isolamento de Domínio**: Componentes de interface localizados em `components/`, hooks em `hooks/`, serviços de API em `services/`, tipos em `types/` e utilitários em `lib/` ou `utils/`.
 - **Tratamento de Exceções**: Todas as rotas de chamada externa DEVEM conter tratamento de erro amigável na interface com toasts informativos ou banners de fallback.
@@ -84,4 +105,4 @@ Sync Impact Report:
   - **MINOR**: Inclusão de novos princípios, seções ou expansões materiais das diretrizes.
   - **PATCH**: Refinamentos textuais, esclarecimentos e correções sem impacto nas regras de governança.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
+**Version**: 1.2.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-24
