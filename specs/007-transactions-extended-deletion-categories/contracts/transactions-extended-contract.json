@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransactionsExtendedAPIContract",
+  "description": "Contratos canônicos para exclusão atômica, 11 categorias e vinculação de contas em transações",
+  "endpoints": {
+    "deleteTransaction": {
+      "method": "DELETE",
+      "path": "/api/transactions/:id",
+      "headers": {
+        "Authorization": {
+          "type": "string",
+          "description": "Bearer token JWT",
+          "required": true
+        }
+      },
+      "params": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único da transação",
+          "required": true
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Transação excluída com sucesso",
+          "schema": {
+            "type": "object",
+            "required": ["success", "message"],
+            "properties": {
+              "success": { "type": "boolean", "const": true },
+              "message": { "type": "string" },
+              "deletedId": { "type": "string" }
+            }
+          }
+        },
+        "404": {
+          "description": "Transação não encontrada ou pertencente a outro usuário",
+          "schema": {
+            "type": "object",
+            "required": ["statusCode", "error", "message"],
+            "properties": {
+              "statusCode": { "type": "integer", "const": 404 },
+              "error": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "updateTransaction": {
+      "method": "PATCH",
+      "path": "/api/transactions/:id",
+      "headers": {
+        "Authorization": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "params": {
+        "id": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "body": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "Alimentação",
+              "Transporte",
+              "Moradia",
+              "Saúde",
+              "Lazer",
+              "Educação",
+              "Receita",
+              "Pagamento de Fatura",
+              "Investimentos",
+              "Outros",
+              "Não Categorizado"
+            ]
+          },
+          "cleanDescription": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "accountId": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Transação atualizada com sucesso"
+        }
+      }
+    },
+    "uploadTransactionsWithAccount": {
+      "method": "POST",
+      "path": "/api/transactions/upload",
+      "query": {
+        "accountId": {
+          "type": "string",
+          "required": false,
+          "description": "ID da conta à qual as transações do extrato serão vinculadas"
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Extrato processado com sucesso",
+          "schema": {
+            "type": "object",
+            "required": ["totalExtracted", "imported", "duplicatesIgnored"],
+            "properties": {
+              "totalExtracted": { "type": "integer" },
+              "imported": { "type": "integer" },
+              "duplicatesIgnored": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "listTransactionsWithAccountFilter": {
+      "method": "GET",
+      "path": "/api/transactions",
+      "query": {
+        "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
+        "category": { "type": "string" },
+        "source": { "type": "string", "enum": ["OFX", "CSV", "SEED"] },
+        "accountId": { "type": "string", "description": "Filtro por conta bancária" }
+      },
+      "responses": {
+        "200": {
+          "description": "Lista de transações recuperada com sucesso"
+        }
+      }
+    }
+  }
+}

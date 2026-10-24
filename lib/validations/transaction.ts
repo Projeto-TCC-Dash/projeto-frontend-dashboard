@@ -40,6 +40,7 @@ export const updateTransactionSchema = z.object({
   category: z.enum(CANONICAL_CATEGORIES, {
     message: "Selecione uma categoria canônica válida",
   }),
+  accountId: z.string().trim().nullable().optional(),
 });
 
 export type UpdateTransactionFormData = z.infer<typeof updateTransactionSchema>;

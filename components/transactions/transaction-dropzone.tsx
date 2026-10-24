@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { UploadCloud, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { UploadCloud, FileText, AlertCircle, Loader2, Building2 } from "lucide-react";
 import { validateStatementFile } from "@/lib/validations/transaction";
+import { useAccounts } from "@/hooks/use-accounts";
 
 export interface TransactionDropzoneProps {
-  onFileSelected: (file: File) => void;
+  onFileSelected: (file: File, accountId?: string) => void;
   isUploading?: boolean;
 }
 
@@ -15,7 +16,10 @@ export function TransactionDropzone({
 }: TransactionDropzoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [selectedAccountId, setSelectedAccountId] = React.useState<string>("");
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const { accounts } = useAccounts();
 
   const processFile = (file: File) => {
     setErrorMessage(null);
@@ -26,7 +30,7 @@ export function TransactionDropzone({
       return;
     }
 
-    onFileSelected(file);
+    onFileSelected(file, selectedAccountId ? selectedAccountId : undefined);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -84,7 +88,35 @@ export function TransactionDropzone({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Seletor de Conta Bancária de Origem */}
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="flex items-center gap-2">
+          <Building2 className="size-4 text-zinc-500 dark:text-zinc-400" />
+          <label
+            htmlFor="upload-account"
+            className="text-xs font-semibold text-zinc-700 dark:text-zinc-300"
+          >
+            Conta Bancária de Origem (opcional)
+          </label>
+        </div>
+        <select
+          id="upload-account"
+          aria-label="Conta Bancária de Origem"
+          value={selectedAccountId}
+          onChange={(e) => setSelectedAccountId(e.target.value)}
+          disabled={isUploading}
+          className="h-9 w-full sm:w-72 rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        >
+          <option value="">Sem conta vinculada / Padrão</option>
+          {accounts.map((acc) => (
+            <option key={acc.id} value={acc.id}>
+              {acc.name} ({acc.institution})
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div
         data-testid="transaction-dropzone"
         onDragOver={handleDragOver}

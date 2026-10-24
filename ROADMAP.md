@@ -9,7 +9,7 @@ Este documento estabelece o planejamento estratégico, arquitetura de componente
 | Versão | Status | Branches / Tags | Cobertura de Testes |
 |---|---|---|---|
 | **v1.0.0** | ✅ Concluída em Produção | Tag `v1.0.0` / Branch `master` | 151 testes unitários/integração verdes |
-| **v1.1.0** | 🚧 Em Planejamento e Execução | Branch `develop` | Em andamento via Spec-Kit |
+| **v1.1.0** | ✅ Features 005 a 008 Concluídas | Branch `feature/008-dashboard-invoice-segregation-profile` | 239 testes unitários/integração verdes |
 
 ### Histórico de Features Entregues (v1.0.0)
 - `specs/001-auth-shell-byok`: Autenticação JWT, Shell responsivo (Sidebar/Navbar), tema Dark/Light e modal BYOK Gemini.

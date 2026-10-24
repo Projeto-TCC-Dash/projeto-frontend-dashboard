@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import AccountsPage from "./page";
 import * as useAccountsModule from "@/hooks/use-accounts";
@@ -17,15 +17,15 @@ describe("AccountsPage", () => {
     vi.spyOn(useAccountsModule, "useCreateAccount").mockReturnValue({
       createAccount: mockCreateAccount,
       isPending: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useCreateAccount>);
     vi.spyOn(useAccountsModule, "useUpdateAccount").mockReturnValue({
       updateAccount: mockUpdateAccount,
       isPending: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useUpdateAccount>);
     vi.spyOn(useAccountsModule, "useDeleteAccount").mockReturnValue({
       deleteAccount: mockDeleteAccount,
       isPending: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useDeleteAccount>);
   });
 
   const mockAccounts: Account[] = [
@@ -59,7 +59,7 @@ describe("AccountsPage", () => {
       netWorth: 0,
       isLoading: true,
       isError: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useAccounts>);
 
     render(<AccountsPage />);
 
@@ -72,7 +72,7 @@ describe("AccountsPage", () => {
       netWorth: 1500,
       isLoading: false,
       isError: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useAccounts>);
 
     render(<AccountsPage />);
 
@@ -89,7 +89,7 @@ describe("AccountsPage", () => {
       netWorth: 1500,
       isLoading: false,
       isError: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useAccounts>);
 
     render(<AccountsPage />);
 
@@ -105,7 +105,7 @@ describe("AccountsPage", () => {
       netWorth: 1500,
       isLoading: false,
       isError: false,
-    } as any);
+    } as unknown as ReturnType<typeof useAccountsModule.useAccounts>);
 
     render(<AccountsPage />);
 

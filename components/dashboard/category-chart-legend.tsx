@@ -9,8 +9,10 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Transporte: "#3b82f6", // Blue
   Saúde: "#ef4444", // Rose
   Lazer: "#10b981", // Emerald
-  Educação: "#06b6d4", // Cyan
+  Educação: "#0284c7", // Sky Blue
   Receita: "#14b8a6", // Teal
+  "Pagamento de Fatura": "#64748b", // Slate
+  Investimentos: "#06b6d4", // Cyan
   Outros: "#64748b", // Slate
   "Não Categorizado": "#71717a", // Zinc
 };

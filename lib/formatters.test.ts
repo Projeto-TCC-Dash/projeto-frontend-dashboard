@@ -9,6 +9,7 @@ import {
   calculateSavingsRate,
   parseBrlToNumber,
   formatBrlCurrency,
+  computeEmergencyReserveGuideline,
 } from "./formatters";
 
 describe("formatters", () => {
@@ -154,6 +155,63 @@ describe("formatters", () => {
       expect(formatBrlCurrency(undefined)).toBe("");
       expect(formatBrlCurrency(null)).toBe("");
       expect(formatBrlCurrency(NaN)).toBe("");
+    });
+  });
+
+  describe("computeEmergencyReserveGuideline", () => {
+    it("calibra reserva de 3 a 6 meses para CLT", () => {
+      const guideline = computeEmergencyReserveGuideline("CLT", 3000);
+      expect(guideline.minMonths).toBe(3);
+      expect(guideline.maxMonths).toBe(6);
+      expect(guideline.minAmount).toBe(9000);
+      expect(guideline.maxAmount).toBe(18000);
+      expect(guideline.isCustomized).toBe(true);
+      expect(guideline.regimeLabel).toBe("CLT");
+      expect(guideline.monthsLabel).toBe("3 a 6 meses");
+      expect(guideline.formattedAmountRange.replace(/\u00A0/g, " ")).toMatch(/R\$\s?9\.000,00 a R\$\s?18\.000,00/);
+    });
+
+    it("calibra reserva de 3 a 6 meses para Servidor Público", () => {
+      const guideline = computeEmergencyReserveGuideline("PUBLIC_SERVANT", 4000);
+      expect(guideline.minMonths).toBe(3);
+      expect(guideline.maxMonths).toBe(6);
+      expect(guideline.regimeLabel).toBe("Servidor Público");
+    });
+
+    it("calibra reserva de 6 a 12 meses para PJ / Autônomo", () => {
+      const guideline = computeEmergencyReserveGuideline("PJ_AUTONOMO", 5000);
+      expect(guideline.minMonths).toBe(6);
+      expect(guideline.maxMonths).toBe(12);
+      expect(guideline.minAmount).toBe(30000);
+      expect(guideline.maxAmount).toBe(60000);
+      expect(guideline.isCustomized).toBe(true);
+      expect(guideline.regimeLabel).toBe("PJ / Autônomo");
+      expect(guideline.monthsLabel).toBe("6 a 12 meses");
+    });
+
+    it("calibra reserva de 6 a 12 meses para Empresário", () => {
+      const guideline = computeEmergencyReserveGuideline("ENTREPRENEUR", 6000);
+      expect(guideline.minMonths).toBe(6);
+      expect(guideline.maxMonths).toBe(12);
+      expect(guideline.regimeLabel).toBe("Empresário");
+    });
+
+    it("usa 6 meses como padrão de mercado quando regime não informado ou outro", () => {
+      const guideline = computeEmergencyReserveGuideline(undefined, 2000);
+      expect(guideline.minMonths).toBe(6);
+      expect(guideline.maxMonths).toBe(6);
+      expect(guideline.minAmount).toBe(12000);
+      expect(guideline.maxAmount).toBe(12000);
+      expect(guideline.isCustomized).toBe(false);
+      expect(guideline.monthsLabel).toBe("6 meses");
+      expect(guideline.formattedAmountRange.replace(/\u00A0/g, " ")).toMatch(/R\$\s?12\.000,00/);
+    });
+
+    it("lida com despesas zeradas ou negativas com segurança", () => {
+      const guideline = computeEmergencyReserveGuideline("CLT", 0);
+      expect(guideline.minAmount).toBe(0);
+      expect(guideline.maxAmount).toBe(0);
+      expect(guideline.formattedAmountRange).toBe("");
     });
   });
 });

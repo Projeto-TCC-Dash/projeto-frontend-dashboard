@@ -1,9 +1,48 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { TransactionDropzone } from "./transaction-dropzone";
+import * as useAccountsModule from "@/hooks/use-accounts";
+import type { Account } from "@/src/types/api";
+
+vi.mock("@/hooks/use-accounts");
 
 describe("TransactionDropzone component", () => {
+  const mockAccounts: Account[] = [
+    {
+      id: "acc-1",
+      name: "Nubank",
+      type: "CHECKING",
+      balance: 2000,
+      initialBalance: 1000,
+      institution: "Nu",
+      color: "#8B5CF6",
+      createdAt: "2026-10-19T10:00:00Z",
+      updatedAt: "2026-10-19T10:00:00Z",
+    },
+    {
+      id: "acc-2",
+      name: "Cartão XP",
+      type: "CREDIT_CARD",
+      balance: -500,
+      initialBalance: 0,
+      institution: "XP",
+      color: "#06B6D4",
+      createdAt: "2026-10-19T10:00:00Z",
+      updatedAt: "2026-10-19T10:00:00Z",
+    },
+  ];
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(useAccountsModule, "useAccounts").mockReturnValue({
+      accounts: mockAccounts,
+      netWorth: 1500,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useAccountsModule.useAccounts>);
+  });
+
   it("renders upload instructions and accepted formats", () => {
     render(<TransactionDropzone onFileSelected={vi.fn()} isUploading={false} />);
 
@@ -12,7 +51,16 @@ describe("TransactionDropzone component", () => {
     expect(screen.getByText(/Até 10MB/i)).toBeDefined();
   });
 
-  it("handles valid file drop and triggers onFileSelected", () => {
+  it("renders account selector with default option and user accounts", () => {
+    render(<TransactionDropzone onFileSelected={vi.fn()} isUploading={false} />);
+
+    expect(screen.getByLabelText(/Conta Bancária de Origem/i)).toBeDefined();
+    expect(screen.getByRole("option", { name: /Sem conta vinculada/i })).toBeDefined();
+    expect(screen.getByRole("option", { name: /Nubank \(Nu\)/i })).toBeDefined();
+    expect(screen.getByRole("option", { name: /Cartão XP \(XP\)/i })).toBeDefined();
+  });
+
+  it("handles valid file drop and triggers onFileSelected without accountId when unselected", () => {
     const onFileSelected = vi.fn();
     render(<TransactionDropzone onFileSelected={onFileSelected} isUploading={false} />);
 
@@ -27,7 +75,28 @@ describe("TransactionDropzone component", () => {
       },
     });
 
-    expect(onFileSelected).toHaveBeenCalledWith(file);
+    expect(onFileSelected).toHaveBeenCalledWith(file, undefined);
+  });
+
+  it("triggers onFileSelected with file and accountId when an account is selected", () => {
+    const onFileSelected = vi.fn();
+    render(<TransactionDropzone onFileSelected={onFileSelected} isUploading={false} />);
+
+    const select = screen.getByLabelText(/Conta Bancária de Origem/i);
+    fireEvent.change(select, { target: { value: "acc-1" } });
+
+    const dropzone = screen.getByTestId("transaction-dropzone");
+    const file = new File(["dummy content"], "extrato.ofx", {
+      type: "application/x-ofx",
+    });
+
+    fireEvent.drop(dropzone, {
+      dataTransfer: {
+        files: [file],
+      },
+    });
+
+    expect(onFileSelected).toHaveBeenCalledWith(file, "acc-1");
   });
 
   it("rejects multiple files dropped simultaneously", () => {

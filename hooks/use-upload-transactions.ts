@@ -4,21 +4,38 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api-client";
 import { UploadTransactionsResponse } from "@/src/types/api";
 
+export type UploadTransactionsInput =
+  | File
+  | { file: File; accountId?: string };
+
 export function useUploadTransactions() {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<UploadTransactionsResponse, Error, File>({
-    mutationFn: async (file: File) => {
+  const mutation = useMutation<
+    UploadTransactionsResponse,
+    Error,
+    UploadTransactionsInput
+  >({
+    mutationFn: async (input: UploadTransactionsInput) => {
+      const file = input instanceof File ? input : input.file;
+      const accountId = input instanceof File ? undefined : input.accountId;
+
       const formData = new FormData();
       formData.append("file", file);
 
-      return apiRequest<UploadTransactionsResponse>("/api/transactions/upload", {
+      const url = accountId
+        ? `/api/transactions/upload?accountId=${encodeURIComponent(accountId)}`
+        : "/api/transactions/upload";
+
+      return apiRequest<UploadTransactionsResponse>(url, {
         method: "POST",
         body: formData,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["analysis"] });
     },
   });
 

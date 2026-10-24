@@ -62,6 +62,51 @@ describe("transaction validations", () => {
       expect(parsed.success).toBe(true);
     });
 
+    it("accepts new canonical categories: Pagamento de Fatura and Investimentos", () => {
+      const faturaParsed = updateTransactionSchema.safeParse({
+        cleanDescription: "Pagamento fatura Nubank",
+        category: "Pagamento de Fatura",
+      });
+      expect(faturaParsed.success).toBe(true);
+
+      const investParsed = updateTransactionSchema.safeParse({
+        cleanDescription: "Aporte Tesouro Direto",
+        category: "Investimentos",
+      });
+      expect(investParsed.success).toBe(true);
+    });
+
+    it("accepts accountId as string, null, or undefined", () => {
+      const withAccount = updateTransactionSchema.safeParse({
+        cleanDescription: "Mercado",
+        category: "Alimentação",
+        accountId: "acc-123456",
+      });
+      expect(withAccount.success).toBe(true);
+      if (withAccount.success) {
+        expect(withAccount.data.accountId).toBe("acc-123456");
+      }
+
+      const withNullAccount = updateTransactionSchema.safeParse({
+        cleanDescription: "Mercado",
+        category: "Alimentação",
+        accountId: null,
+      });
+      expect(withNullAccount.success).toBe(true);
+      if (withNullAccount.success) {
+        expect(withNullAccount.data.accountId).toBeNull();
+      }
+
+      const withoutAccount = updateTransactionSchema.safeParse({
+        cleanDescription: "Mercado",
+        category: "Alimentação",
+      });
+      expect(withoutAccount.success).toBe(true);
+      if (withoutAccount.success) {
+        expect(withoutAccount.data.accountId).toBeUndefined();
+      }
+    });
+
     it("rejects empty cleanDescription", () => {
       const parsed = updateTransactionSchema.safeParse({
         cleanDescription: "   ",
