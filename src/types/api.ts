@@ -1,5 +1,5 @@
 // ==========================================
-// CATEGORIAS CANÔNICAS (9 Categorias Oficiais)
+// CATEGORIAS CANÔNICAS (11 Categorias Oficiais)
 // ==========================================
 export const CANONICAL_CATEGORIES = [
   'Alimentação',
@@ -9,6 +9,8 @@ export const CANONICAL_CATEGORIES = [
   'Lazer',
   'Educação',
   'Receita',
+  'Pagamento de Fatura',
+  'Investimentos',
   'Outros',
   'Não Categorizado',
 ] as const;
@@ -61,8 +63,91 @@ export interface AuthSession {
 }
 
 // ==========================================
-// TRANSAÇÕES (Features Futuras)
+// PERFIL FINANCEIRO DO USUÁRIO (ONBOARDING)
 // ==========================================
+export const INCOME_TYPES = [
+  'CLT',
+  'PJ_AUTONOMO',
+  'PUBLIC_SERVANT',
+  'ENTREPRENEUR',
+  'STUDENT',
+  'RETIRED',
+  'OTHER',
+] as const;
+export type IncomeType = (typeof INCOME_TYPES)[number];
+
+export const INCOME_TYPE_LABELS: Record<IncomeType, string> = {
+  CLT: 'CLT (Carteira Assinada)',
+  PJ_AUTONOMO: 'PJ / Autônomo / Freelancer',
+  PUBLIC_SERVANT: 'Servidor Público',
+  ENTREPRENEUR: 'Empresário / Sócio',
+  STUDENT: 'Estudante / Estagiário',
+  RETIRED: 'Aposentado / Pensionista',
+  OTHER: 'Outro',
+};
+
+export const FINANCIAL_GOALS = [
+  'RESERVA_EMERGENCIA',
+  'QUITAR_DIVIDAS',
+  'COMPRAR_IMOVEL',
+  'INVESTIR_LONGO_PRAZO',
+  'CONTROLE_GASTOS',
+] as const;
+export type FinancialGoal = (typeof FINANCIAL_GOALS)[number];
+
+export const FINANCIAL_GOAL_LABELS: Record<FinancialGoal, string> = {
+  RESERVA_EMERGENCIA: 'Criar / Expandir Reserva de Emergência',
+  QUITAR_DIVIDAS: 'Quitar Dívidas e Empréstimos',
+  COMPRAR_IMOVEL: 'Comprar Imóvel / Casa Própria',
+  INVESTIR_LONGO_PRAZO: 'Investir para Longo Prazo / Independência',
+  CONTROLE_GASTOS: 'Controlar Gastos Supérfluos e Orçamento',
+};
+
+export const RISK_PROFILES = [
+  'CONSERVATIVE',
+  'MODERATE',
+  'AGGRESSIVE',
+] as const;
+export type RiskProfile = (typeof RISK_PROFILES)[number];
+
+export const RISK_PROFILE_LABELS: Record<RiskProfile, string> = {
+  CONSERVATIVE: 'Conservador (prioriza segurança e liquidez)',
+  MODERATE: 'Moderado (equilíbrio entre segurança e rentabilidade)',
+  AGGRESSIVE: 'Agressivo (foco em crescimento com tolerância à oscilação)',
+};
+
+export interface FinancialProfile {
+  incomeType?: IncomeType;
+  declaredMonthlyIncome?: number;
+  goals?: FinancialGoal[];
+  riskProfile?: RiskProfile;
+  updatedAt?: string;
+}
+
+export interface UserProfileResponse {
+  id: string;
+  email: string;
+  hasAiKey: boolean;
+  financialProfile?: FinancialProfile;
+}
+
+export interface UpdateFinancialProfileDTO {
+  incomeType?: IncomeType;
+  declaredMonthlyIncome?: number;
+  goals?: FinancialGoal[];
+  riskProfile?: RiskProfile;
+}
+
+// ==========================================
+// TRANSAÇÕES
+// ==========================================
+export interface TransactionAccountSummary {
+  id: string;
+  name: string;
+  color?: string;
+  institution?: string;
+}
+
 export interface Transaction {
   id: string;
   externalId: string;
@@ -72,6 +157,8 @@ export interface Transaction {
   date: string; // ISO 8601 UTC
   category: Category;
   source: TransactionSource;
+  accountId?: string;
+  account?: TransactionAccountSummary;
 }
 
 export interface UploadTransactionsResponse {
@@ -83,6 +170,14 @@ export interface UploadTransactionsResponse {
 export interface UpdateTransactionDTO {
   category?: Category;
   cleanDescription?: string;
+  accountId?: string | null;
+}
+
+export interface TransactionFilterParams {
+  month?: string;
+  category?: Category;
+  source?: TransactionSource;
+  accountId?: string;
 }
 
 export interface CategorizeResponse {
@@ -102,6 +197,7 @@ export interface CategoryMetric {
 export interface FinancialMetrics {
   totalIncome: number;
   totalExpenses: number;
+  invoiceSettlements?: number;
   netBalance: number;
   savingsRate: number; // Em percentual (ex: 35.5%)
   topCategories: CategoryMetric[];
@@ -144,3 +240,71 @@ export interface ChatStreamChunk {
   code?: string;
   statusCode?: number;
 }
+
+// ==========================================
+// GESTÃO MULTICONTA E CARTÕES DE CRÉDITO (Feature 006)
+// ==========================================
+export const ACCOUNT_TYPES = [
+  'CHECKING',
+  'CREDIT_CARD',
+  'INVESTMENT',
+  'CASH',
+  'OTHER',
+] as const;
+
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  CHECKING: 'Conta Corrente',
+  CREDIT_CARD: 'Cartão de Crédito',
+  INVESTMENT: 'Investimentos',
+  CASH: 'Dinheiro em Espécie',
+  OTHER: 'Outras Contas',
+};
+
+export const ACCOUNT_TYPE_ICONS: Record<AccountType, string> = {
+  CHECKING: 'Landmark',
+  CREDIT_CARD: 'CreditCard',
+  INVESTMENT: 'TrendingUp',
+  CASH: 'Banknote',
+  OTHER: 'Wallet',
+};
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  balance: number;
+  initialBalance: number;
+  institution?: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AccountsOverview {
+  accounts: Account[];
+  netWorth: number;
+}
+
+export interface CreateAccountDTO {
+  name: string;
+  type: AccountType;
+  initialBalance?: number;
+  institution?: string;
+  color?: string;
+}
+
+export interface UpdateAccountDTO {
+  name?: string;
+  type?: AccountType;
+  initialBalance?: number;
+  institution?: string;
+  color?: string;
+}
+
+export interface DeleteAccountParams {
+  id: string;
+  cascade?: boolean;
+}
+

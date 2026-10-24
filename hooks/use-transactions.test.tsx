@@ -109,6 +109,35 @@ describe("useTransactions Hook", () => {
     );
   });
 
+  it("includes accountId in query params and query key when provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ "content-type": "application/json" }),
+      json: async () => [mockTransactions[0]],
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { result } = renderHook(
+      () =>
+        useTransactions({
+          month: "2026-10",
+          accountId: "acc-nubank",
+        }),
+      { wrapper }
+    );
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /\/api\/transactions\?.*month=2026-10.*accountId=acc-nubank/
+      ),
+      expect.anything()
+    );
+  });
+
   it("handles fetch error gracefully", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,

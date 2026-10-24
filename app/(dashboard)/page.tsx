@@ -3,8 +3,10 @@
 import * as React from "react";
 import { getCurrentYearMonth } from "@/lib/formatters";
 import { useAuth } from "@/hooks/use-auth";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { useFinancialAnalysis } from "@/hooks/use-financial-analysis";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { ProfileOnboardingBanner } from "@/components/profile/profile-onboarding-banner";
 import { MetricCardsGrid } from "@/components/dashboard/metric-cards-grid";
 import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart";
 import { AiDiagnosisCard } from "@/components/dashboard/ai-diagnosis-card";
@@ -14,6 +16,12 @@ export default function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = React.useState<string>(getCurrentYearMonth());
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState<boolean>(false);
   const { user } = useAuth();
+  const { data: userProfile } = useUserProfile();
+
+  const hasFinancialProfile = Boolean(
+    userProfile?.financialProfile?.incomeType ||
+      (userProfile?.financialProfile?.goals && userProfile.financialProfile.goals.length > 0)
+  );
 
   const {
     metrics,
@@ -34,6 +42,9 @@ export default function DashboardPage() {
         hasAiKey={user?.hasAiKey ?? true}
       />
 
+      {/* Banner de Onboarding de Perfil Financeiro Voluntário */}
+      <ProfileOnboardingBanner hasProfile={hasFinancialProfile} />
+
       {/* Grid de Resumo Financeiro (KPIs Consolidados) */}
       <MetricCardsGrid metrics={metrics} isLoading={isLoading} />
 
@@ -44,7 +55,7 @@ export default function DashboardPage() {
         isLoading={isLoading}
       />
 
-      {/* Card de Diagnóstico IA */}
+      {/* Card de Diagnóstico IA Calibrado */}
       <AiDiagnosisCard
         analysis={analysis}
         isLoading={isLoading}
@@ -54,6 +65,8 @@ export default function DashboardPage() {
         hasAiKey={user?.hasAiKey ?? true}
         onRefresh={() => void refreshAnalysis()}
         onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
+        financialProfile={userProfile?.financialProfile}
+        monthlyExpenses={metrics?.totalExpenses}
       />
 
       {/* Modal de Configuração de Chave Gemini (BYOK) */}

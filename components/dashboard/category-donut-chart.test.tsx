@@ -79,4 +79,21 @@ describe("CategoryDonutChart Component", () => {
       "/transactions?month=2026-10&category=Transporte"
     );
   });
+
+  it("renders new canonical categories with official semantic colors", () => {
+    const extendedCategories: CategoryMetric[] = [
+      { category: "Investimentos", amount: 3000, percentage: 60 },
+      { category: "Pagamento de Fatura", amount: 2000, percentage: 40 },
+    ];
+
+    render(<CategoryDonutChart categories={extendedCategories} month="2026-10" />);
+
+    const investSlice = screen.getByTestId("donut-slice-Investimentos");
+    expect(investSlice).toBeInTheDocument();
+    expect(investSlice).toHaveAttribute("fill", "#06b6d4");
+
+    const invoiceSlice = screen.getByTestId("donut-slice-Pagamento de Fatura");
+    expect(invoiceSlice).toBeInTheDocument();
+    expect(invoiceSlice).toHaveAttribute("fill", "#64748b");
+  });
 });

@@ -1,23 +1,60 @@
 "use client";
 
 import * as React from "react";
-import { Edit2, ArrowDownRight, ArrowUpRight, Inbox, Loader2 } from "lucide-react";
+import { Edit2, Trash2, ArrowDownRight, ArrowUpRight, Inbox, Loader2 } from "lucide-react";
 import { Transaction } from "@/src/types/api";
 import { formatCurrencyBRL, formatDateBR } from "@/lib/formatters";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { TransactionDeleteDialog } from "./transaction-delete-dialog";
+import { useDeleteTransaction } from "@/hooks/use-delete-transaction";
 
 export interface TransactionTableProps {
   transactions: Transaction[];
   isLoading?: boolean;
   onEdit?: (transaction: Transaction) => void;
+  onDelete?: (transaction: Transaction) => void;
+}
+
+export function getCategoryBadgeClass(category: string): string {
+  switch (category) {
+    case "Alimentação":
+      return "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200 dark:border-amber-800/50";
+    case "Transporte":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200 dark:border-blue-800/50";
+    case "Moradia":
+      return "bg-purple-100 text-purple-800 dark:bg-purple-950/50 dark:text-purple-300 border-purple-200 dark:border-purple-800/50";
+    case "Saúde":
+      return "bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border-red-200 dark:border-red-800/50";
+    case "Lazer":
+      return "bg-pink-100 text-pink-800 dark:bg-pink-950/50 dark:text-pink-300 border-pink-200 dark:border-pink-800/50";
+    case "Educação":
+      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50";
+    case "Receita":
+      return "bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border-green-200 dark:border-green-800/50";
+    case "Pagamento de Fatura":
+      return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700";
+    case "Investimentos":
+      return "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/50 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800/50";
+    case "Outros":
+      return "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700";
+    case "Não Categorizado":
+    default:
+      return "bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-300 border-orange-300 dark:border-orange-800/50";
+  }
 }
 
 export function TransactionTable({
   transactions,
   isLoading = false,
   onEdit,
+  onDelete,
 }: TransactionTableProps) {
+  const [txToDelete, setTxToDelete] = React.useState<Transaction | null>(null);
+  const { deleteTransaction, isDeleting } = useDeleteTransaction();
+
+  const handleDeleteConfirm = async (id: string) => {
+    await deleteTransaction(id);
+  };
   if (isLoading) {
     return (
       <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-950">
@@ -54,6 +91,7 @@ export function TransactionTable({
               <th scope="col" className="px-4 py-3 sm:px-6">Data</th>
               <th scope="col" className="px-4 py-3 sm:px-6">Descrição</th>
               <th scope="col" className="px-4 py-3 sm:px-6">Categoria</th>
+              <th scope="col" className="px-4 py-3 sm:px-6">Conta</th>
               <th scope="col" className="px-4 py-3 sm:px-6">Origem</th>
               <th scope="col" className="px-4 py-3 text-right sm:px-6">Valor</th>
               <th scope="col" className="px-4 py-3 text-center sm:px-6">Ações</th>
@@ -91,12 +129,31 @@ export function TransactionTable({
 
                   {/* Categoria */}
                   <td className="whitespace-nowrap px-4 py-3.5 sm:px-6">
-                    <Badge
-                      variant={tx.category === "Não Categorizado" ? "outline" : "secondary"}
-                      className="text-xs"
+                    <span
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${getCategoryBadgeClass(
+                        tx.category
+                      )}`}
                     >
                       {tx.category}
-                    </Badge>
+                    </span>
+                  </td>
+
+                  {/* Conta */}
+                  <td className="whitespace-nowrap px-4 py-3.5 sm:px-6">
+                    {tx.account ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+                        <span
+                          className="size-2 rounded-full shrink-0"
+                          style={{ backgroundColor: tx.account.color || "#64748B" }}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate max-w-[120px]">
+                          {tx.account.name || tx.account.institution}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-xs text-zinc-400 dark:text-zinc-600">—</span>
+                    )}
                   </td>
 
                   {/* Origem */}
@@ -126,18 +183,36 @@ export function TransactionTable({
 
                   {/* Ações */}
                   <td className="whitespace-nowrap px-4 py-3.5 text-center sm:px-6">
-                    {onEdit && (
+                    <div className="flex items-center justify-center gap-1">
+                      {onEdit && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Editar transação"
+                          onClick={() => onEdit(tx)}
+                          className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        aria-label="Editar transação"
-                        onClick={() => onEdit(tx)}
-                        className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        aria-label="Excluir transação"
+                        onClick={() => {
+                          if (onDelete) {
+                            onDelete(tx);
+                          } else {
+                            setTxToDelete(tx);
+                          }
+                        }}
+                        className="h-8 w-8 text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
                       >
-                        <Edit2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
-                    )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -145,6 +220,14 @@ export function TransactionTable({
           </tbody>
         </table>
       </div>
+
+      <TransactionDeleteDialog
+        isOpen={Boolean(txToDelete)}
+        transaction={txToDelete}
+        onClose={() => setTxToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

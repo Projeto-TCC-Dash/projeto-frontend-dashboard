@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, User as UserIcon } from "lucide-react";
@@ -12,12 +13,16 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-muted/50 border border-border/50 text-xs text-muted-foreground">
+      <Link
+        href="/settings/profile"
+        className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border/50 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        title="Meu Perfil Financeiro"
+      >
         <UserIcon className="size-3.5 text-foreground" />
-        <span className="font-medium text-foreground max-w-[160px] truncate" title={user.email}>
+        <span className="font-medium text-foreground max-w-[160px] truncate">
           {user.email}
         </span>
-      </div>
+      </Link>
 
       <Button
         variant="ghost"

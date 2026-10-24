@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UserProfileContract",
+  "description": "Contrato OpenAPI/JSON Schema dos endpoints de Perfil de Usuário e Perfil Financeiro",
+  "endpoints": {
+    "getProfile": {
+      "method": "GET",
+      "path": "/api/user/profile",
+      "headers": {
+        "Authorization": "Bearer <TOKEN_JWT>"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "type": "object",
+          "required": ["id", "email", "hasAiKey"],
+          "properties": {
+            "id": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "hasAiKey": { "type": "boolean" },
+            "financialProfile": {
+              "type": "object",
+              "properties": {
+                "incomeType": {
+                  "type": "string",
+                  "enum": ["CLT", "PJ_AUTONOMO", "PUBLIC_SERVANT", "ENTREPRENEUR", "STUDENT", "RETIRED", "OTHER"]
+                },
+                "declaredMonthlyIncome": { "type": "number", "minimum": 0 },
+                "goals": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["RESERVA_EMERGENCIA", "QUITAR_DIVIDAS", "COMPRAR_IMOVEL", "INVESTIR_LONGO_PRAZO", "CONTROLE_GASTOS"]
+                  }
+                },
+                "riskProfile": {
+                  "type": "string",
+                  "enum": ["CONSERVATIVE", "MODERATE", "AGGRESSIVE"]
+                },
+                "updatedAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "updateProfile": {
+      "method": "PUT",
+      "path": "/api/user/profile",
+      "headers": {
+        "Authorization": "Bearer <TOKEN_JWT>",
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "type": "object",
+          "properties": {
+            "incomeType": {
+              "type": "string",
+              "enum": ["CLT", "PJ_AUTONOMO", "PUBLIC_SERVANT", "ENTREPRENEUR", "STUDENT", "RETIRED", "OTHER"]
+            },
+            "declaredMonthlyIncome": { "type": "number", "minimum": 0 },
+            "goals": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["RESERVA_EMERGENCIA", "QUITAR_DIVIDAS", "COMPRAR_IMOVEL", "INVESTIR_LONGO_PRAZO", "CONTROLE_GASTOS"]
+              }
+            },
+            "riskProfile": {
+              "type": "string",
+              "enum": ["CONSERVATIVE", "MODERATE", "AGGRESSIVE"]
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "$ref": "#/endpoints/getProfile/response/body"
+        }
+      }
+    }
+  }
+}

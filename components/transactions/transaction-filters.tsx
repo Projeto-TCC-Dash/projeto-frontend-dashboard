@@ -5,15 +5,18 @@ import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { CANONICAL_CATEGORIES, TRANSACTION_SOURCES, Category, TransactionSource } from "@/src/types/api";
 import { shiftYearMonth } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
+import { useAccounts } from "@/hooks/use-accounts";
 
 export interface TransactionFiltersProps {
   month: string;
   category?: Category;
   source?: TransactionSource;
+  accountId?: string;
   onFilterChange: (filters: {
     month: string;
     category?: Category;
     source?: TransactionSource;
+    accountId?: string;
   }) => void;
 }
 
@@ -21,13 +24,17 @@ export function TransactionFilters({
   month,
   category,
   source,
+  accountId,
   onFilterChange,
 }: TransactionFiltersProps) {
+  const { accounts } = useAccounts();
+
   const handlePrevMonth = () => {
     onFilterChange({
       month: shiftYearMonth(month, -1),
       category,
       source,
+      accountId,
     });
   };
 
@@ -36,6 +43,7 @@ export function TransactionFilters({
       month: shiftYearMonth(month, 1),
       category,
       source,
+      accountId,
     });
   };
 
@@ -45,6 +53,7 @@ export function TransactionFilters({
         month: e.target.value,
         category,
         source,
+        accountId,
       });
     }
   };
@@ -55,6 +64,7 @@ export function TransactionFilters({
       month,
       category: val ? (val as Category) : undefined,
       source,
+      accountId,
     });
   };
 
@@ -64,6 +74,17 @@ export function TransactionFilters({
       month,
       category,
       source: val ? (val as TransactionSource) : undefined,
+      accountId,
+    });
+  };
+
+  const handleAccountSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    onFilterChange({
+      month,
+      category,
+      source,
+      accountId: val ? val : undefined,
     });
   };
 
@@ -72,6 +93,7 @@ export function TransactionFilters({
       month,
       category: undefined,
       source: undefined,
+      accountId: undefined,
     });
   };
 
@@ -165,10 +187,34 @@ export function TransactionFilters({
             ))}
           </select>
         </div>
+
+        {/* Dropdown de Conta Bancária */}
+        <div className="flex flex-col gap-1.5 min-w-[150px]">
+          <label
+            htmlFor="filter-account"
+            className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
+          >
+            Conta Bancária
+          </label>
+          <select
+            id="filter-account"
+            value={accountId ?? ""}
+            onChange={handleAccountSelect}
+            aria-label="Conta Bancária"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          >
+            <option value="">Todas as contas</option>
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id}>
+                {acc.name} ({acc.institution})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Botão limpar filtros caso algum esteja ativo */}
-      {(category || source) && (
+      {(category || source || accountId) && (
         <Button
           type="button"
           variant="ghost"
