@@ -9,13 +9,15 @@ import {
   Lightbulb,
   CheckCircle2,
   Clock,
+  ShieldCheck,
+  Target,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FinancialAnalysis } from "@/src/types/api";
+import { FinancialAnalysis, FinancialProfile, FINANCIAL_GOAL_LABELS } from "@/src/types/api";
 import { MarkdownRenderer } from "@/lib/markdown-renderer";
-import { formatDateBR } from "@/lib/formatters";
+import { formatDateBR, computeEmergencyReserveGuideline } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 export interface AiDiagnosisCardProps {
@@ -28,6 +30,8 @@ export interface AiDiagnosisCardProps {
   error?: Error | null;
   onRetry?: () => void;
   className?: string;
+  financialProfile?: FinancialProfile | null;
+  monthlyExpenses?: number;
 }
 
 export function AiDiagnosisCard({
@@ -40,6 +44,8 @@ export function AiDiagnosisCard({
   error,
   onRetry,
   className,
+  financialProfile,
+  monthlyExpenses,
 }: AiDiagnosisCardProps) {
   // 1. Estado quando o usuário não possui chave de IA configurada (BYOK Fallback)
   if (!hasAiKey) {
@@ -194,6 +200,10 @@ export function AiDiagnosisCard({
   }
 
   // 5. Exibição Completa do Parecer e Recomendações
+  const expenses = analysis.metrics?.totalExpenses ?? monthlyExpenses ?? 0;
+  const guideline = computeEmergencyReserveGuideline(financialProfile?.incomeType, expenses);
+  const activeGoals = financialProfile?.goals ?? [];
+
   return (
     <Card
       className={cn("border-border overflow-hidden transition-all duration-200", className)}
@@ -243,6 +253,45 @@ export function AiDiagnosisCard({
       </CardHeader>
 
       <CardContent className="pt-5 space-y-6">
+        {/* Diretriz Calibrada de Reserva de Emergência sob Medida */}
+        <div
+          className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 sm:p-5 space-y-2"
+          data-testid="emergency-reserve-guideline"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+              <ShieldCheck className="size-4 text-sky-500" />
+              <span>Diretriz de Reserva de Emergência sob Medida</span>
+            </div>
+            <Badge variant="outline" className="border-sky-500/30 text-sky-700 dark:text-sky-300 bg-sky-500/10 text-xs">
+              {guideline.regimeLabel} • Meta: {guideline.monthsLabel}
+            </Badge>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            {guideline.isCustomized ? (
+              <>
+                Com base no seu perfil ({guideline.regimeLabel}), a meta prudencial recomendada é de{" "}
+                <span className="font-semibold text-foreground">{guideline.monthsLabel}</span> de despesas de consumo
+                {guideline.formattedAmountRange ? (
+                  <>
+                    {" "}(faixa estimada: <span className="font-mono font-semibold text-sky-600 dark:text-sky-400">{guideline.formattedAmountRange}</span>)
+                  </>
+                ) : null}.
+              </>
+            ) : (
+              <>
+                Adotando a média prudencial de mercado de{" "}
+                <span className="font-semibold text-foreground">6 meses</span> de gastos
+                {guideline.formattedAmountRange ? (
+                  <>
+                    {" "}(faixa estimada: <span className="font-mono font-semibold text-sky-600 dark:text-sky-400">{guideline.formattedAmountRange}</span>)
+                  </>
+                ) : null}. Personalize seu regime em Configurações &gt; Perfil Financeiro.
+              </>
+            )}
+          </p>
+        </div>
+
         {/* Texto do Parecer em Markdown Sanitizado */}
         <div className="prose prose-sm dark:prose-invert max-w-none" data-testid="diagnosis-markdown-content">
           <MarkdownRenderer content={analysis.diagnosis} />
@@ -254,9 +303,22 @@ export function AiDiagnosisCard({
             className="rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5 space-y-3"
             data-testid="diagnosis-recommendations-section"
           >
-            <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
-              <Lightbulb className="size-4 text-amber-500" />
-              <span>Recomendações Práticas para o seu Orçamento</span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+                <Lightbulb className="size-4 text-amber-500" />
+                <span>Recomendações Práticas para o seu Orçamento</span>
+              </div>
+              {activeGoals.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5" data-testid="user-active-goals-chips">
+                  <span className="text-[11px] text-muted-foreground mr-1">Metas ativas:</span>
+                  {activeGoals.map((goal) => (
+                    <Badge key={goal} variant="secondary" className="text-[10px] px-2 py-0.5 font-normal">
+                      <Target className="size-3 mr-1 text-primary" />
+                      {FINANCIAL_GOAL_LABELS[goal] || goal}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             <ul className="grid gap-2 sm:grid-cols-1">
               {analysis.recommendations.map((rec, index) => (

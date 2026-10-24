@@ -55,7 +55,7 @@ export default function DashboardPage() {
         isLoading={isLoading}
       />
 
-      {/* Card de Diagnóstico IA */}
+      {/* Card de Diagnóstico IA Calibrado */}
       <AiDiagnosisCard
         analysis={analysis}
         isLoading={isLoading}
@@ -65,6 +65,8 @@ export default function DashboardPage() {
         hasAiKey={user?.hasAiKey ?? true}
         onRefresh={() => void refreshAnalysis()}
         onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
+        financialProfile={userProfile?.financialProfile}
+        monthlyExpenses={metrics?.totalExpenses}
       />
 
       {/* Modal de Configuração de Chave Gemini (BYOK) */}

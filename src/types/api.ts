@@ -197,6 +197,7 @@ export interface CategoryMetric {
 export interface FinancialMetrics {
   totalIncome: number;
   totalExpenses: number;
+  invoiceSettlements?: number;
   netBalance: number;
   savingsRate: number; // Em percentual (ex: 35.5%)
   topCategories: CategoryMetric[];

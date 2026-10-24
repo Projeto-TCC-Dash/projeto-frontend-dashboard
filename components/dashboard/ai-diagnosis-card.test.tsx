@@ -123,4 +123,74 @@ describe("AiDiagnosisCard Component", () => {
 
     expect(screen.getByTestId("ai-diagnosis-card-loading")).toBeInTheDocument();
   });
+
+  it("renders calibrated emergency reserve guideline for CLT profile with calculated amounts", () => {
+    render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        financialProfile={{
+          incomeType: "CLT",
+          declaredMonthlyIncome: 10000,
+          goals: ["RESERVA_EMERGENCIA"],
+        }}
+      />
+    );
+
+    const guideline = screen.getByTestId("emergency-reserve-guideline");
+    expect(guideline).toBeInTheDocument();
+    expect(screen.getByText("CLT • Meta: 3 a 6 meses")).toBeInTheDocument();
+    // 6500 * 3 = 19500, 6500 * 6 = 39000
+    expect(guideline.textContent?.replace(/\u00A0/g, " ")).toMatch(/R\$\s?19\.500,00 a R\$\s?39\.000,00/);
+  });
+
+  it("renders calibrated emergency reserve guideline for PJ / Autônomo (6 a 12 meses)", () => {
+    render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        financialProfile={{
+          incomeType: "PJ_AUTONOMO",
+          declaredMonthlyIncome: 12000,
+        }}
+      />
+    );
+
+    const guideline = screen.getByTestId("emergency-reserve-guideline");
+    expect(guideline).toBeInTheDocument();
+    expect(screen.getByText("PJ / Autônomo • Meta: 6 a 12 meses")).toBeInTheDocument();
+    // 6500 * 6 = 39000, 6500 * 12 = 78000
+    expect(guideline.textContent?.replace(/\u00A0/g, " ")).toMatch(/R\$\s?39\.000,00 a R\$\s?78\.000,00/);
+  });
+
+  it("renders market standard guideline (6 meses) when profile is not informed", () => {
+    render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+      />
+    );
+
+    const guideline = screen.getByTestId("emergency-reserve-guideline");
+    expect(guideline).toBeInTheDocument();
+    expect(screen.getByText("Padrão de Mercado • Meta: 6 meses")).toBeInTheDocument();
+  });
+
+  it("renders user active goals chips in recommendations header", () => {
+    render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        financialProfile={{
+          incomeType: "CLT",
+          goals: ["QUITAR_DIVIDAS", "RESERVA_EMERGENCIA"],
+        }}
+      />
+    );
+
+    const chips = screen.getByTestId("user-active-goals-chips");
+    expect(chips).toBeInTheDocument();
+    expect(screen.getByText("Quitar Dívidas e Empréstimos")).toBeInTheDocument();
+    expect(screen.getByText("Criar / Expandir Reserva de Emergência")).toBeInTheDocument();
+  });
 });

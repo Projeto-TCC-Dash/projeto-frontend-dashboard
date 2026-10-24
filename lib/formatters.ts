@@ -1,3 +1,5 @@
+import { IncomeType } from "@/src/types/api";
+
 /**
  * Utilitários puros de formatação monetária, datas, competências mensais e cálculo de poupança.
  */
@@ -144,4 +146,76 @@ export function formatBrlCurrency(amount: number | undefined | null): string {
     style: "currency",
     currency: "BRL",
   }).format(amount);
+}
+
+export interface EmergencyReserveGuideline {
+  minMonths: number;
+  maxMonths: number;
+  minAmount: number;
+  maxAmount: number;
+  monthsLabel: string;
+  formattedAmountRange: string;
+  isCustomized: boolean;
+  regimeLabel: string;
+}
+
+export function computeEmergencyReserveGuideline(
+  incomeType?: IncomeType,
+  monthlyExpenses: number = 0
+): EmergencyReserveGuideline {
+  const safeExpenses = Math.max(0, monthlyExpenses);
+  let minMonths = 6;
+  let maxMonths = 6;
+  let isCustomized = false;
+  let regimeLabel = "Padrão de Mercado";
+
+  if (incomeType === "CLT") {
+    minMonths = 3;
+    maxMonths = 6;
+    isCustomized = true;
+    regimeLabel = "CLT";
+  } else if (incomeType === "PUBLIC_SERVANT") {
+    minMonths = 3;
+    maxMonths = 6;
+    isCustomized = true;
+    regimeLabel = "Servidor Público";
+  } else if (incomeType === "PJ_AUTONOMO") {
+    minMonths = 6;
+    maxMonths = 12;
+    isCustomized = true;
+    regimeLabel = "PJ / Autônomo";
+  } else if (incomeType === "ENTREPRENEUR") {
+    minMonths = 6;
+    maxMonths = 12;
+    isCustomized = true;
+    regimeLabel = "Empresário";
+  }
+
+  const minAmount = safeExpenses * minMonths;
+  const maxAmount = safeExpenses * maxMonths;
+
+  const monthsLabel =
+    minMonths === maxMonths
+      ? `${minMonths} meses`
+      : `${minMonths} a ${maxMonths} meses`;
+
+  let formattedAmountRange = "";
+  if (safeExpenses > 0) {
+    if (minMonths === maxMonths) {
+      formattedAmountRange = formatCurrencyBRL(minAmount);
+    } else {
+      formattedAmountRange = `${formatCurrencyBRL(minAmount)} a ${formatCurrencyBRL(maxAmount)}`;
+    }
+  }
+
+  return {
+    minMonths,
+    maxMonths,
+    minAmount,
+    maxAmount,
+    monthsLabel,
+    formattedAmountRange,
+    isCustomized,
+    regimeLabel,
+  };
 }
