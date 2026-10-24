@@ -1,6 +1,6 @@
-# 🗺️ Roadmap de Evolução — Frontend (v1.1.0+)
+# 🗺️ Roadmap de Evolução — Frontend (v1.1.0 & v1.2.0+)
 
-Este documento estabelece o planejamento estratégico, arquitetura de componentes e a esteira de desenvolvimento do **Frontend (`projeto-frontend-dashboard`)** para o ciclo **v1.1.0**, em total conformidade com a Constituição Técnica, os princípios de **Schema-Driven Development (SDD)** e os fluxos do **Spec-Kit**.
+Este documento estabelece o planejamento estratégico, arquitetura de componentes e a esteira de desenvolvimento do **Frontend (`projeto-frontend-dashboard`)** para os ciclos **v1.1.0** e **v1.2.0**, em total conformidade com a Constituição Técnica, os princípios de **Schema-Driven Development (SDD)** e os fluxos do **Spec-Kit**.
 
 ---
 
@@ -9,31 +9,40 @@ Este documento estabelece o planejamento estratégico, arquitetura de componente
 | Versão | Status | Branches / Tags | Cobertura de Testes |
 |---|---|---|---|
 | **v1.0.0** | ✅ Concluída em Produção | Tag `v1.0.0` / Branch `master` | 151 testes unitários/integração verdes |
-| **v1.1.0** | ✅ Features 005 a 008 Concluídas | Branch `feature/008-dashboard-invoice-segregation-profile` | 239 testes unitários/integração verdes |
+| **v1.1.0** | ✅ Concluída em Produção | Tag `v1.1.0` / Branches `develop` e `master` | 239 testes unitários/integração verdes |
+| **v1.2.0** | 📋 Planejamento Concluído | Branch `feature/009-profile-security-export` | 239 testes existentes + suíte Feature 009 planejada |
 
-### Histórico de Features Entregues (v1.0.0)
+### Histórico de Features Entregues (v1.0.0 & v1.1.0)
 - `specs/001-auth-shell-byok`: Autenticação JWT, Shell responsivo (Sidebar/Navbar), tema Dark/Light e modal BYOK Gemini.
 - `specs/002-transactions-management`: Upload OFX/CSV, tabela paginada com 9 categorias iniciais, edição inline e classificação por IA.
 - `specs/003-dashboard-metrics-analysis`: KPIs mensais, gráfico de rosca de categorias, diagnóstico do mês em cache e recomendações.
 - `specs/004-virtual-financial-advisor`: Assistente virtual conversacional via streaming contínuo SSE com Google Gemini.
+- `specs/005-financial-profile-onboarding`: Regime de renda, renda mensal declarada em BRL, metas financeiras e calibração de perfil.
+- `specs/006-accounts-management`: Gestão de múltiplas contas e cartões, patrimônio líquido unificado e exclusão em cascata.
+- `specs/007-transactions-extended-deletion-categories`: 11 categorias canônicas, vínculo de contas e exclusão pontual atômica.
+- `specs/008-dashboard-invoice-segregation-profile`: Segregação contábil de faturas de cartão e diagnóstico IA calibrado por regime de renda.
 
 ---
 
-## 🎯 Visão Geral do Ciclo v1.1.0
-
-O ciclo v1.1.0 conecta o frontend a todas as novas capacidades já implementadas e testadas no backend (Features 007 a 010 do backend), trazendo **Gestão Multicontas**, **Exclusão Atômica de Transações**, **11 Categorias Canônicas**, **Segregação Contábil de Faturas** e **Perfil Financeiro do Usuário com IA Calibrada**.
+## 🎯 Visão Geral dos Ciclos v1.1.0 e v1.2.0
 
 ```mermaid
 flowchart TD
-    subgraph v110 ["Ciclo de Desenvolvimento v1.1.0 (Frontend Spec-Kit)"]
+    subgraph v110 ["Ciclo v1.1.0 (Entregue & Tag v1.1.0)"]
         F005["Feature 005: Perfil Financeiro, Regime de Renda e Metas"]
         F006["Feature 006: Gestão Multiconta e Cartões de Crédito (/accounts)"]
         F007["Feature 007: Exclusão de Transações, 11 Categorias e Associação de Contas"]
         F008["Feature 008: Dashboard com Segregação de Faturas e IA Calibrada"]
     end
 
+    subgraph v120 ["Ciclo v1.2.0 (Planejamento Concluído — Spec-Kit)"]
+        F009["Feature 009: Perfil de Usuário, Segurança (2FA & Google) e Central de Exportação"]
+    end
+
     F005 --> F006 --> F007 --> F008
-    F008 --> Release["Release v1.1.0 (Merge develop -> master & Tag v1.1.0)"]
+    F008 --> Release110["Release v1.1.0 (Merge develop -> master & Tag v1.1.0)"]
+    Release110 --> F009
+    F009 --> Release120["Release v1.2.0 (Merge develop -> master & Tag v1.2.0)"]
 ```
 
 ---
@@ -134,6 +143,42 @@ flowchart TD
 
 ---
 
+### 🛡️ Feature 009: Perfil de Usuário, Segurança (2FA & Google) e Central de Exportação (`specs/009-profile-security-export`)
+**Objetivo**: Oferecer gestão completa de identidade e perfil do usuário (avatar e nome), central de segurança avançada com vinculação de conta Google (OAuth 2.0), autenticação em dois fatores (2FA via e-mail com desafio OTP de 6 dígitos) e encerramento de sessão, além de uma central de exportação de dados financeiros formatados em CSV, PDF e XLSX.
+
+- **Contratos de API**:
+  - `POST /api/user/avatar`: Upload de avatar (`multipart/form-data`, validação de JPG/PNG/WebP até 5MB) com preview e invalidação de cache.
+  - `DELETE /api/user/avatar`: Exclusão da foto de perfil personalizada com retorno ao fallback de iniciais.
+  - `PUT /api/user/profile`: Atualização do nome de usuário (`name`, 2-100 caracteres) com sincronização imediata no shell.
+  - `POST /api/auth/google/link` e `DELETE /api/auth/google/unlink`: Vinculação/desvinculação de conta Google com proteção contra desvinculação se for o único método de login.
+  - `POST /api/auth/2fa/setup`: Disparo de e-mail com código OTP de 6 dígitos para o endereço do usuário logado.
+  - `POST /api/auth/2fa/verify`: Ativação definitiva do 2FA após conferência de código OTP de 6 dígitos.
+  - `DELETE /api/auth/2fa`: Desativação do 2FA mediante confirmação de senha/código de segurança.
+  - `POST /api/auth/logout`: Revogação de sessão no servidor com expurgo de tokens em cookies/storage local e redirecionamento para `/login`.
+  - `GET /api/export/transactions?format=csv|pdf|xlsx&month=YYYY-MM`: Download de extrato de transações com formatação localizada (BRL, datas PT-BR).
+- **Entregas de Interface & Componentes**:
+  - **Aba de Perfil (`/settings/profile`)**:
+    - Componente de foto/avatar com visualizador, botão de upload com preview imediato, validação client-side (tamanho/tipo) e botão de exclusão com alerta de confirmação.
+    - Formulário de identidade com input controlado para edição de nome de usuário e botão de salvar com feedback de sucesso/erro.
+  - **Aba de Segurança (`/settings/security`)**:
+    - Card de Métodos de Login com indicador visual de status de conta Google vinculada e ações de vincular/desvincular.
+    - Card de Autenticação em 2 Fatores (2FA) com chave de ativação, modal de desafio OTP de 6 dígitos e badge de status (Ativo/Inativo).
+    - Card de Encerramento de Sessão com botão de Logout seguro e diálogo de confirmação.
+  - **Central de Exportação de Dados (`/settings/export` ou modal dedicado)**:
+    - Seletor de formato (CSV, PDF, XLSX) com ícones e descrições claras de compatibilidade.
+    - Filtro de período (Mês específico ou Todo o histórico).
+    - Feedback visual de progresso/loading e acionamento nativo de download com nomenclatura padronizada (`transacoes-YYYY-MM.ext`).
+- **Comandos Spec-Kit**:
+  ```bash
+  /speckit-specify Criar especificação para perfil de usuário (upload/edição/exclusão de avatar e nome), segurança da conta (vincular Google, 2FA via e-mail e logout) e central de exportação de relatórios em CSV, PDF e XLSX formatados.
+  /speckit-plan
+  /speckit-tasks
+  /speckit-implement
+  /speckit-converge
+  ```
+
+---
+
 ## 🛠️ Regras de Governança e Qualidade (Constituição Técnica)
 
 Para todas as features do roadmap, as seguintes regras são inegociáveis:
@@ -147,11 +192,9 @@ Para todas as features do roadmap, as seguintes regras são inegociáveis:
 
 ## 📅 Sequência Recomendada de Execução
 
-1. **Protocolar ROADMAP.md e commit no branch `develop`**.
-2. **Iniciar Feature 005 (`specs/005-financial-profile-onboarding`)**:
-   - `git checkout -b feature/005-financial-profile-onboarding develop`
-   - `/speckit-specify` $\rightarrow$ `/speckit-plan` $\rightarrow$ `/speckit-tasks` $\rightarrow$ `/speckit-implement` $\rightarrow$ `/speckit-converge`
-3. **Executar Feature 006 (`specs/006-accounts-management`)**.
-4. **Executar Feature 007 (`specs/007-transactions-extended-deletion-categories`)**.
-5. **Executar Feature 008 (`specs/008-dashboard-invoice-segregation-profile`)**.
-6. **Release v1.1.0**: Bateria de testes finais, merge em `develop` $\rightarrow$ `master` e tag `v1.1.0`.
+1. **Ciclo v1.1.0 (Concluído)**: Features 005 a 008 entregues e consolidadas na tag `v1.1.0`.
+2. **Ciclo v1.2.0 (Em Andamento)**:
+   - Branch: `feature/009-profile-security-export`
+   - Etapas concluídas: `/speckit-specify` ✅, `/speckit-plan` ✅, `/speckit-tasks` ✅
+   - Próxima etapa a ser iniciada: `/speckit-implement` $\rightarrow$ `/speckit-converge`
+3. **Release v1.2.0**: Bateria de testes finais, merge em `develop` $\rightarrow$ `master` e tag `v1.2.0`.
