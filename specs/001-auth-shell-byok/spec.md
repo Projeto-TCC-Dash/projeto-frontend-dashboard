@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-19
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Criar fluxo de autenticação com login e cadastro (JWT), layout responsivo base com barra de navegação e tema dark/light, e modal/página para cadastro e teste ativo da chave de API do Google AI Studio (BYOK) via PUT /api/user/ai-key com indicação visual de status da IA."
 

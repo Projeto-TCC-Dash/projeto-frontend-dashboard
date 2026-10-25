@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-19
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Criar tela de gestão de transações com upload drag-and-drop de extratos OFX e CSV para POST /api/transactions/upload, listagem filtrada por mês (YYYY-MM), categoria canônica e origem, edição manual de transações via PATCH /api/transactions/:id, e botão de categorização automática em lote via POST /api/transactions/categorize."
 

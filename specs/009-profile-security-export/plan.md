@@ -10,7 +10,7 @@ Implementar a aba completa de **Perfil de Usuário (Identidade, Nome e Avatar co
 
 - **Stack**: Next.js 16 (App Router), React 19, Tailwind CSS v4, Lucide Icons, Shadcn, TanStack Query v5.
 - **Roteamento**: Shell de configurações em `/settings` com abas dedicadas:
-  - `/settings/profile`: Dados pessoais, avatar e perfil financeiro voluntário.
+  - `/settings/profile`: Dados cadastrais e foto de perfil via formulário unificado (refinado na Feature 010; metas financeiras movidas para `/settings/metas` na Feature 011).
   - `/settings/security`: Autenticação em dois fatores (2FA), contas conectadas (Google) e encerramento de sessão.
   - `/settings/export`: Central de exportação de dados com filtros e download de relatórios.
 - **Armazenamento e Estado**: TanStack Query com invalidação de chaves `['userProfile']`, `['auth']` e `['transactions']`.

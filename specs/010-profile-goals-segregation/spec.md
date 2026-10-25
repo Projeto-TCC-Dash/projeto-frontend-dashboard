@@ -4,7 +4,9 @@
 
 **Created**: 2026-10-24
 
-**Status**: Draft
+**Status**: Implemented
+
+> **Nota de Evolução Arquitetural (Feature 011)**: A rota `/goals` introduzida na US1 para desvincular as metas de `/settings/profile` foi refinada na Feature 011 ([specs/011-settings-metas-profile](../011-settings-metas-profile/spec.md)) para residir em `/settings/metas` com layout condicional isolado, mantendo a rota `/goals` ativa com redirecionamento transparente de compatibilidade.
 
 **Input**: User description: "eu gostaria de alterar a parte de editar perfil. Quero que a aba de perfil e metas seja somente para traçar meta, e que toda a parte de alteração de perfil fique para quando o usuario clicar no seu nome/email. Ajeitar também a parte de foto de perfil, quero que fique junto com a abade informacao de identidade, entao quando salva alteracao, que salve a foto e a alteracao do nome junto. A aba de segurança e sessao e central de exportacao devera ir para a aba de perfil separada também."
 

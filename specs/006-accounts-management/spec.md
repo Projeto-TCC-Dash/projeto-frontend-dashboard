@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-19
 
-**Status**: Ready
+**Status**: Implemented
 
 **Input**: User description: "Criar módulo de gestão de contas e cartões em /accounts consumindo GET /api/accounts, POST /api/accounts, PATCH /api/accounts/:id e DELETE /api/accounts/:id, exibindo cards de saldo por tipo, card de patrimônio líquido consolidado, modal de criação/edição com seletor de cor e diálogo de exclusão segura com suporte a cascade."
 

@@ -17,7 +17,8 @@ Segregar a experiência de **Metas e Perfil Financeiro** da **Central de Configu
 - **Gerenciamento de Estado de Servidor**: TanStack Query (`@tanstack/react-query`) com invalidação direcionada de `['userProfile']`.
 - **Manipulação de Arquivos e Memória**: `URL.createObjectURL` e limpeza mandatória com `URL.revokeObjectURL` para previews de avatar, com validação de limite de 5MB e formatos suportados (JPEG, PNG, WebP).
 - **Roteamento**:
-  - `/goals`: Nova página exclusiva para metas financeiras.
+  - `/goals`: Página dedicada para metas financeiras (posteriormente redirecionada para `/settings/metas` pela Feature 011).
+  - `/settings/metas`: Rota final dedicada ao perfil de investidor e metas patrimoniais (Feature 011).
   - `/settings/profile`: Central de identidade do usuário (avatar unificado + nome + e-mail somente leitura).
   - `/settings/security`: 2FA por e-mail, contas vinculadas e logout seguro.
   - `/settings/export`: Central de exportação de dados (CSV, PDF, XLSX).

@@ -4,7 +4,9 @@
 
 **Created**: 2026-10-24
 
-**Status**: Ready
+**Status**: Implemented
+
+> **Nota de Evolução Arquitetural (Feature 010 & 011)**: A experiência de gerenciamento de dados de identidade pessoal (US1) foi aprimorada e unificada sob a Feature 010 ([specs/010-profile-goals-segregation](../010-profile-goals-segregation/spec.md)), integrando a manipulação de avatar e o nome em um único componente com salvamento atômico (`UserProfileIdentityForm`), enquanto as metas financeiras foram desacopladas para `/settings/metas` na Feature 011 ([specs/011-settings-metas-profile](../011-settings-metas-profile/spec.md)).
 
 **Input**: User description: "Crie uma especificação de novas features, onde o usuário vai poder visualizar seu perfil em uma aba, podendo adicionar/editar/excluir foto de usuário, editar nome de usuário, vincular conta do google, autenticaçao com 2 fatores, 2FA (via email), sair da sessão. Além de ter uma área onde vai ser possivel exportar dados em CSV, PDF e XLSX formatados."
 

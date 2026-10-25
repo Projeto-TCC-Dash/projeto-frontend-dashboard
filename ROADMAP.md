@@ -10,9 +10,9 @@ Este documento estabelece o planejamento estratégico, arquitetura de componente
 |---|---|---|---|
 | **v1.0.0** | ✅ Concluída em Produção | Tag `v1.0.0` / Branch `master` | 151 testes unitários/integração verdes |
 | **v1.1.0** | ✅ Concluída em Produção | Tag `v1.1.0` / Branches `develop` e `master` | 239 testes unitários/integração verdes |
-| **v1.2.0** | 📋 Planejamento Concluído | Branch `feature/009-profile-security-export` | 239 testes existentes + suíte Feature 009 planejada |
+| **v1.2.0** | ✅ Implementado & Validado | Branch `feature/009-profile-security-export` | 316 testes unitários/integração verdes |
 
-### Histórico de Features Entregues (v1.0.0 & v1.1.0)
+### Histórico de Features Entregues (v1.0.0, v1.1.0 & v1.2.0)
 - `specs/001-auth-shell-byok`: Autenticação JWT, Shell responsivo (Sidebar/Navbar), tema Dark/Light e modal BYOK Gemini.
 - `specs/002-transactions-management`: Upload OFX/CSV, tabela paginada com 9 categorias iniciais, edição inline e classificação por IA.
 - `specs/003-dashboard-metrics-analysis`: KPIs mensais, gráfico de rosca de categorias, diagnóstico do mês em cache e recomendações.
@@ -21,6 +21,9 @@ Este documento estabelece o planejamento estratégico, arquitetura de componente
 - `specs/006-accounts-management`: Gestão de múltiplas contas e cartões, patrimônio líquido unificado e exclusão em cascata.
 - `specs/007-transactions-extended-deletion-categories`: 11 categorias canônicas, vínculo de contas e exclusão pontual atômica.
 - `specs/008-dashboard-invoice-segregation-profile`: Segregação contábil de faturas de cartão e diagnóstico IA calibrado por regime de renda.
+- `specs/009-profile-security-export`: Identidade do usuário, segurança multicamadas (2FA via e-mail e Google OAuth) e central de exportação (CSV, PDF, XLSX).
+- `specs/010-profile-goals-segregation`: Segregação de metas financeiras e formulário unificado de identidade (foto + nome) com salvamento atômico.
+- `specs/011-settings-metas-profile`: Rota `/settings/metas` dedicada e isolada para perfil de investidor/metas, preservação de `/goals` como redirecionamento e âncora de conta em `/settings/profile`.
 
 ---
 
@@ -35,14 +38,17 @@ flowchart TD
         F008["Feature 008: Dashboard com Segregação de Faturas e IA Calibrada"]
     end
 
-    subgraph v120 ["Ciclo v1.2.0 (Planejamento Concluído — Spec-Kit)"]
+    subgraph v120 ["Ciclo v1.2.0 (Implementado & Validado)"]
         F009["Feature 009: Perfil de Usuário, Segurança (2FA & Google) e Central de Exportação"]
+        F010["Feature 010: Segregação de Metas e Identidade Unificada (Foto + Nome)"]
+        F011["Feature 011: Rota /settings/metas e Redirecionador /goals"]
     end
 
     F005 --> F006 --> F007 --> F008
     F008 --> Release110["Release v1.1.0 (Merge develop -> master & Tag v1.1.0)"]
     Release110 --> F009
-    F009 --> Release120["Release v1.2.0 (Merge develop -> master & Tag v1.2.0)"]
+    F009 --> F010 --> F011
+    F011 --> Release120["Release v1.2.0 (Merge develop -> master & Tag v1.2.0)"]
 ```
 
 ---
@@ -160,6 +166,7 @@ flowchart TD
   - **Aba de Perfil (`/settings/profile`)**:
     - Componente de foto/avatar com visualizador, botão de upload com preview imediato, validação client-side (tamanho/tipo) e botão de exclusão com alerta de confirmação.
     - Formulário de identidade com input controlado para edição de nome de usuário e botão de salvar com feedback de sucesso/erro.
+    - *(Aprimorado na Feature 010)*: Integrado no componente unificado `UserProfileIdentityForm` com salvamento atômico conjunto de foto e nome.
   - **Aba de Segurança (`/settings/security`)**:
     - Card de Métodos de Login com indicador visual de status de conta Google vinculada e ações de vincular/desvincular.
     - Card de Autenticação em 2 Fatores (2FA) com chave de ativação, modal de desafio OTP de 6 dígitos e badge de status (Ativo/Inativo).
@@ -171,6 +178,43 @@ flowchart TD
 - **Comandos Spec-Kit**:
   ```bash
   /speckit-specify Criar especificação para perfil de usuário (upload/edição/exclusão de avatar e nome), segurança da conta (vincular Google, 2FA via e-mail e logout) e central de exportação de relatórios em CSV, PDF e XLSX formatados.
+  /speckit-plan
+  /speckit-tasks
+  /speckit-implement
+  /speckit-converge
+  ```
+
+---
+
+### 🎯 Feature 010: Segregação de Metas e Formulário Unificado de Identidade (`specs/010-profile-goals-segregation`)
+**Objetivo**: Desacoplar a definição de metas e perfil de investidor das configurações cadastrais da conta, unificar a edição de foto e nome em um único formulário atômico, e posicionar o identificador do cabeçalho como âncora de entrada oficial para `/settings/profile`.
+
+- **Entregas de Interface & Componentes**:
+  - `UserProfileIdentityForm`: Formulário integrado de identidade com preview local instantâneo, descarte de memória via `URL.revokeObjectURL`, marcação pendente de exclusão de foto e botão "Salvar alterações" coordenado.
+  - Cabeçalho `UserNav`: Exibição visual do avatar (ou iniciais) com link de redirecionamento para `/settings/profile`.
+  - Desvinculação inicial de metas financeiras do shell de configurações pessoais.
+- **Comandos Spec-Kit**:
+  ```bash
+  /speckit-specify Segregar metas financeiras da área de dados cadastrais, unificar edição de nome e avatar com salvamento conjunto e vincular clique no cabeçalho para /settings/profile.
+  /speckit-plan
+  /speckit-tasks
+  /speckit-implement
+  /speckit-converge
+  ```
+
+---
+
+### 📈 Feature 011: Perfil de Investidor em `/settings/metas` e Isolamento de Shell (`specs/011-settings-metas-profile`)
+**Objetivo**: Estabelecer a rota oficial `/settings/metas` para o perfil de investidor e metas patrimoniais, garantindo layout limpo e focado (sem abas de conta), link direto na Sidebar ("Perfil e Metas") e compatibilidade com a rota legada `/goals` via redirecionador.
+
+- **Entregas de Interface & Componentes**:
+  - Nova página `/settings/metas` renderizando exclusivamente `FinancialProfileForm`.
+  - `SettingsLayout`: Isolamento condicional omitindo `SettingsNav` e cabeçalho de conta quando em `/settings/metas`.
+  - `Sidebar`: Item "Perfil e Metas" apontando para `/settings/metas`.
+  - Redirecionador automático em `app/(dashboard)/goals/page.tsx` para `/settings/metas`.
+- **Comandos Spec-Kit**:
+  ```bash
+  /speckit-specify Configurar rota /settings/metas para perfil de investidor e metas patrimoniais, isolar layout de conta, atualizar Sidebar e redirecionar rota legada /goals.
   /speckit-plan
   /speckit-tasks
   /speckit-implement
@@ -193,8 +237,8 @@ Para todas as features do roadmap, as seguintes regras são inegociáveis:
 ## 📅 Sequência Recomendada de Execução
 
 1. **Ciclo v1.1.0 (Concluído)**: Features 005 a 008 entregues e consolidadas na tag `v1.1.0`.
-2. **Ciclo v1.2.0 (Em Andamento)**:
+2. **Ciclo v1.2.0 (Concluído & Validado)**:
    - Branch: `feature/009-profile-security-export`
-   - Etapas concluídas: `/speckit-specify` ✅, `/speckit-plan` ✅, `/speckit-tasks` ✅
-   - Próxima etapa a ser iniciada: `/speckit-implement` $\rightarrow$ `/speckit-converge`
-3. **Release v1.2.0**: Bateria de testes finais, merge em `develop` $\rightarrow$ `master` e tag `v1.2.0`.
+   - Features consolidadas: 009, 010 e 011 entregues com **316 testes verdes** e 0 erros de tipagem.
+   - Etapas concluídas: `/speckit-specify` ✅, `/speckit-plan` ✅, `/speckit-tasks` ✅, `/speckit-implement` ✅, `/speckit-converge` ✅
+3. **Release v1.2.0**: Bateria de testes finais, merge de `feature/009-profile-security-export` em `develop` $\rightarrow$ `master` e criação da tag `v1.2.0`.
