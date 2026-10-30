@@ -14,7 +14,7 @@ Anteriormente, o item do menu lateral "Perfil Financeiro" apontava para `/settin
 - **Central de Perfil e Configurações via Cabeçalho**: O componente `UserNav` (no cabeçalho do dashboard) passa a ser o ponto de entrada primário para a conta do usuário. Ao clicar no avatar/nome/e-mail, o usuário é direcionado para `/settings/profile`.
 - **Abas de Configurações**: Mantidas sob o layout `/settings/layout.tsx`:
   1. `/settings/profile`: "Informações de Identidade" (Nome, E-mail e Foto em formulário unificado).
-  2. `/settings/security`: "Segurança & Sessão" (2FA via e-mail, contas conectadas, logout).
+  2. `/settings/security`: "Segurança & Sessão" (contas conectadas, logout).
   3. `/settings/export`: "Central de Exportação" (Exportação de relatórios CSV, PDF, XLSX).
 
 ### Rationale

@@ -2,7 +2,7 @@
 Sync Impact Report:
 - Version change: 1.1.0 -> 1.2.0
 - List of modified principles:
-  - Added VIII. Gestão de Identidade, Autenticação Multifator (2FA) e Segurança de Sessão
+  - Added VIII. Gestão de Identidade e Segurança de Sessão
   - Added IX. Manipulação Segura de Mídias, Validação de Arquivos e Exportação
 - Added sections:
   - Updated Arquitetura e Stack Técnica com suporte a uploads multipart, Blobs e exportações (CSV, PDF, XLSX)
@@ -55,11 +55,8 @@ Sync Impact Report:
 - As mutações e validações de regras de negócio DEVEM ser cobertas com cenários de sucesso e caminhos de erro antes da homologação da entrega.
 - Testes automatizados DEVEM ser executáveis localmente e no pipeline de integração contínua através do comando `pnpm test`.
 
-### VIII. Gestão de Identidade, Autenticação Multifator (2FA) e Segurança de Sessão
+### VIII. Gestão de Identidade e Segurança de Sessão
 - **Salvaguarda Contra Orfandade de Autenticação**: A interface DEVE impedir a desvinculação de conta externa (ex: Google OAuth) se esta for o único meio de autenticação ativo do usuário (sem senha cadastrada), prevenindo bloqueio permanente de acesso.
-- **Fluxo Robusto de 2FA**:
-  - A ativação do 2FA via e-mail DEVE exigir a confirmação bem-sucedida de um desafio OTP de 6 dígitos antes de marcar o status como ativo na interface.
-  - A desativação do 2FA DEVE exigir confirmação de segurança (diálogo com senha ou código de confirmação) para evitar desativação acidental ou não autorizada.
 - **Encerramento Seguro de Sessão (Logout)**:
   - O logout DEVE invocar a rota de revogação de sessão no servidor (`POST /api/auth/logout`), expurgar tokens locais em cookies e `localStorage`, limpar os caches do TanStack Query e redirecionar imediatamente o usuário para `/login`.
 
@@ -82,13 +79,13 @@ Sync Impact Report:
 - **Comunicação em Tempo Real**: Streams SSE nativos com `ReadableStream` e decodificação progressiva UTF-8 sem dependências externas pesadas.
 - **Mídias e Arquivos**: Suporte nativo a uploads multipart com validação client-side, manipulação de `Blob` para downloads e controle estrito de memória (`URL.createObjectURL` / `URL.revokeObjectURL`).
 - **Testes Automatizados**: Vitest e React Testing Library (`@testing-library/react`) configurados com ambiente DOM (`happy-dom` ou `jsdom`) para execução de testes unitários e testes de integração de componentes e hooks.
-- **Tipagens e Contratos Canônicos**: Centralizados em `src/types/api.ts` cobrindo Usuário, Autenticação, 2FA, Sessão, Exportações, Transações, Métricas Financeiras e Chunks de Chat.
+- **Tipagens e Contratos Canônicos**: Centralizados em `src/types/api.ts` cobrindo Usuário, Autenticação, Sessão, Exportações, Transações, Métricas Financeiras e Chunks de Chat.
 
 ## Padrões de Desenvolvimento e Validação de Qualidade
 
 - **Validação Estática**: Todo código produzido DEVE compilar com sucesso via `pnpm typecheck` (`tsc --noEmit`) e passar pelas regras de lint configuradas no projeto (`pnpm lint`).
 - **Validação de Testes**: Todo novo módulo ou funcionalidade DEVE ser submetido à validação de testes automatizados via `pnpm test`, sendo reprovada qualquer entrega que contenha quebras de testes existentes ou novas funcionalidades críticas sem cobertura.
-- **Portais para Diálogos Críticos**: Todos os modais (`Dialog`, `AlertDialog`) de exclusão de mídias, confirmação de desativação de 2FA e logout DEVEM renderizar via `createPortal(..., document.body)` para evitar problemas de sobreposição e herança de estilos CSS.
+- **Portais para Diálogos Críticos**: Todos os modais (`Dialog`, `AlertDialog`) de exclusão de mídias e logout DEVEM renderizar via `createPortal(..., document.body)` para evitar problemas de sobreposição e herança de estilos CSS.
 - **Formatação de Código**: Manter conformidade com as regras do Prettier (`pnpm format`).
 - **Isolamento de Domínio**: Componentes de interface localizados em `components/`, hooks em `hooks/`, serviços de API em `services/`, tipos em `types/` e utilitários em `lib/` ou `utils/`.
 - **Tratamento de Exceções**: Todas as rotas de chamada externa DEVEM conter tratamento de erro amigável na interface com toasts informativos ou banners de fallback.

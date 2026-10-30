@@ -14,7 +14,6 @@ Retorna os dados cadastrais, avatar e configurações de segurança do usuário 
   "avatarUrl": "https://storage.exemplo.com/avatars/user-1.webp",
   "hasAiKey": true,
   "security": {
-    "twoFactorEnabled": false,
     "hasLocalPassword": true,
     "googleLinked": true,
     "googleEmail": "debora.google@gmail.com",
@@ -46,25 +45,7 @@ Exclui a foto de perfil do usuário, restaurando o fallback de iniciais.
 
 ---
 
-## 2. Autenticação em Dois Fatores (2FA via E-mail)
-
-### `POST /api/auth/2fa/request-enable`
-Solicita envio de código de 6 dígitos para o e-mail cadastrado.
-
-### `POST /api/auth/2fa/confirm-enable`
-Valida o código de 6 dígitos e ativa o 2FA.
-```json
-{
-  "code": "849201"
-}
-```
-
-### `POST /api/auth/2fa/disable`
-Desativa o 2FA mediante confirmação de credenciais.
-
----
-
-## 3. Vínculo de Conta Google
+## 2. Vínculo de Conta Google
 
 ### `POST /api/auth/google/link`
 Vincula a conta Google autenticada.
@@ -74,7 +55,7 @@ Desvincula a conta Google associada.
 
 ---
 
-## 4. Central de Exportação
+## 3. Central de Exportação
 
 ### `GET /api/transactions/export`
 Gera e faz download dos lançamentos financeiros formatados.

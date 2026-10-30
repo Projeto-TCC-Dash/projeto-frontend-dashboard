@@ -24,7 +24,7 @@ Como uma pessoa usuária focada em sua gestão financeira pessoal, desejo acessa
 
 1. **Given** a barra lateral de navegação do dashboard, **When** o usuário clica no item correspondente a metas ("Perfil e Metas"), **Then** o sistema navega para uma visualização dedicada exclusivamente ao planejamento financeiro e metas patrimoniais.
 2. **Given** a página de metas financeiras, **When** o usuário insere ou atualiza sua renda estimada, reserva desejada e objetivos financeiros e confirma, **Then** as metas são persistidas com sucesso e um aviso visual de confirmação é exibido.
-3. **Given** a página de metas financeiras, **When** inspecionada visualmente, **Then** não devem constar opções de edição de nome, upload de foto, configurações de segurança/2FA ou central de exportação de dados nesta tela.
+3. **Given** a página de metas financeiras, **When** inspecionada visualmente, **Then** não devem constar opções de edição de nome, upload de foto, configurações de segurança ou central de exportação de dados nesta tela.
 
 ---
 
@@ -63,7 +63,7 @@ Como uma pessoa usuária que deseja atualizar suas credenciais visuais e cadastr
 
 ### User Story 4 - Centralização de Segurança, Sessão e Exportação na Área de Perfil (Priority: P2)
 
-Como uma pessoa usuária gerenciando sua conta, desejo que as abas de "Segurança & Sessão" (com autenticação em dois fatores, contas vinculadas e logout) e "Central de Exportação" (com exportação de lançamentos em CSV, PDF e XLSX) fiquem organizadas dentro da área de perfil de usuário, para que todas as ferramentas de administração de conta residam em um mesmo local coeso.
+Como uma pessoa usuária gerenciando sua conta, desejo que as abas de "Segurança & Sessão" (com contas vinculadas e logout) e "Central de Exportação" (com exportação de lançamentos em CSV, PDF e XLSX) fiquem organizadas dentro da área de perfil de usuário, para que todas as ferramentas de administração de conta residam em um mesmo local coeso.
 
 **Why this priority**: Consolida todas as configurações operacionais e de governança da conta pessoal sob a navegação de perfil, mantendo a experiência de uso limpa e previsível.
 
@@ -72,7 +72,7 @@ Como uma pessoa usuária gerenciando sua conta, desejo que as abas de "Seguranç
 **Acceptance Scenarios**:
 
 1. **Given** a área de perfil de usuário acessada via cabeçalho, **When** visualizada, **Then** a navegação apresenta as abas: "Informações de Identidade", "Segurança & Sessão" e "Central de Exportação".
-2. **Given** a aba "Segurança & Sessão", **When** selecionada, **Then** o usuário gerencia a ativação/desativação de 2FA por e-mail, visualiza contas vinculadas e tem acesso ao encerramento de sessão.
+2. **Given** a aba "Segurança & Sessão", **When** selecionada, **Then** o usuário visualiza contas vinculadas e tem acesso ao encerramento de sessão.
 3. **Given** a aba "Central de Exportação", **When** selecionada, **Then** o usuário pode configurar e disparar a exportação de dados financeiros nos formatos CSV, PDF e XLSX.
 
 ---
@@ -97,14 +97,14 @@ Como uma pessoa usuária gerenciando sua conta, desejo que as abas de "Seguranç
 - **FR-007**: A solicitação de remoção da foto existente no formulário de identidade DEVE exibir temporariamente as iniciais do nome do usuário e ser confirmada apenas ao salvar o formulário.
 - **FR-008**: O botão de submissão do formulário de identidade DEVE permanecer desabilitado se não houver modificações pendentes no nome ou na foto de perfil.
 - **FR-009**: A área de perfil de usuário DEVE conter a navegação entre as abas: "Informações de Identidade", "Segurança & Sessão" e "Central de Exportação".
-- **FR-010**: A aba "Segurança & Sessão" DEVE permitir o gerenciamento de autenticação em dois fatores (2FA), contas conectadas e opção de encerramento seguro de sessão.
+- **FR-010**: A aba "Segurança & Sessão" DEVE permitir o gerenciamento de contas conectadas e opção de encerramento seguro de sessão.
 - **FR-011**: A aba "Central de Exportação" DEVE permitir o download dos relatórios financeiros consolidados em formatos CSV, PDF e XLSX.
 
 ### Key Entities
 
 - **Perfil de Usuário (Identidade)**: Dados cadastrais e visuais da pessoa usuária (nome completo de exibição, e-mail de acesso e avatar/foto de perfil).
 - **Metas e Perfil Financeiro**: Informações estritamente financeiras do usuário (renda mensal estimada, tolerância a risco, valor da reserva de emergência e metas de curto/médio/longo prazo).
-- **Configurações de Segurança e Conta**: Estado de proteção da conta (2FA via e-mail ativado/desativado, contas de provedores externos vinculadas e credenciais de sessão).
+- **Configurações de Segurança e Conta**: Estado de proteção da conta (contas de provedores externos vinculadas e credenciais de sessão).
 
 ## Success Criteria *(mandatory)*
 

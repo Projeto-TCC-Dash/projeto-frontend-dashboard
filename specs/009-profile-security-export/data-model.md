@@ -6,7 +6,6 @@
 
 ```typescript
 export interface UserSecuritySettings {
-  twoFactorEnabled: boolean;
   hasLocalPassword: boolean;
   googleLinked: boolean;
   googleEmail?: string;
@@ -29,31 +28,7 @@ export interface UpdateUserProfileDTO {
 }
 ```
 
-### 2. DTOs de Autenticação em Dois Fatores (2FA)
-
-```typescript
-export interface Request2FAResponse {
-  message: string;
-  expiresInSeconds: number;
-}
-
-export interface Confirm2FADTO {
-  code: string;
-}
-
-export interface Disable2FADTO {
-  password?: string;
-  code?: string;
-}
-
-export interface TwoFactorActionResponse {
-  success: boolean;
-  message: string;
-  twoFactorEnabled: boolean;
-}
-```
-
-### 3. Filtros e Parâmetros de Exportação
+### 2. Filtros e Parâmetros de Exportação
 
 ```typescript
 export type ExportFormat = "csv" | "xlsx" | "pdf";

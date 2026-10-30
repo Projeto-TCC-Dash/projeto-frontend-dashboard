@@ -1,4 +1,4 @@
-# Feature Specification: Perfil de Usuário, Segurança (2FA & Google Auth) e Central de Exportação
+# Feature Specification: Perfil de Usuário, Segurança (Google Auth) e Central de Exportação
 
 **Feature Branch**: `feature/009-profile-security-export`
 
@@ -8,7 +8,7 @@
 
 > **Nota de Evolução Arquitetural (Feature 010 & 011)**: A experiência de gerenciamento de dados de identidade pessoal (US1) foi aprimorada e unificada sob a Feature 010 ([specs/010-profile-goals-segregation](../010-profile-goals-segregation/spec.md)), integrando a manipulação de avatar e o nome em um único componente com salvamento atômico (`UserProfileIdentityForm`), enquanto as metas financeiras foram desacopladas para `/settings/metas` na Feature 011 ([specs/011-settings-metas-profile](../011-settings-metas-profile/spec.md)).
 
-**Input**: User description: "Crie uma especificação de novas features, onde o usuário vai poder visualizar seu perfil em uma aba, podendo adicionar/editar/excluir foto de usuário, editar nome de usuário, vincular conta do google, autenticaçao com 2 fatores, 2FA (via email), sair da sessão. Além de ter uma área onde vai ser possivel exportar dados em CSV, PDF e XLSX formatados."
+**Input**: User description: "Crie uma especificação de novas features, onde o usuário vai poder visualizar seu perfil em uma aba, podendo adicionar/editar/excluir foto de usuário, editar nome de usuário, vincular conta do google, sair da sessão. Além de ter uma área onde vai ser possivel exportar dados em CSV, PDF e XLSX formatados."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -29,21 +29,18 @@ Como uma pessoa usuária autenticada na plataforma, desejo acessar uma aba dedic
 
 ---
 
-### User Story 2 - Autenticação em Dois Fatores (2FA via E-mail) e Segurança de Sessão (Priority: P1) 🎯 MVP
+### User Story 2 - Segurança de Sessão e Encerramento Seguro (Priority: P1) 🎯 MVP
 
-Como uma pessoa usuária preocupada com a proteção das minhas informações financeiras, desejo ativar a autenticação em dois fatores (2FA) com validação de código temporário por e-mail, e dispor de uma ação clara para encerrar minha sessão com segurança, para impedir acessos não autorizados aos meus lançamentos bancários e patrimônio.
+Como uma pessoa usuária preocupada com a proteção das minhas informações financeiras, desejo dispor de uma ação clara para encerrar minha sessão com segurança, para impedir acessos não autorizados aos meus lançamentos bancários e patrimônio ao sair do dispositivo.
 
-**Why this priority**: A integridade e segurança de dados financeiros sensíveis exige camadas modernas de proteção contra vazamento de credenciais e controle de sessão ativo.
+**Why this priority**: A integridade e segurança de dados financeiros sensíveis exige controle confiável de encerramento de sessão ativo.
 
-**Independent Test**: Pode ser testado na seção de segurança solicitando a ativação do 2FA, recebendo o código de verificação de 6 dígitos no e-mail cadastrado, inserindo-o para confirmar a ativação, e validando que o status do 2FA muda para "Ativado"; em seguida, acionar a opção "Sair da Sessão" e verificar que a sessão é encerrada com redirecionamento para o login.
+**Independent Test**: Pode ser testado na seção de segurança acionando a opção "Sair da Sessão" e verificando que a sessão é encerrada com redirecionamento para o login.
 
 **Acceptance Scenarios**:
 
-1. **Given** a aba de segurança do usuário, **When** o status atual do 2FA é "Desativado", **Then** a interface exibe um interruptor/botão "Ativar 2FA via E-mail" acompanhado de texto explicativo sobre o funcionamento da verificação em duas etapas.
-2. **Given** a solicitação de ativação do 2FA, **When** o usuário clica em "Ativar", **Then** o sistema dispara um código de confirmação de 6 dígitos para o e-mail cadastrado e abre um diálogo modal para inserção do código temporário com temporizador de expiração e opção de reenvio.
-3. **Given** o diálogo modal de confirmação do 2FA aberto, **When** o usuário digita o código correto de 6 dígitos, **Then** o sistema ativa o 2FA para a conta, exibe confirmação visual de sucesso e atualiza o badge de segurança para "2FA Ativo via E-mail".
-4. **Given** o 2FA ativo na conta, **When** o usuário opta por "Desativar 2FA", **Then** o sistema exige a confirmação por senha ou código de segurança antes de reverter a proteção.
-5. **Given** uma pessoa autenticada em qualquer área do sistema, **When** ela aciona a ação "Sair da sessão" (Logout), **Then** os tokens de acesso locais são revogados e destruídos, o cache em memória é limpo e a navegação é redirecionada para a tela de login.
+1. **Given** a aba de segurança do usuário, **When** renderizada, **Then** exibe a área de encerramento de sessão com descrição clara do impacto do logout.
+2. **Given** uma pessoa autenticada em qualquer área do sistema, **When** ela aciona a ação "Sair da sessão" (Logout), **Then** os tokens de acesso locais são revogados e destruídos, o cache em memória é limpo e a navegação é redirecionada para a tela de login.
 
 ---
 
@@ -85,7 +82,6 @@ Como uma pessoa usuária que necessita arquivar meus comprovantes financeiros, d
 ### Edge Cases
 
 - **Upload de arquivo de foto inválido ou corrompido**: Se o usuário selecionar um arquivo que não seja imagem ou que exceda o tamanho limite de 5MB, a interface deve interceptar imediatamente antes do upload, exibindo mensagem clara em português e mantendo o avatar anterior intacto.
-- **Expiração do código 2FA temporário**: O código enviado por e-mail possui janela de expiração (ex: 5 minutos); caso o usuário insira após esse prazo, a interface informa que o código expirou e oferece botão de ação com um clique para "Reenviar novo código".
 - **Tentativa de desvincular o único método de login**: Se a conta for criada exclusivamente via Google OAuth e o usuário não possuir senha local cadastrada, a desvinculação da conta Google é bloqueada até que o usuário defina uma senha de acesso.
 - **Exportação de período sem nenhuma movimentação**: Ao solicitar exportação para um período sem lançamentos, o sistema alerta amigavelmente que não existem transações no intervalo selecionado antes de gerar um arquivo vazio.
 - **Navegação com sessão expirada ou invalidada durante a exportação**: Se a sessão for encerrada em outra aba ou o token expirar, a tentativa de exportação redireciona de forma elegante para a autenticação com preservação do estado.
@@ -97,20 +93,18 @@ Como uma pessoa usuária que necessita arquivar meus comprovantes financeiros, d
 - **FR-001**: O sistema DEVE disponibilizar uma aba/seção dedicada de "Meu Perfil" permitindo visualizar e atualizar o nome de exibição do usuário.
 - **FR-002**: O sistema DEVE permitir upload, visualização prévia, atualização e exclusão de foto de perfil (avatar), aceitando formatos JPG, PNG e WebP com tamanho máximo de 5MB.
 - **FR-003**: Ao remover a foto de perfil, o sistema DEVE renderizar de forma determinística um avatar alternativo contendo as iniciais do nome do usuário.
-- **FR-004**: O sistema DEVE permitir a ativação e desativação da Autenticação em Dois Fatores (2FA) com validação de código de segurança de 6 dígitos enviado ao e-mail do usuário.
-- **FR-005**: Quando o 2FA estiver ativado na conta, o fluxo de login subsequente DEVE exigir a validação do código temporário recebido por e-mail antes de conceder acesso aos recursos protegidos.
-- **FR-006**: O sistema DEVE fornecer ação de encerramento seguro de sessão ("Sair da Sessão"), invalidando o token no cliente e redirecionando para a rota de login pública.
-- **FR-007**: O sistema DEVE permitir vincular e desvincular uma conta Google ao perfil existente através de fluxo OAuth2 padrão.
-- **FR-008**: O sistema DEVE impedir a desvinculação da conta Google caso esta seja a única via de acesso cadastrada pelo usuário sem senha local associada.
-- **FR-009**: O sistema DEVE disponibilizar uma área de exportação de dados financeiros com filtros por intervalo de datas/mês, conta financeira e categoria.
-- **FR-010**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato CSV estruturado com codificação UTF-8.
-- **FR-011**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato XLSX com colunas estilizadas e células formatadas em moeda brasileira (BRL).
-- **FR-012**: O sistema DEVE ser capaz de gerar e exportar um relatório consolidado em PDF diagramado contendo resumo de KPIs e listagem de transações para impressão e comprovação fiscal.
+- **FR-004**: O sistema DEVE fornecer ação de encerramento seguro de sessão ("Sair da Sessão"), invalidando o token no cliente e redirecionando para a rota de login pública.
+- **FR-005**: O sistema DEVE permitir vincular e desvincular uma conta Google ao perfil existente através de fluxo OAuth2 padrão.
+- **FR-006**: O sistema DEVE impedir a desvinculação da conta Google caso esta seja a única via de acesso cadastrada pelo usuário sem senha local associada.
+- **FR-007**: O sistema DEVE disponibilizar uma área de exportação de dados financeiros com filtros por intervalo de datas/mês, conta financeira e categoria.
+- **FR-008**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato CSV estruturado com codificação UTF-8.
+- **FR-009**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato XLSX com colunas estilizadas e células formatadas em moeda brasileira (BRL).
+- **FR-010**: O sistema DEVE ser capaz de gerar e exportar um relatório consolidado em PDF diagramado contendo resumo de KPIs e listagem de transações para impressão e comprovação fiscal.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Perfil do Usuário (`UserProfile`)**: Entidade que reúne identidade cadastral (`id`, `name`, `email`, `avatarUrl`), perfil financeiro voluntário (`financialProfile`), credenciais de segurança e preferências da conta.
-- **Configuração de Segurança (`SecuritySettings`)**: Configurações relativas a `twoFactorEnabled` (status do 2FA via e-mail), `hasLocalPassword` (existência de senha clássica) e `googleLinked` (detalhes da conta Google associada: e-mail e data de vinculação).
+- **Configuração de Segurança (`SecuritySettings`)**: Configurações relativas a `hasLocalPassword` (existência de senha clássica) e `googleLinked` (detalhes da conta Google associada: e-mail e data de vinculação).
 - **Parâmetros de Exportação (`ExportFilters`)**: Critérios informados pelo usuário para geração de arquivos, incluindo `format` (`CSV`, `XLSX`, `PDF`), `startDate`, `endDate`, `accountId` e `category`.
 
 ## Success Criteria *(mandatory)*
@@ -119,12 +113,10 @@ Como uma pessoa usuária que necessita arquivar meus comprovantes financeiros, d
 
 - **SC-001**: 100% dos usuários conseguem atualizar seu nome e foto de perfil com preview em menos de 10 segundos.
 - **SC-002**: Redução a zero de bloqueios acidentais de conta ao impedir desvinculação do Google sem senha local previamente definida.
-- **SC-003**: 100% de sucesso na entrega do código 2FA de 6 dígitos no fluxo de ativação via e-mail.
-- **SC-004**: Geração e download de arquivos de exportação (CSV, XLSX e PDF) em menos de 5 segundos para períodos com até 5.000 lançamentos.
-- **SC-005**: 100% de aprovação na suíte de testes automatizados com cobertura para todos os novos componentes de formulário, fluxos de segurança e geradores de exportação.
+- **SC-003**: Geração e download de arquivos de exportação (CSV, XLSX e PDF) em menos de 5 segundos para períodos com até 5.000 lançamentos.
+- **SC-004**: 100% de aprovação na suíte de testes automatizados com cobertura para todos os novos componentes de formulário, fluxos de segurança e geradores de exportação.
 
 ## Assumptions
 
-- O envio de e-mails para validação do código 2FA é orquestrado pelo serviço de mensageria de e-mail do backend (ex: SMTP / Resend / SendGrid).
 - A geração dos arquivos nos formatos CSV, XLSX e PDF pode ser realizada através de bibliotecas especializadas e leves no cliente ou via endpoints dedicados do backend com streaming de arquivo.
 - O upload de fotos de perfil pode armazenar o arquivo em CDN / bucket seguro ou como string base64 / imagem persistida no backend.

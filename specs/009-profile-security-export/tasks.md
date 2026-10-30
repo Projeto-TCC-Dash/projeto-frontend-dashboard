@@ -1,4 +1,4 @@
-# Tasks: Perfil de Usuário, Segurança (2FA & Google Auth) e Central de Exportação
+# Tasks: Perfil de Usuário, Segurança (Google Auth) e Central de Exportação
 
 **Input**: Design documents from `/specs/009-profile-security-export/`
 
@@ -7,7 +7,7 @@
 ## Phase 1: Foundational (Tipagem, Schemas Zod e Utilitários de Domínio)
 
 - [x] T001 [P] Estender entidades `UserProfileResponse`, `UserSecuritySettings` e DTOs em `src/types/api.ts`
-- [x] T002 [P] Criar schemas Zod para validação de nome, avatar (tamanho <= 5MB e formatos de imagem) e 2FA em `lib/validations/profile.ts`
+- [x] T002 [P] Criar schemas Zod para validação de nome e avatar (tamanho <= 5MB e formatos de imagem) em `lib/validations/profile.ts`
 - [x] T003 [P] Implementar utilitário puro `generateCsvTransactions` em `lib/export-utils.ts` com testes em `lib/export-utils.test.ts`
 
 ---
@@ -24,14 +24,12 @@
 
 ---
 
-## Phase 3: User Story 2 - Autenticação em Dois Fatores (2FA via E-mail) e Segurança de Sessão (Priority: P1) 🎯 MVP
+## Phase 3: User Story 2 - Segurança de Sessão e Encerramento Seguro (Priority: P1) 🎯 MVP
 
-**Goal**: Permitir ao usuário ativar e desativar o 2FA via e-mail e encerrar sua sessão com segurança.
+**Goal**: Permitir ao usuário gerenciar a segurança da conta e encerrar sua sessão com segurança.
 
-- [x] T009 [P] [US2] Criar hook `useTwoFactorAuth` em `hooks/use-two-factor-auth.ts` consumindo endpoints de 2FA e logout
-- [x] T010 [P] [US2] Criar modal OTP de 6 dígitos `TwoFactorSetupModal` com contagem regressiva e feedback em `components/security/two-factor-setup-modal.tsx`
-- [x] T011 [US2] Criar aba de segurança em `app/(dashboard)/settings/security/page.tsx` com switch de 2FA e botão de ação "Sair da Sessão" (Logout)
-- [x] T012 [US2] Criar testes unitários para `useTwoFactorAuth` e `TwoFactorSetupModal` em `hooks/use-two-factor-auth.test.tsx` e `components/security/two-factor-setup-modal.test.tsx`
+- [x] T009 [US2] Criar aba de segurança em `app/(dashboard)/settings/security/page.tsx` com botão de ação "Sair da Sessão" (Logout) seguro
+- [x] T010 [US2] Criar testes unitários para `SecuritySettingsPage` em `app/(dashboard)/settings/security/page.test.tsx`
 
 ---
 

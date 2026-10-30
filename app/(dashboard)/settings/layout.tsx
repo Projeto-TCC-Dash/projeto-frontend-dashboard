@@ -23,7 +23,7 @@ export default function SettingsLayout({
           Configurações da Conta
         </h1>
         <p className="text-sm text-muted-foreground">
-          Gerencie seus dados de identidade, proteja sua conta com 2FA e exporte relatórios financeiros completos.
+          Gerencie seus dados de identidade, configure a segurança da conta e exporte relatórios financeiros completos.
         </p>
       </div>
 

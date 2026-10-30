@@ -69,7 +69,7 @@ Como uma pessoa usuária navegando entre recursos da aplicação, desejo que o l
 
 - **FR-001**: O sistema DEVE fornecer a rota `/settings/metas` dedicada exclusivamente ao formulário de perfil de investidor e metas financeiras.
 - **FR-002**: A rota `/settings/metas` DEVE conter as opções de seleção do Perfil de Risco (Conservador, Moderado, Agressivo), Metas Financeiras Prioritárias, Renda Mensal Declarada e Regime de Trabalho.
-- **FR-003**: A rota `/settings/metas` NÃO DEVE conter campos de identificação pessoal (nome, foto de perfil, e-mail) ou abas de gerenciamento de conta (2FA, contas vinculadas, exportação).
+- **FR-003**: A rota `/settings/metas` NÃO DEVE conter campos de identificação pessoal (nome, foto de perfil, e-mail) ou abas de gerenciamento de conta (contas vinculadas, exportação).
 - **FR-004**: O item de menu "Perfil e Metas" na barra de navegação principal (navbar/sidebar) DEVE apontar especificamente para a rota `/settings/metas`.
 - **FR-005**: O acesso à rota `/settings/profile` DEVE ocorrer com exclusividade a partir do clique no identificador do usuário (nome, e-mail ou avatar) no cabeçalho superior (`UserNav`).
 - **FR-006**: A rota `/settings/profile` DEVE renderizar o formulário unificado de informações de identidade (foto e nome) e os controles de conta.

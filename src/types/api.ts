@@ -136,7 +136,6 @@ export interface FinancialProfile {
 }
 
 export interface UserSecuritySettings {
-  twoFactorEnabled: boolean;
   hasLocalPassword: boolean;
   googleLinked: boolean;
   googleEmail?: string;
@@ -177,26 +176,6 @@ export interface UserProfileIdentityFormProps {
     removeAvatar?: boolean;
   }) => Promise<void>;
   isPending?: boolean;
-}
-
-export interface Request2FAResponse {
-  message: string;
-  expiresInSeconds: number;
-}
-
-export interface Confirm2FADTO {
-  code: string;
-}
-
-export interface Disable2FADTO {
-  password?: string;
-  code?: string;
-}
-
-export interface TwoFactorActionResponse {
-  success: boolean;
-  message: string;
-  twoFactorEnabled: boolean;
 }
 
 export interface UpdateFinancialProfileDTO {

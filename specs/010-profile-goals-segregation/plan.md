@@ -20,7 +20,7 @@ Segregar a experiência de **Metas e Perfil Financeiro** da **Central de Configu
   - `/goals`: Página dedicada para metas financeiras (posteriormente redirecionada para `/settings/metas` pela Feature 011).
   - `/settings/metas`: Rota final dedicada ao perfil de investidor e metas patrimoniais (Feature 011).
   - `/settings/profile`: Central de identidade do usuário (avatar unificado + nome + e-mail somente leitura).
-  - `/settings/security`: 2FA por e-mail, contas vinculadas e logout seguro.
+  - `/settings/security`: Contas vinculadas e logout seguro.
   - `/settings/export`: Central de exportação de dados (CSV, PDF, XLSX).
 - **Testes Automatizados**: Vitest e React Testing Library (`pnpm test`).
 

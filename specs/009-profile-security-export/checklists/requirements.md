@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Perfil de Usuário, Segurança (2FA & Google Auth) e Central de Exportação
+# Specification Quality Checklist: Perfil de Usuário, Segurança (Google Auth) e Central de Exportação
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-10-24

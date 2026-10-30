@@ -4,8 +4,6 @@ import {
   updateUserProfileSchema,
   avatarFileSchema,
   validateAvatarFile,
-  confirm2FASchema,
-  disable2FASchema,
 } from './profile';
 
 describe('updateFinancialProfileSchema', () => {
@@ -130,30 +128,5 @@ describe('avatarFileSchema e validateAvatarFile', () => {
     const validation = validateAvatarFile(textFile);
     expect(validation.valid).toBe(false);
     expect(validation.error).toContain('Formato de imagem inválido');
-  });
-});
-
-describe('confirm2FASchema', () => {
-  it('deve validar com sucesso código de exatamente 6 dígitos numéricos', () => {
-    const result = confirm2FASchema.safeParse({ code: '123456' });
-    expect(result.success).toBe(true);
-  });
-
-  it('deve rejeitar código com menos ou mais de 6 dígitos ou contendo letras', () => {
-    expect(confirm2FASchema.safeParse({ code: '12345' }).success).toBe(false);
-    expect(confirm2FASchema.safeParse({ code: '1234567' }).success).toBe(false);
-    expect(confirm2FASchema.safeParse({ code: '12345a' }).success).toBe(false);
-  });
-});
-
-describe('disable2FASchema', () => {
-  it('deve aceitar formulário de desativação opcional', () => {
-    const result = disable2FASchema.safeParse({});
-    expect(result.success).toBe(true);
-  });
-
-  it('deve validar código de 6 dígitos se fornecido', () => {
-    expect(disable2FASchema.safeParse({ code: '654321' }).success).toBe(true);
-    expect(disable2FASchema.safeParse({ code: 'abc' }).success).toBe(false);
   });
 });

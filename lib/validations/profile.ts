@@ -64,23 +64,3 @@ export function validateAvatarFile(file: File): { valid: boolean; error?: string
   }
   return { valid: true };
 }
-
-export const confirm2FASchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .regex(/^\d{6}$/, 'O código deve conter exatamente 6 dígitos numéricos'),
-});
-
-export type Confirm2FAFormData = z.infer<typeof confirm2FASchema>;
-
-export const disable2FASchema = z.object({
-  password: z.string().optional(),
-  code: z
-    .string()
-    .trim()
-    .regex(/^\d{6}$/, 'O código deve conter 6 dígitos')
-    .optional(),
-});
-
-export type Disable2FAFormData = z.infer<typeof disable2FASchema>;

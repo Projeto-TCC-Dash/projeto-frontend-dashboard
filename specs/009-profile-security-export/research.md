@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **Feature 009** estende a plataforma com um ecossistema completo de **Gestão de Identidade (Perfil & Avatar)**, **Segurança em Camadas (2FA via E-mail & Google OAuth)** e uma **Central de Exportação de Dados Financeiros (CSV, PDF, XLSX)**.
+A **Feature 009** estende a plataforma com um ecossistema de **Gestão de Identidade (Perfil & Avatar)**, **Segurança (Google OAuth & Logout)** e uma **Central de Exportação de Dados Financeiros (CSV, PDF, XLSX)**.
 
 ## Key Findings & Decisions
 
@@ -16,15 +16,7 @@ A **Feature 009** estende a plataforma com um ecossistema completo de **Gestão 
   - O avatar renderiza a imagem com suporte a preview instantâneo via `URL.createObjectURL(file)`.
   - Se sem imagem, calcula as iniciais do nome de forma determinística (ex: "Ana Silva" -> "AS") com fundo de contraste semântico.
 
-### 2. Autenticação em Dois Fatores (2FA via E-mail) e Gestão de Sessão
-- **Fluxo de Ativação do 2FA**:
-  1. Usuário clica em "Ativar 2FA" na aba de Segurança.
-  2. Frontend chama `POST /api/auth/2fa/request-enable`. O backend gera um código OTP de 6 dígitos numéricos com validade de 5 minutos e despacha para o e-mail cadastrado.
-  3. Modal com 6 campos de dígitos (ou input formatado) recebe o código digitado pelo usuário.
-  4. Frontend chama `POST /api/auth/2fa/confirm-enable` enviando `{ code: "123456" }`.
-  5. Sucesso: status atualizado para ativo e invalidação da query de perfil.
-- **Desativação de 2FA**:
-  - Exige confirmação de segurança (`POST /api/auth/2fa/disable`) para evitar desativação indevida.
+### 2. Gestão de Sessão e Logout Seguro
 - **Encerramento de Sessão (Logout)**:
   - Destruição de credenciais no `localStorage`, limpeza do `QueryClient` de cache do TanStack Query e redirecionamento imediato para `/login`.
 

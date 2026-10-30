@@ -62,7 +62,7 @@ Visualização dedicada ao planejamento financeiro pessoal.
 - Subtítulo: "Defina sua reserva de emergência, perfil de risco e objetivos financeiros."
 - Conteúdo:
   - Card de Metas e Alocação (`FinancialProfileForm`).
-  - Não renderiza `SettingsNav`, dados cadastrais de usuário, foto de perfil, 2FA ou botões de exportação.
+  - Não renderiza `SettingsNav`, dados cadastrais de usuário, foto de perfil, opções de segurança ou botões de exportação.
 
 ---
 

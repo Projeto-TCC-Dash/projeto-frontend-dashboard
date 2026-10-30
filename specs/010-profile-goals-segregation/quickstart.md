@@ -55,7 +55,7 @@
 
 ### Cenário 4: Navegação entre Abas de Configuração
 1. Na página de configurações, clique na aba **"Segurança & Sessão"** (`/settings/security`).
-   - Verifique os controles de 2FA por e-mail, contas vinculadas e opção de logout.
+   - Verifique os controles de contas vinculadas e opção de logout.
 2. Clique na aba **"Central de Exportação"** (`/settings/export`).
    - Verifique os controles de geração e download de arquivos CSV, PDF e XLSX.
 

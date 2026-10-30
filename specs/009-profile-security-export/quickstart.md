@@ -1,6 +1,6 @@
 # Quickstart: Feature 009
 
-## Como validar o Perfil, Segurança 2FA e Central de Exportação
+## Como validar o Perfil, Segurança e Central de Exportação
 
 1. **Acessar Configurações de Perfil**:
    - Navegue para `/settings/profile` ou aba "Meu Perfil" no menu de configurações.
@@ -8,10 +8,9 @@
    - Edite seu nome de exibição.
    - Remova a foto para validar o retorno ao avatar com iniciais.
 
-2. **Ativação e Teste do 2FA**:
-   - Na aba de Segurança, clique em "Ativar 2FA via E-mail".
-   - Digite o código de 6 dígitos recebido e confirme a ativação.
-   - Teste a opção "Sair da Sessão" no menu de usuário.
+2. **Segurança e Encerramento de Sessão**:
+   - Acesse a aba de Segurança em `/settings/security`.
+   - Teste a opção "Sair da Sessão" para validar o logout seguro.
 
 3. **Vínculo com Google**:
    - Observe o status de "Contas Conectadas" e o botão de vinculação/desvinculação segura.

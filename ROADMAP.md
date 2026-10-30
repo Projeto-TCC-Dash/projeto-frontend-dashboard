@@ -21,7 +21,7 @@ Este documento estabelece o planejamento estratégico, arquitetura de componente
 - `specs/006-accounts-management`: Gestão de múltiplas contas e cartões, patrimônio líquido unificado e exclusão em cascata.
 - `specs/007-transactions-extended-deletion-categories`: 11 categorias canônicas, vínculo de contas e exclusão pontual atômica.
 - `specs/008-dashboard-invoice-segregation-profile`: Segregação contábil de faturas de cartão e diagnóstico IA calibrado por regime de renda.
-- `specs/009-profile-security-export`: Identidade do usuário, segurança multicamadas (2FA via e-mail e Google OAuth) e central de exportação (CSV, PDF, XLSX).
+- `specs/009-profile-security-export`: Identidade do usuário, segurança (Google OAuth e Logout) e central de exportação (CSV, PDF, XLSX).
 - `specs/010-profile-goals-segregation`: Segregação de metas financeiras e formulário unificado de identidade (foto + nome) com salvamento atômico.
 - `specs/011-settings-metas-profile`: Rota `/settings/metas` dedicada e isolada para perfil de investidor/metas, preservação de `/goals` como redirecionamento e âncora de conta em `/settings/profile`.
 
@@ -39,7 +39,7 @@ flowchart TD
     end
 
     subgraph v120 ["Ciclo v1.2.0 (Implementado & Validado)"]
-        F009["Feature 009: Perfil de Usuário, Segurança (2FA & Google) e Central de Exportação"]
+        F009["Feature 009: Perfil de Usuário, Segurança (Google OAuth) e Central de Exportação"]
         F010["Feature 010: Segregação de Metas e Identidade Unificada (Foto + Nome)"]
         F011["Feature 011: Rota /settings/metas e Redirecionador /goals"]
     end
@@ -149,17 +149,14 @@ flowchart TD
 
 ---
 
-### 🛡️ Feature 009: Perfil de Usuário, Segurança (2FA & Google) e Central de Exportação (`specs/009-profile-security-export`)
-**Objetivo**: Oferecer gestão completa de identidade e perfil do usuário (avatar e nome), central de segurança avançada com vinculação de conta Google (OAuth 2.0), autenticação em dois fatores (2FA via e-mail com desafio OTP de 6 dígitos) e encerramento de sessão, além de uma central de exportação de dados financeiros formatados em CSV, PDF e XLSX.
+### 🛡️ Feature 009: Perfil de Usuário, Segurança (Google OAuth) e Central de Exportação (`specs/009-profile-security-export`)
+**Objetivo**: Oferecer gestão completa de identidade e perfil do usuário (avatar e nome), central de segurança com vinculação de conta Google (OAuth 2.0) e encerramento de sessão, além de uma central de exportação de dados financeiros formatados em CSV, PDF e XLSX.
 
 - **Contratos de API**:
   - `POST /api/user/avatar`: Upload de avatar (`multipart/form-data`, validação de JPG/PNG/WebP até 5MB) com preview e invalidação de cache.
   - `DELETE /api/user/avatar`: Exclusão da foto de perfil personalizada com retorno ao fallback de iniciais.
   - `PUT /api/user/profile`: Atualização do nome de usuário (`name`, 2-100 caracteres) com sincronização imediata no shell.
   - `POST /api/auth/google/link` e `DELETE /api/auth/google/unlink`: Vinculação/desvinculação de conta Google com proteção contra desvinculação se for o único método de login.
-  - `POST /api/auth/2fa/setup`: Disparo de e-mail com código OTP de 6 dígitos para o endereço do usuário logado.
-  - `POST /api/auth/2fa/verify`: Ativação definitiva do 2FA após conferência de código OTP de 6 dígitos.
-  - `DELETE /api/auth/2fa`: Desativação do 2FA mediante confirmação de senha/código de segurança.
   - `POST /api/auth/logout`: Revogação de sessão no servidor com expurgo de tokens em cookies/storage local e redirecionamento para `/login`.
   - `GET /api/export/transactions?format=csv|pdf|xlsx&month=YYYY-MM`: Download de extrato de transações com formatação localizada (BRL, datas PT-BR).
 - **Entregas de Interface & Componentes**:
@@ -169,7 +166,6 @@ flowchart TD
     - *(Aprimorado na Feature 010)*: Integrado no componente unificado `UserProfileIdentityForm` com salvamento atômico conjunto de foto e nome.
   - **Aba de Segurança (`/settings/security`)**:
     - Card de Métodos de Login com indicador visual de status de conta Google vinculada e ações de vincular/desvincular.
-    - Card de Autenticação em 2 Fatores (2FA) com chave de ativação, modal de desafio OTP de 6 dígitos e badge de status (Ativo/Inativo).
     - Card de Encerramento de Sessão com botão de Logout seguro e diálogo de confirmação.
   - **Central de Exportação de Dados (`/settings/export` ou modal dedicado)**:
     - Seletor de formato (CSV, PDF, XLSX) com ícones e descrições claras de compatibilidade.
@@ -177,7 +173,7 @@ flowchart TD
     - Feedback visual de progresso/loading e acionamento nativo de download com nomenclatura padronizada (`transacoes-YYYY-MM.ext`).
 - **Comandos Spec-Kit**:
   ```bash
-  /speckit-specify Criar especificação para perfil de usuário (upload/edição/exclusão de avatar e nome), segurança da conta (vincular Google, 2FA via e-mail e logout) e central de exportação de relatórios em CSV, PDF e XLSX formatados.
+  /speckit-specify Criar especificação para perfil de usuário (upload/edição/exclusão de avatar e nome), segurança da conta (vincular Google e logout) e central de exportação de relatórios em CSV, PDF e XLSX formatados.
   /speckit-plan
   /speckit-tasks
   /speckit-implement
