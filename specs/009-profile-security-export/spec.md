@@ -1,122 +1,162 @@
-# Feature Specification: Perfil de Usuário, Segurança (Google Auth) e Central de Exportação
+# Feature Specification: Perfil de Usuário, Autenticação Social Google (Login & Vínculo) e Central de Exportação
 
 **Feature Branch**: `feature/009-profile-security-export`
 
 **Created**: 2026-10-24
 
-**Status**: Implemented
+**Updated**: 2026-10-30
 
-> **Nota de Evolução Arquitetural (Feature 010 & 011)**: A experiência de gerenciamento de dados de identidade pessoal (US1) foi aprimorada e unificada sob a Feature 010 ([specs/010-profile-goals-segregation](../010-profile-goals-segregation/spec.md)), integrando a manipulação de avatar e o nome em um único componente com salvamento atômico (`UserProfileIdentityForm`), enquanto as metas financeiras foram desacopladas para `/settings/metas` na Feature 011 ([specs/011-settings-metas-profile](../011-settings-metas-profile/spec.md)).
+**Status**: Specified (Aguardando Planejamento Técnico)
 
-**Input**: User description: "Crie uma especificação de novas features, onde o usuário vai poder visualizar seu perfil em uma aba, podendo adicionar/editar/excluir foto de usuário, editar nome de usuário, vincular conta do google, sair da sessão. Além de ter uma área onde vai ser possivel exportar dados em CSV, PDF e XLSX formatados."
+> **Nota de Evolução Arquitetural (Feature 010 & 011)**: A experiência de gerenciamento de dados de identidade pessoal (US1) foi integrada ao componente unificado `UserProfileIdentityForm` sob a Feature 010 ([specs/010-profile-goals-segregation](../010-profile-goals-segregation/spec.md)), enquanto as metas financeiras foram desacopladas para `/settings/metas` na Feature 011 ([specs/011-settings-metas-profile](../011-settings-metas-profile/spec.md)).
+
+**Input**: User description: "Implementar o módulo completo de Perfil, Vínculo Social com Google e Central de Exportação de Dados Financeiros, 100% alinhado aos contratos do backend:
+1. Perfil e Avatar: Upload multipart/form-data via POST /api/user/avatar, exclusão via DELETE /api/user/avatar, atualização de nome via PATCH /api/user/profile e consulta via GET /api/user/profile.
+2. Vínculo e Login Google (OAuth 2.0 / GIS): Login social no frontend via @react-oauth/google enviando idToken para POST /api/auth/google. Se o backend responder 401/404, o frontend deve avisar que a conta Google não está vinculada e instruir o usuário a entrar com e-mail/senha para vincular no perfil. Na tela de perfil (/settings/security), vincular (POST /api/auth/google/link) e desvincular (DELETE /api/auth/google/unlink) com trava se Google for o único método sem senha local.
+3. Central de Exportação: Download de extratos filtrados (format=csv|xlsx|pdf) via GET /api/transactions/export.
+4. Remoção estrita e permanente de 2FA e Cloudflare Turnstile."
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Gerenciamento de Identidade, Nome e Foto de Perfil (Priority: P1) 🎯 MVP
 
-Como uma pessoa usuária autenticada na plataforma, desejo acessar uma aba dedicada do meu perfil para visualizar meus dados cadastrais, editar meu nome de exibição e adicionar, atualizar ou excluir minha foto de perfil, para que minha experiência na plataforma seja personalizada e meu avatar seja reconhecido na barra de navegação e nos módulos do sistema.
+Como uma pessoa usuária autenticada na plataforma financeira, desejo acessar a aba de perfil da minha conta para visualizar meus dados cadastrais, atualizar meu nome de exibição e fazer upload ou remoção da minha foto de perfil, para que minha conta reflita minha identidade visual no dashboard e na barra de navegação.
 
-**Why this priority**: A gestão de identidade básica e personalização visual é a base de identificação e engajamento do usuário na plataforma.
+**Why this priority**: Estabelece a identidade pessoal do usuário no sistema, personalizando a experiência visual e conferindo confiança ao utilizar a ferramenta.
 
-**Independent Test**: Pode ser testado acessando as configurações de perfil, alterando o nome de exibição, fazendo upload de uma nova imagem de perfil, confirmando que o avatar na barra de navegação e na página reflete a nova imagem, e posteriormente removendo a foto para validar que o avatar retorna às iniciais do nome.
-
-**Acceptance Scenarios**:
-
-1. **Given** a tela de configurações de perfil, **When** o usuário acessa a aba "Meu Perfil", **Then** a interface renderiza o avatar atual, o nome de exibição, o e-mail cadastrado e a data de criação da conta.
-2. **Given** o componente de avatar, **When** o usuário clica em "Adicionar foto" ou "Alterar foto", **Then** um seletor de arquivos permite escolher uma imagem (formatos JPG, PNG ou WebP com tamanho de até 5MB), exibindo preview imediato antes da confirmação.
-3. **Given** uma foto de perfil já cadastrada, **When** o usuário clica em "Remover foto" e confirma a ação, **Then** a imagem é desvinculada do perfil e o avatar passa a exibir as iniciais do nome do usuário com fundo temático.
-4. **Given** o formulário de dados pessoais, **When** o usuário altera o campo "Nome completo / exibição" e clica em "Salvar alterações", **Then** o sistema valida o preenchimento, persiste os dados, emite notificação de sucesso e atualiza o nome exibido no cabeçalho do sistema.
-
----
-
-### User Story 2 - Segurança de Sessão e Encerramento Seguro (Priority: P1) 🎯 MVP
-
-Como uma pessoa usuária preocupada com a proteção das minhas informações financeiras, desejo dispor de uma ação clara para encerrar minha sessão com segurança, para impedir acessos não autorizados aos meus lançamentos bancários e patrimônio ao sair do dispositivo.
-
-**Why this priority**: A integridade e segurança de dados financeiros sensíveis exige controle confiável de encerramento de sessão ativo.
-
-**Independent Test**: Pode ser testado na seção de segurança acionando a opção "Sair da Sessão" e verificando que a sessão é encerrada com redirecionamento para o login.
+**Independent Test**: Pode ser testado na aba `/settings/profile`: alterar o nome de exibição, selecionar um arquivo de imagem (JPG, PNG ou WebP até 5MB), visualizar a prévia instantânea, salvar as modificações e confirmar que o nome e a foto refletem imediatamente no avatar do topo da aplicação. Em seguida, testar a remoção do avatar e confirmar o retorno ao fallback de iniciais do nome.
 
 **Acceptance Scenarios**:
 
-1. **Given** a aba de segurança do usuário, **When** renderizada, **Then** exibe a área de encerramento de sessão com descrição clara do impacto do logout.
-2. **Given** uma pessoa autenticada em qualquer área do sistema, **When** ela aciona a ação "Sair da sessão" (Logout), **Then** os tokens de acesso locais são revogados e destruídos, o cache em memória é limpo e a navegação é redirecionada para a tela de login.
+1. **Given** a página `/settings/profile`, **When** carregada, **Then** exibe o avatar atual (ou fallback com iniciais), o nome de exibição, o e-mail cadastrado (somente leitura) e a data de criação da conta.
+2. **Given** o formulário de identidade, **When** o usuário escolhe um arquivo de imagem válido (JPG, PNG ou WebP com tamanho <= 5MB), **Then** a interface apresenta um preview visual imediato do avatar no cliente antes de qualquer requisição ao servidor.
+3. **Given** uma foto de perfil já cadastrada, **When** o usuário aciona a opção de remoção e confirma o salvamento, **Then** o sistema executa a exclusão física no backend (`DELETE /api/user/avatar`), desvincula o avatar e restaura o componente visual de iniciais do nome.
+4. **Given** a edição de nome e/ou foto de perfil, **When** o usuário clica em "Salvar alterações", **Then** o sistema despacha as requisições apropriadas (`PATCH /api/user/profile` para o nome e `POST /api/user/avatar` multipart para o arquivo), exibe feedback de sucesso e sincroniza o cabeçalho (`UserNav`).
+5. **Given** a seleção de um arquivo inválido (> 5MB ou formato incompatível), **When** avaliado pelo cliente, **Then** a interface intercepta antes do envio, exibe mensagem clara em português e preserva o avatar anterior.
 
 ---
 
-### User Story 3 - Vínculo de Conta Google (Social Account Linking) (Priority: P2)
+### User Story 2 - Login Social com Google na Tela de Entrada (Priority: P1) 🎯 MVP
 
-Como uma pessoa usuária que utiliza o ecossistema Google, desejo vincular minha conta Google à minha conta financeira existente, para que eu possa realizar login de forma rápida e segura com um único clique (Single Sign-On).
+Como uma pessoa usuária com conta Google previamente vinculada, desejo realizar login na tela de autenticação (`/login`) utilizando um botão "Entrar com o Google" com um clique, para agilizar meu acesso à plataforma sem a necessidade de digitar e-mail e senha convencionais.
 
-**Why this priority**: Facilita a rotina de autenticação do usuário, reduz atrito de login e fornece alternativa segura baseada no ecossistema de identidade Google.
+**Why this priority**: Reduz o atrito no fluxo de autenticação diário para usuários que utilizam o ecossistema Google, mantendo conformidade com as diretrizes visuais e de segurança do Google Identity Services (GIS).
 
-**Independent Test**: Pode ser testado acessando a aba de contas vinculadas, clicando em "Vincular com Google", completando o fluxo de consentimento na janela do Google, e verificando que a interface passa a exibir a conta Google vinculada com o endereço de e-mail associado.
+**Independent Test**: Pode ser testado na tela `/login`: acionar o botão de login com o Google, autenticar na janela popup do Google e verificar se o `idToken` é enviado a `POST /api/auth/google`. Em caso de sucesso, confirmar o redirecionamento ao dashboard (ou onboarding de chave de IA se `hasAiKey: false`). Em caso de conta Google não vinculada (erro 401/404 do backend), verificar que a tela exibe orientação amigável instruindo o usuário a entrar com e-mail/senha para vincular sua conta no perfil.
 
 **Acceptance Scenarios**:
 
-1. **Given** a seção "Contas Conectadas", **When** o usuário não possui vínculo com Google, **Then** um card com o logotipo do Google e o botão "Conectar Conta Google" é disponibilizado.
-2. **Given** o clique em "Conectar Conta Google", **When** o fluxo OAuth2 é concluído com êxito, **Then** a interface atualiza exibindo o selo "Vinculado", acompanhado do e-mail Google conectado e da data de vinculação.
-3. **Given** uma conta Google vinculada e uma senha local ativa, **When** o usuário clica em "Desvincular Google", **Then** um diálogo de confirmação solicita confirmação e, ao aceitar, desfaz o vínculo preservando o acesso habitual por e-mail e senha.
-4. **Given** um usuário que autenticou originalmente apenas via Google (sem senha local prévia), **When** ele tenta desvincular o Google, **Then** o sistema exige o cadastramento de uma senha local antes de permitir a desvinculação, impedindo bloqueio de conta.
+1. **Given** a tela de login (`/login`), **When** renderizada, **Then** disponibiliza o botão oficial do Google ("Entrar com o Google") separado do formulário tradicional de e-mail e senha por um divisor ("ou continue com").
+2. **Given** que o usuário clica em "Entrar com o Google" e autoriza o consentimento na janela do Google, **When** a credencial JWT (`idToken`) é emitida pelo Google Identity Services, **Then** o frontend envia o payload `{ idToken }` para `POST /api/auth/google`.
+3. **Given** uma resposta 200 OK do endpoint `POST /api/auth/google`, **When** o token de sessão é recebido, **Then** o sistema armazena o token de autenticação, hidrata o usuário na sessão e redireciona para o dashboard (ou `/onboarding` se `hasAiKey: false`).
+4. **Given** que a conta Google utilizada NÃO está vinculada a nenhum perfil cadastrado (retorno 401 ou 404 do backend), **When** o erro é interceptado, **Then** a interface apresenta um alerta claro: *"Nenhuma conta vinculada a este perfil Google. Faça login com seu e-mail e senha tradicionais e vincule sua conta Google nas configurações de Segurança."*
+5. **Given** que o usuário fecha voluntariamente a janela popup do Google ou cancela o consentimento, **When** o evento de cancelamento ocorre, **Then** o frontend restaura o botão e a interface ao estado inicial sem disparar erros intrusivos.
 
 ---
 
-### User Story 4 - Central de Exportação de Dados Financeiros (CSV, PDF e XLSX) (Priority: P2)
+### User Story 3 - Vínculo e Desvinculação de Conta Google no Perfil de Segurança (Priority: P2)
 
-Como uma pessoa usuária que necessita arquivar meus comprovantes financeiros, declarar impostos ou realizar análises personalizadas em softwares externos, desejo dispor de uma área dedicada para exportar meus lançamentos e relatórios consolidados nos formatos CSV, PDF formatado e XLSX, com filtros flexíveis de período e contas.
+Como uma pessoa usuária autenticada na plataforma, desejo gerenciar a vinculação da minha conta Google na aba de Segurança (`/settings/security`), para associar minha credencial do Google à minha conta financeira existente ou desvinculá-la quando não desejar mais o login social.
 
-**Why this priority**: Garante soberania e portabilidade total dos dados ao usuário (alinhada aos direitos LGPD de portabilidade), permitindo prestação de contas, contabilidade externa e backup independente.
+**Why this priority**: Dá controle e flexibilidade à governança da conta, permitindo alternar ou associar credenciais sociais com salvaguardas explícitas contra bloqueio de acesso (lockout).
 
-**Independent Test**: Pode ser testado na aba/tela de Exportação selecionando o mês vigente, aplicando filtros opcionais de categoria/conta, selecionando o formato desejado (CSV, PDF ou XLSX) e clicando em "Exportar": o sistema deve gerar o arquivo formatado e disparar o download com sucesso.
+**Independent Test**: Pode ser testado na aba `/settings/security` na seção "Contas Conectadas": clicar em "Conectar Conta Google", autorizar no popup, verificar a chamada para `POST /api/auth/google/link` e conferir a atualização do status para "Conectado" com o e-mail Google associado. Em seguida, testar o fluxo de desvinculação (`DELETE /api/auth/google/unlink`) com diálogo de confirmação e validar a trava de segurança quando a conta não possui senha local cadastrada.
 
 **Acceptance Scenarios**:
 
-1. **Given** a tela de exportação de dados, **When** o usuário acessa o módulo, **Then** a interface apresenta opções para selecionar: período (mês específico, intervalo customizado ou histórico completo), filtro por conta bancária e filtro por categoria.
-2. **Given** os filtros definidos, **When** o usuário escolhe a opção "Exportar CSV", **Then** o sistema gera um arquivo `.csv` codificado em UTF-8 com cabeçalho padrão (`Data, Descrição, Categoria, Conta, Tipo, Valor`) e separadores compatíveis com softwares brasileiros de planilha.
-3. **Given** os filtros definidos, **When** o usuário escolhe a opção "Exportar XLSX", **Then** o sistema gera uma pasta de trabalho `.xlsx` estruturada com colunas formatadas para moeda brasileira (BRL), estilos de cabeçalho e aba de resumo consolidado com KPIs do período.
-4. **Given** os filtros definidos, **When** o usuário escolhe a opção "Exportar Relatório em PDF", **Then** o sistema compila um documento PDF diagramado contendo cabeçalho institucional, sumário executivo com KPIs (receitas, despesas, faturas, saldo líquido) e a tabela discriminada de lançamentos pronta para impressão ou arquivamento fiscal.
-5. **Given** uma solicitação de exportação em processamento, **When** o arquivo está sendo gerado, **Then** um indicador visual de progresso informa o status e desabilita cliques múltiplos até a conclusão do download.
+1. **Given** a seção "Contas Conectadas" em `/settings/security`, **When** o usuário não possui vínculo com o Google (`googleLinked: false`), **Then** exibe o badge "Não vinculado" e o botão "Conectar Conta Google".
+2. **Given** que o usuário clica em "Conectar Conta Google", **When** o popup do Google retorna o `idToken`, **Then** o frontend dispara `POST /api/auth/google/link` enviando `{ idToken }`, atualiza os dados em cache do TanStack Query e exibe o status "Conectado" com o e-mail Google e a data de vinculação.
+3. **Given** uma tentativa de vincular uma conta Google que já está associada a outro usuário (erro 409 Conflict), **When** interceptado, **Then** a interface informa que a conta Google selecionada já se encontra em uso por outro perfil no sistema.
+4. **Given** uma conta Google conectada e uma senha local ativa (`hasLocalPassword: true`), **When** o usuário clica em "Desvincular Google" e confirma no diálogo modal, **Then** o sistema executa `DELETE /api/auth/google/unlink`, restaura o status para "Não vinculado" e exibe aviso de confirmação.
+5. **Given** uma conta Google que constitui o único método de login do usuário (`hasLocalPassword: false`), **When** o usuário clica em desvincular o Google, **Then** a interface impede o desvínculo, abrindo um modal de aviso informativo explicando que ele deve cadastrar uma senha local antes de poder desvincular a conta Google.
 
 ---
 
-### Edge Cases
+### User Story 4 - Central de Exportação de Dados Financeiros (CSV, XLSX e PDF) (Priority: P2)
 
-- **Upload de arquivo de foto inválido ou corrompido**: Se o usuário selecionar um arquivo que não seja imagem ou que exceda o tamanho limite de 5MB, a interface deve interceptar imediatamente antes do upload, exibindo mensagem clara em português e mantendo o avatar anterior intacto.
-- **Tentativa de desvincular o único método de login**: Se a conta for criada exclusivamente via Google OAuth e o usuário não possuir senha local cadastrada, a desvinculação da conta Google é bloqueada até que o usuário defina uma senha de acesso.
-- **Exportação de período sem nenhuma movimentação**: Ao solicitar exportação para um período sem lançamentos, o sistema alerta amigavelmente que não existem transações no intervalo selecionado antes de gerar um arquivo vazio.
-- **Navegação com sessão expirada ou invalidada durante a exportação**: Se a sessão for encerrada em outra aba ou o token expirar, a tentativa de exportação redireciona de forma elegante para a autenticação com preservação do estado.
+Como uma pessoa usuária que necessita arquivar comprovantes, prestar contas ou declarar impostos, desejo dispor de uma central dedicada de exportação de dados (`/settings/export`) para baixar meus lançamentos nos formatos CSV estruturado, XLSX formatado e PDF diagramado, aplicando filtros opcionais de período, conta bancária e categoria.
+
+**Why this priority**: Assegura soberania sobre os próprios dados (LGPD) e atende necessidades fiscais e de auditoria contábil com relatórios profissionais.
+
+**Independent Test**: Pode ser testado na aba `/settings/export`: selecionar os filtros desejados (ex: mês específico, conta bancária e categoria), acionar o download para cada formato (CSV, XLSX e PDF), validando que a chamada a `GET /api/transactions/export` recebe os query params corretos e que o navegador inicia o download do arquivo com os headers e nomes canônicos retornados pelo backend.
+
+**Acceptance Scenarios**:
+
+1. **Given** a aba `/settings/export`, **When** carregada, **Then** exibe controles de filtros: seleção de período (mês específico `YYYY-MM` ou intervalo `startDate` e `endDate`), seletor de conta bancária e seletor de categoria canônica.
+2. **Given** os filtros definidos, **When** o usuário aciona "Exportar CSV", **Then** o frontend invoca `GET /api/transactions/export?format=csv&...`, recebe o stream de texto UTF-8 delimitado por ponto e vírgula com BOM (`\uFEFF`) e inicia o download do arquivo `.csv`.
+3. **Given** os filtros definidos, **When** o usuário aciona "Exportar XLSX", **Then** o frontend invoca `GET /api/transactions/export?format=xlsx&...`, recebe a planilha Excel formatada com valores em BRL e inicia o download do arquivo `.xlsx`.
+4. **Given** os filtros definidos, **When** o usuário aciona "Exportar PDF", **Then** o frontend invoca `GET /api/transactions/export?format=pdf&...`, recebe o documento PDF com cabeçalho institucional e resumo de KPIs e inicia o download do arquivo `.pdf`.
+5. **Given** uma solicitação de download em andamento, **When** o backend está compilando o arquivo, **Then** os botões exibem estado de carregamento (`isPending`), impedindo cliques múltiplos simultâneos e emitindo toast de sucesso ou erro amigável ao finalizar.
+
+---
+
+### User Story 5 - Encerramento Seguro de Sessão (Logout) (Priority: P3)
+
+Como uma pessoa usuária da plataforma, desejo dispor de uma ação de encerramento seguro de sessão na tela de configurações de segurança e no menu de usuário, para desconectar meu acesso ativo com invalidação de credenciais no cliente.
+
+**Why this priority**: Evita que sessões permaneçam abertas indevidamente em dispositivos compartilhados ou após término de uso.
+
+**Independent Test**: Pode ser testado na aba `/settings/security` ou no menu do usuário clicando em "Sair da Sessão": validar a destruição dos tokens locais (`auth_token`, `auth_user`), limpeza do cache do TanStack Query e redirecionamento para `/login`.
+
+**Acceptance Scenarios**:
+
+1. **Given** a tela `/settings/security`, **When** renderizada, **Then** exibe a seção de Encerramento de Sessão com botão proeminente "Sair da Sessão".
+2. **Given** o clique em "Sair da Sessão", **When** acionado, **Then** os tokens locais de autenticação são expurgados do `localStorage`, o estado do `AuthProvider` é redefinido para não autenticado e o usuário é redirecionado imediatamente para `/login`.
+
+---
+
+## Edge Cases
+
+- **Upload de arquivo inválido ou corrompido**: Se o usuário selecionar um arquivo com extensão não permitida ou superior a 5MB, a interface deve interceptar no cliente via Zod/validador antes de efetuar a requisição, exibindo mensagem amigável e preservando o avatar anterior.
+- **Tentativa de desvincular único método de acesso**: Bloqueio ativo no cliente via modal informativo quando `hasLocalPassword: false`, alinhado ao retorno de erro 400 do backend (`Não é possível desvincular a conta Google pois ela é o único método de autenticação da conta. Cadastre uma senha antes de desvincular.`).
+- **Conta Google já vinculada a outro usuário**: Tratamento do código HTTP 409 retornando mensagem explicativa na interface sem corromper o estado atual.
+- **Login social com conta Google não vinculada**: Tratamento do código HTTP 401 ou 404 em `POST /api/auth/google`, orientando o usuário com mensagem didática na tela de login a entrar com e-mail e senha tradicionais e vincular a conta na aba de Segurança.
+- **Cancelamento voluntário de popup Google**: Fechamento voluntário do modal/popup do Google pelo usuário deve restaurar o estado visual do botão sem lançar exceções não tratadas nem travar a tela.
+- **Exportação de período sem lançamentos**: Tratamento resiliente pelo backend retornando extrato zerado ou vazio com cabeçalhos consistentes.
+- **2FA e Cloudflare Turnstile**: Nenhuma tela, input, validação ou dependência desses mecanismos deve estar presente.
+
+---
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: O sistema DEVE disponibilizar uma aba/seção dedicada de "Meu Perfil" permitindo visualizar e atualizar o nome de exibição do usuário.
-- **FR-002**: O sistema DEVE permitir upload, visualização prévia, atualização e exclusão de foto de perfil (avatar), aceitando formatos JPG, PNG e WebP com tamanho máximo de 5MB.
-- **FR-003**: Ao remover a foto de perfil, o sistema DEVE renderizar de forma determinística um avatar alternativo contendo as iniciais do nome do usuário.
-- **FR-004**: O sistema DEVE fornecer ação de encerramento seguro de sessão ("Sair da Sessão"), invalidando o token no cliente e redirecionando para a rota de login pública.
-- **FR-005**: O sistema DEVE permitir vincular e desvincular uma conta Google ao perfil existente através de fluxo OAuth2 padrão.
-- **FR-006**: O sistema DEVE impedir a desvinculação da conta Google caso esta seja a única via de acesso cadastrada pelo usuário sem senha local associada.
-- **FR-007**: O sistema DEVE disponibilizar uma área de exportação de dados financeiros com filtros por intervalo de datas/mês, conta financeira e categoria.
-- **FR-008**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato CSV estruturado com codificação UTF-8.
-- **FR-009**: O sistema DEVE ser capaz de exportar os lançamentos financeiros no formato XLSX com colunas estilizadas e células formatadas em moeda brasileira (BRL).
-- **FR-010**: O sistema DEVE ser capaz de gerar e exportar um relatório consolidado em PDF diagramado contendo resumo de KPIs e listagem de transações para impressão e comprovação fiscal.
+- **FR-001**: O sistema DEVE fornecer visualização e edição de dados cadastrais na rota `/settings/profile`, permitindo alterar o nome de exibição através de requisição `PATCH /api/user/profile`.
+- **FR-002**: O sistema DEVE permitir upload de foto de perfil via `POST /api/user/avatar` (`multipart/form-data`, campo `file`), aceitando formatos JPG, PNG e WebP com tamanho limite de 5MB.
+- **FR-003**: O sistema DEVE permitir exclusão de foto de perfil via `DELETE /api/user/avatar`, restaurando o avatar com as iniciais do nome.
+- **FR-004**: O sistema DEVE oferecer prévia instantânea client-side no componente de avatar antes da persistência no servidor.
+- **FR-005**: A tela de login (`/login`) DEVE disponibilizar a opção de login social com Google através da biblioteca oficial `@react-oauth/google`, despachando a credencial JWT `{ idToken }` para o endpoint `POST /api/auth/google`.
+- **FR-006**: Ao receber resposta 200 de `POST /api/auth/google`, a aplicação DEVE persistir a sessão de forma segura e redirecionar para `/dashboard` (ou `/onboarding` se `hasAiKey: false`).
+- **FR-007**: Ao receber resposta 401 ou 404 de `POST /api/auth/google`, o frontend DEVE exibir mensagem clara orientando o usuário a efetuar login com e-mail/senha e realizar a vinculação no perfil.
+- **FR-008**: A seção "Contas Conectadas" na rota `/settings/security` DEVE exibir o status de vinculação do Google (`googleLinked`, `googleEmail`, `googleLinkedAt`).
+- **FR-009**: O sistema DEVE permitir a vinculação da conta Google logada através de `POST /api/auth/google/link` enviando `{ idToken }`.
+- **FR-010**: O sistema DEVE permitir a desvinculação da conta Google através de `DELETE /api/auth/google/unlink`.
+- **FR-011**: O sistema DEVE impedir a desvinculação da conta Google se `hasLocalPassword: false`, alertando o usuário sobre a necessidade de definir uma senha antes da ação.
+- **FR-012**: O sistema DEVE fornecer a central de exportação em `/settings/export` consumindo `GET /api/transactions/export` com os formatos `csv`, `xlsx` e `pdf`.
+- **FR-013**: A central de exportação DEVE suportar os filtros opcionais `month` (`YYYY-MM`), `startDate`, `endDate`, `accountId` e `category`.
+- **FR-014**: O sistema DEVE acionar o download do arquivo preservando a codificação adequada (UTF-8 com BOM para CSV, binário para XLSX e PDF) e o nome indicado no header `Content-Disposition`.
+- **FR-015**: O sistema DEVE fornecer ação de logout seguro, destruindo tokens no cliente e redirecionando para a rota de login pública.
+- **FR-016**: O sistema NÃO DEVE incluir componentes, validações, rotas ou dependências de 2FA ou Cloudflare Turnstile.
 
-### Key Entities *(include if feature involves data)*
+---
 
-- **Perfil do Usuário (`UserProfile`)**: Entidade que reúne identidade cadastral (`id`, `name`, `email`, `avatarUrl`), perfil financeiro voluntário (`financialProfile`), credenciais de segurança e preferências da conta.
-- **Configuração de Segurança (`SecuritySettings`)**: Configurações relativas a `hasLocalPassword` (existência de senha clássica) e `googleLinked` (detalhes da conta Google associada: e-mail e data de vinculação).
-- **Parâmetros de Exportação (`ExportFilters`)**: Critérios informados pelo usuário para geração de arquivos, incluindo `format` (`CSV`, `XLSX`, `PDF`), `startDate`, `endDate`, `accountId` e `category`.
+### Key Entities
+
+- **UserProfile**: `{ id: string; email: string; name?: string; avatarUrl?: string | null; hasAiKey: boolean; security?: UserSecuritySettings; createdAt?: string }`
+- **UserSecuritySettings**: `{ hasLocalPassword: boolean; googleLinked: boolean; googleEmail?: string; googleLinkedAt?: string }`
+- **GoogleAuthPayload**: `{ idToken: string }`
+- **ExportFilterParams**: `{ format: 'csv' | 'xlsx' | 'pdf'; month?: string; startDate?: string; endDate?: string; accountId?: string; category?: string }`
+
+---
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% dos usuários conseguem atualizar seu nome e foto de perfil com preview em menos de 10 segundos.
-- **SC-002**: Redução a zero de bloqueios acidentais de conta ao impedir desvinculação do Google sem senha local previamente definida.
-- **SC-003**: Geração e download de arquivos de exportação (CSV, XLSX e PDF) em menos de 5 segundos para períodos com até 5.000 lançamentos.
-- **SC-004**: 100% de aprovação na suíte de testes automatizados com cobertura para todos os novos componentes de formulário, fluxos de segurança e geradores de exportação.
-
-## Assumptions
-
-- A geração dos arquivos nos formatos CSV, XLSX e PDF pode ser realizada através de bibliotecas especializadas e leves no cliente ou via endpoints dedicados do backend com streaming de arquivo.
-- O upload de fotos de perfil pode armazenar o arquivo em CDN / bucket seguro ou como string base64 / imagem persistida no backend.
+- **SC-001**: O upload e preview de fotos de perfil ocorrem em menos de 100ms no cliente para imagens até 5MB.
+- **SC-002**: 100% dos fluxos de cancelamento ou fechamento de popup do Google mantêm a tela de login ou segurança responsiva sem congelamento de interface.
+- **SC-003**: 100% das tentativas de desvinculação do Google sem senha local ativa são bloqueadas no cliente com orientação explicativa.
+- **SC-004**: Download de relatórios financeiros (CSV, XLSX e PDF) disparado diretamente com headers nativos e salvamento no sistema de arquivos do usuário.
+- **SC-005**: 100% de aprovação na suíte de testes unitários e de integração com Vitest (`pnpm test`) e zero erros estáticos no TypeScript (`pnpm typecheck`).

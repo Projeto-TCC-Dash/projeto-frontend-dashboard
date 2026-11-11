@@ -1,36 +1,33 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { getCurrentYearMonth } from "@/lib/formatters";
-import { useAuth } from "@/hooks/use-auth";
-import { useUserProfile } from "@/hooks/use-user-profile";
-import { useFinancialAnalysis } from "@/hooks/use-financial-analysis";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { ProfileOnboardingBanner } from "@/components/profile/profile-onboarding-banner";
-import { MetricCardsGrid } from "@/components/dashboard/metric-cards-grid";
-import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart";
-import { AiDiagnosisCard } from "@/components/dashboard/ai-diagnosis-card";
-import { AiKeyModal } from "@/components/ai-key/ai-key-modal";
+import * as React from "react"
+import { getCurrentYearMonth } from "@/lib/formatters"
+import { useAuth } from "@/hooks/use-auth"
+import { useUserProfile } from "@/hooks/use-user-profile"
+import { useFinancialAnalysis } from "@/hooks/use-financial-analysis"
+import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import { ProfileOnboardingBanner } from "@/components/profile/profile-onboarding-banner"
+import { MetricCardsGrid } from "@/components/dashboard/metric-cards-grid"
+import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart"
+import { AiDiagnosisCard } from "@/components/dashboard/ai-diagnosis-card"
+import { AiKeyModal } from "@/components/ai-key/ai-key-modal"
 
 export default function DashboardPage() {
-  const [selectedMonth, setSelectedMonth] = React.useState<string>(getCurrentYearMonth());
-  const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState<boolean>(false);
-  const { user } = useAuth();
-  const { data: userProfile } = useUserProfile();
+  const [selectedMonth, setSelectedMonth] = React.useState<string>(
+    getCurrentYearMonth()
+  )
+  const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState<boolean>(false)
+  const { user } = useAuth()
+  const { data: userProfile } = useUserProfile()
 
   const hasFinancialProfile = Boolean(
     userProfile?.financialProfile?.incomeType ||
-      (userProfile?.financialProfile?.goals && userProfile.financialProfile.goals.length > 0)
-  );
+    (userProfile?.financialProfile?.goals &&
+      userProfile.financialProfile.goals.length > 0)
+  )
 
-  const {
-    metrics,
-    analysis,
-    isLoading,
-    isRefreshing,
-    error,
-    refreshAnalysis,
-  } = useFinancialAnalysis(selectedMonth);
+  const { metrics, analysis, isLoading, isRefreshing, error, refreshAnalysis } =
+    useFinancialAnalysis(selectedMonth)
 
   return (
     <div className="space-y-6">
@@ -70,10 +67,7 @@ export default function DashboardPage() {
       />
 
       {/* Modal de Configuração de Chave Gemini (BYOK) */}
-      <AiKeyModal
-        open={aiKeyModalOpen}
-        onOpenChange={setAiKeyModalOpen}
-      />
+      <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />
     </div>
-  );
+  )
 }

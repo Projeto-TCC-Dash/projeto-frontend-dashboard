@@ -1,15 +1,16 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
+import * as React from "react"
+import { useGoogleLogin, useGoogleOAuth } from "@react-oauth/google"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -17,8 +18,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useGoogleAuth } from "@/hooks/use-google-auth";
+} from "@/components/ui/dialog"
+import { useGoogleAuth } from "@/hooks/use-google-auth"
 import {
   CheckCircle2,
   AlertTriangle,
@@ -26,19 +27,114 @@ import {
   Unlink,
   Link2,
   ShieldAlert,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export interface ConnectedAccountsSectionProps {
-  googleLinked?: boolean;
-  googleEmail?: string;
-  googleLinkedAt?: string;
-  hasLocalPassword?: boolean;
-  onLink?: () => Promise<unknown>;
-  onUnlink?: () => Promise<unknown>;
-  isLinking?: boolean;
-  isUnlinking?: boolean;
-  className?: string;
+  googleLinked?: boolean
+  googleEmail?: string
+  googleLinkedAt?: string
+  hasLocalPassword?: boolean
+  onLink?: () => Promise<unknown>
+  onUnlink?: () => Promise<unknown>
+  isLinking?: boolean
+  isUnlinking?: boolean
+  className?: string
+}
+
+interface GoogleOAuthConnectButtonProps {
+  isLinking: boolean
+  onAuthorizeStart: () => void
+  onAuthorizeEnd: () => void
+  onTokenReceived: (token: string) => Promise<void>
+  onError: (message: string) => void
+}
+
+function ConnectGoogleButtonView({
+  isLinking,
+  onClick,
+}: {
+  isLinking: boolean
+  onClick: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={onClick}
+      disabled={isLinking}
+      data-testid="link-google-button"
+      className="w-full gap-1.5 text-xs sm:w-auto"
+    >
+      {isLinking ? (
+        <Loader2 className="size-3.5 animate-spin" />
+      ) : (
+        <Link2 className="size-3.5" />
+      )}
+      <span>Conectar Conta Google</span>
+    </Button>
+  )
+}
+
+/**
+ * Isolates Google OAuth hooks so tests injecting `onLink` can mount without GoogleOAuthProvider.
+ */
+function GoogleOAuthConnectButton({
+  isLinking,
+  onAuthorizeStart,
+  onAuthorizeEnd,
+  onTokenReceived,
+  onError,
+}: GoogleOAuthConnectButtonProps) {
+  const { scriptLoadedSuccessfully } = useGoogleOAuth()
+
+  const triggerGooglePopup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      if (!tokenResponse?.access_token) {
+        onAuthorizeEnd()
+        onError("Não foi possível obter a credencial da conta Google.")
+        return
+      }
+      try {
+        await onTokenReceived(tokenResponse.access_token)
+      } finally {
+        onAuthorizeEnd()
+      }
+    },
+    onError: (errorResponse) => {
+      onAuthorizeEnd()
+      onError(
+        errorResponse?.error_description ||
+          "Falha ao autorizar conexão com o Google."
+      )
+    },
+    onNonOAuthError: (nonOAuthError) => {
+      onAuthorizeEnd()
+      if (nonOAuthError.type === "popup_failed_to_open") {
+        onError(
+          "O navegador bloqueou a janela popup do Google. Permita popups para este site e tente novamente."
+        )
+      } else if (nonOAuthError.type === "popup_closed") {
+        onError("Conexão com o Google cancelada antes da conclusão.")
+      } else {
+        onError("Não foi possível concluir a autenticação com o Google.")
+      }
+    },
+  })
+
+  const handleClick = () => {
+    if (!scriptLoadedSuccessfully) {
+      onError(
+        "Serviço de autenticação do Google ainda está carregando ou foi bloqueado. Aguarde um instante e tente novamente."
+      )
+      return
+    }
+    onAuthorizeStart()
+    triggerGooglePopup()
+  }
+
+  return <ConnectGoogleButtonView isLinking={isLinking} onClick={handleClick} />
 }
 
 export function ConnectedAccountsSection({
@@ -52,70 +148,84 @@ export function ConnectedAccountsSection({
   isUnlinking: propIsUnlinking,
   className,
 }: ConnectedAccountsSectionProps) {
-  const hook = useGoogleAuth();
-  const linkAction = onLink || hook.linkGoogle;
-  const unlinkAction = onUnlink || hook.unlinkGoogle;
-  const isLinking = propIsLinking ?? hook.isLinking;
-  const isUnlinking = propIsUnlinking ?? hook.isUnlinking;
+  const hook = useGoogleAuth()
+  const unlinkAction = onUnlink || hook.unlinkGoogle
+  const [isAuthorizingGoogle, setIsAuthorizingGoogle] = React.useState(false)
+  const isLinking = propIsLinking ?? (hook.isLinking || isAuthorizingGoogle)
+  const isUnlinking = propIsUnlinking ?? hook.isUnlinking
 
-  const [blockedDialogOpen, setBlockedDialogOpen] = React.useState(false);
-  const [confirmUnlinkDialogOpen, setConfirmUnlinkDialogOpen] = React.useState(false);
-  const [feedbackError, setFeedbackError] = React.useState<string | null>(null);
+  const [blockedDialogOpen, setBlockedDialogOpen] = React.useState(false)
+  const [confirmUnlinkDialogOpen, setConfirmUnlinkDialogOpen] =
+    React.useState(false)
+  const [feedbackError, setFeedbackError] = React.useState<string | null>(null)
 
   const handleUnlinkClick = () => {
-    setFeedbackError(null);
+    setFeedbackError(null)
     if (!hasLocalPassword) {
-      setBlockedDialogOpen(true);
+      setBlockedDialogOpen(true)
     } else {
-      setConfirmUnlinkDialogOpen(true);
+      setConfirmUnlinkDialogOpen(true)
     }
-  };
+  }
 
   const handleConfirmUnlink = async () => {
-    setFeedbackError(null);
+    setFeedbackError(null)
     try {
-      await unlinkAction();
-      setConfirmUnlinkDialogOpen(false);
+      await unlinkAction()
+      setConfirmUnlinkDialogOpen(false)
     } catch (err: unknown) {
       setFeedbackError(
         err instanceof Error ? err.message : "Erro ao desvincular conta Google"
-      );
+      )
     }
-  };
+  }
 
   const handleLinkClick = async () => {
-    setFeedbackError(null);
+    if (!onLink) return
+    setFeedbackError(null)
     try {
-      await linkAction();
+      await onLink()
     } catch (err: unknown) {
       setFeedbackError(
         err instanceof Error ? err.message : "Erro ao vincular conta Google"
-      );
+      )
     }
-  };
+  }
+
+  const handleGoogleTokenReceived = async (token: string) => {
+    setFeedbackError(null)
+    try {
+      await hook.linkGoogle({ idToken: token })
+    } catch (err: unknown) {
+      setFeedbackError(
+        err instanceof Error ? err.message : "Erro ao vincular conta Google"
+      )
+    }
+  }
 
   const formattedLinkedAt = React.useMemo(() => {
-    if (!googleLinkedAt) return null;
+    if (!googleLinkedAt) return null
     try {
       return new Date(googleLinkedAt).toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "short",
         year: "numeric",
-      });
+      })
     } catch {
-      return null;
+      return null
     }
-  }, [googleLinkedAt]);
+  }, [googleLinkedAt])
 
   return (
     <Card className={cn("shadow-sm", className)}>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <Link2 className="size-5 text-primary" />
           <span>Contas Conectadas & Identidade Externa</span>
         </CardTitle>
         <CardDescription>
-          Vincule serviços externos para agilizar o login ou use como método de autenticação secundário.
+          Vincule serviços externos para agilizar o login ou use como método de
+          autenticação secundário.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -130,9 +240,9 @@ export function ConnectedAccountsSection({
         )}
 
         {/* Linha Google */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg border border-border/70 bg-card/50">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="size-10 rounded-lg bg-muted flex items-center justify-center font-bold text-sm shrink-0 border border-border">
+        <div className="flex flex-col justify-between gap-4 rounded-lg border border-border/70 bg-card/50 p-4 sm:flex-row sm:items-center">
+          <div className="flex items-start gap-3.5 sm:items-center">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-sm font-bold">
               {/* Ícone de Google SVG */}
               <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -156,9 +266,14 @@ export function ConnectedAccountsSection({
 
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm text-foreground">Google</span>
+                <span className="text-sm font-semibold text-foreground">
+                  Google
+                </span>
                 {googleLinked ? (
-                  <Badge variant="default" className="text-[11px] gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <Badge
+                    variant="default"
+                    className="gap-1 border border-emerald-500/20 bg-emerald-500/10 text-[11px] text-emerald-600 dark:text-emerald-400"
+                  >
                     <CheckCircle2 className="size-3" />
                     <span>Conectado</span>
                   </Badge>
@@ -171,7 +286,10 @@ export function ConnectedAccountsSection({
 
               {googleLinked ? (
                 <p className="text-xs text-muted-foreground">
-                  Vinculado a <strong className="text-foreground">{googleEmail || "sua conta Google"}</strong>
+                  Vinculado a{" "}
+                  <strong className="text-foreground">
+                    {googleEmail || "sua conta Google"}
+                  </strong>
                   {formattedLinkedAt && ` desde ${formattedLinkedAt}`}
                 </p>
               ) : (
@@ -182,7 +300,7 @@ export function ConnectedAccountsSection({
             </div>
           </div>
 
-          <div className="sm:self-center shrink-0">
+          <div className="shrink-0 sm:self-center">
             {googleLinked ? (
               <Button
                 type="button"
@@ -191,7 +309,7 @@ export function ConnectedAccountsSection({
                 onClick={handleUnlinkClick}
                 disabled={isUnlinking}
                 data-testid="unlink-google-button"
-                className="gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive w-full sm:w-auto"
+                className="w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive sm:w-auto"
               >
                 {isUnlinking ? (
                   <Loader2 className="size-3.5 animate-spin" />
@@ -200,23 +318,22 @@ export function ConnectedAccountsSection({
                 )}
                 <span>Desvincular Google</span>
               </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
+            ) : onLink ? (
+              <ConnectGoogleButtonView
+                isLinking={isLinking}
                 onClick={handleLinkClick}
-                disabled={isLinking}
-                data-testid="link-google-button"
-                className="gap-1.5 text-xs w-full sm:w-auto"
-              >
-                {isLinking ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Link2 className="size-3.5" />
-                )}
-                <span>Conectar Conta Google</span>
-              </Button>
+              />
+            ) : (
+              <GoogleOAuthConnectButton
+                isLinking={isLinking}
+                onAuthorizeStart={() => {
+                  setFeedbackError(null)
+                  setIsAuthorizingGoogle(true)
+                }}
+                onAuthorizeEnd={() => setIsAuthorizingGoogle(false)}
+                onTokenReceived={handleGoogleTokenReceived}
+                onError={(message) => setFeedbackError(message)}
+              />
             )}
           </div>
         </div>
@@ -235,9 +352,12 @@ export function ConnectedAccountsSection({
             <DialogTitle className="text-center text-lg font-bold">
               Desvinculação Bloqueada
             </DialogTitle>
-            <DialogDescription className="text-center text-sm pt-2 text-muted-foreground">
-              A conta Google é atualmente sua <strong>única forma de acesso</strong> à plataforma,
-              e você ainda não configurou uma senha local. Para sua proteção e para evitar a perda de acesso à sua conta, cadastre uma senha antes de desvincular o Google.
+            <DialogDescription className="pt-2 text-center text-sm text-muted-foreground">
+              A conta Google é atualmente sua{" "}
+              <strong>única forma de acesso</strong> à plataforma, e você ainda
+              não configurou uma senha local. Para sua proteção e para evitar a
+              perda de acesso à sua conta, cadastre uma senha antes de
+              desvincular o Google.
             </DialogDescription>
           </DialogHeader>
 
@@ -254,7 +374,10 @@ export function ConnectedAccountsSection({
       </Dialog>
 
       {/* Diálogo de Confirmação de Desvinculação */}
-      <Dialog open={confirmUnlinkDialogOpen} onOpenChange={setConfirmUnlinkDialogOpen}>
+      <Dialog
+        open={confirmUnlinkDialogOpen}
+        onOpenChange={setConfirmUnlinkDialogOpen}
+      >
         <DialogContent
           data-testid="unlink-confirm-dialog"
           onClose={() => setConfirmUnlinkDialogOpen(false)}
@@ -262,8 +385,9 @@ export function ConnectedAccountsSection({
           <DialogHeader>
             <DialogTitle>Desvincular conta Google?</DialogTitle>
             <DialogDescription>
-              Você não poderá mais usar o login rápido do Google para acessar a plataforma
-              com este e-mail. Para entrar, será necessário utilizar sua senha cadastrada.
+              Você não poderá mais usar o login rápido do Google para acessar a
+              plataforma com este e-mail. Para entrar, será necessário utilizar
+              sua senha cadastrada.
             </DialogDescription>
           </DialogHeader>
 
@@ -291,5 +415,5 @@ export function ConnectedAccountsSection({
         </DialogContent>
       </Dialog>
     </Card>
-  );
+  )
 }

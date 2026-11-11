@@ -1,69 +1,79 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useAiKey } from "@/hooks/use-ai-key";
-import { aiKeySchema } from "@/lib/validations/ai-key";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ExternalLink, Eye, EyeOff, Loader2, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import * as React from "react"
+import { useAiKey } from "@/hooks/use-ai-key"
+import { aiKeySchema } from "@/lib/validations/ai-key"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Loader2,
+  CheckCircle2,
+  AlertTriangle,
+  AlertCircle,
+} from "lucide-react"
 
 interface AiKeyFormProps {
-  onSuccess?: (status?: "ACTIVE_VERIFIED" | "ACTIVE_PROVISIONAL_DEMAND") => void;
-  showHelpLink?: boolean;
+  onSuccess?: (status?: "ACTIVE_VERIFIED" | "ACTIVE_PROVISIONAL_DEMAND") => void
+  showHelpLink?: boolean
 }
 
 export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
-  const { saveAndTestKey, isPending } = useAiKey();
+  const { saveAndTestKey, isPending } = useAiKey()
 
-  const [apiKey, setApiKey] = React.useState("");
-  const [showKey, setShowKey] = React.useState(false);
-  const [fieldError, setFieldError] = React.useState<string | null>(null);
+  const [apiKey, setApiKey] = React.useState("")
+  const [showKey, setShowKey] = React.useState(false)
+  const [fieldError, setFieldError] = React.useState<string | null>(null)
   const [resultMessage, setResultMessage] = React.useState<{
-    type: "success" | "warning" | "error";
-    text: string;
-  } | null>(null);
+    type: "success" | "warning" | "error"
+    text: string
+  } | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setFieldError(null);
-    setResultMessage(null);
+    e.preventDefault()
+    setFieldError(null)
+    setResultMessage(null)
 
-    const cleanApiKey = apiKey.trim().replace(/^["']|["']$/g, "");
-    const validation = aiKeySchema.safeParse({ apiKey: cleanApiKey });
+    const cleanApiKey = apiKey.trim().replace(/^["']|["']$/g, "")
+    const validation = aiKeySchema.safeParse({ apiKey: cleanApiKey })
     if (!validation.success) {
-      setFieldError(validation.error.issues[0]?.message || "Chave de API inválida");
-      return;
+      setFieldError(
+        validation.error.issues[0]?.message || "Chave de API inválida"
+      )
+      return
     }
 
     try {
-      const response = await saveAndTestKey({ apiKey: validation.data.apiKey });
+      const response = await saveAndTestKey({ apiKey: validation.data.apiKey })
 
       if (response.status === "ACTIVE_PROVISIONAL_DEMAND") {
         setResultMessage({
           type: "warning",
           text: "Chave registrada com sucesso! Nota: Os servidores do Google AI Studio estão operando sob alta demanda temporária. A conexão está ativa, mas pode haver lentidão momentânea.",
-        });
+        })
         if (onSuccess) {
-          onSuccess("ACTIVE_PROVISIONAL_DEMAND");
+          onSuccess("ACTIVE_PROVISIONAL_DEMAND")
         }
       } else {
         setResultMessage({
           type: "success",
           text: "Conexão verificada com sucesso! Sua chave pessoal do Google Gemini está ativa e operacional.",
-        });
+        })
         if (onSuccess) {
-          onSuccess("ACTIVE_VERIFIED");
+          onSuccess("ACTIVE_VERIFIED")
         }
       }
     } catch (err: unknown) {
       const message =
         err instanceof Error
           ? err.message
-          : "Erro ao validar chave. Verifique se a chave é válida e possui permissões ativas no Google AI Studio.";
+          : "Erro ao validar chave. Verifique se a chave é válida e possui permissões ativas no Google AI Studio."
       setResultMessage({
         type: "error",
         text: message,
-      });
+      })
     }
   }
 
@@ -72,22 +82,22 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
       {resultMessage && (
         <div
           role="alert"
-          className={`flex items-start gap-2.5 p-3.5 text-sm rounded-lg border ${
+          className={`flex items-start gap-2.5 rounded-lg border p-3.5 text-sm ${
             resultMessage.type === "success"
-              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
               : resultMessage.type === "warning"
-              ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20"
-              : "bg-destructive/10 text-destructive border-destructive/20"
+                ? "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                : "border-destructive/20 bg-destructive/10 text-destructive"
           }`}
         >
           {resultMessage.type === "success" && (
-            <CheckCircle2 className="size-4 shrink-0 mt-0.5" />
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
           )}
           {resultMessage.type === "warning" && (
-            <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           )}
           {resultMessage.type === "error" && (
-            <AlertCircle className="size-4 shrink-0 mt-0.5" />
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
           )}
           <span className="leading-relaxed">{resultMessage.text}</span>
         </div>
@@ -96,7 +106,7 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
       <div className="space-y-1.5">
         <label
           htmlFor="apiKey"
-          className="text-sm font-medium text-foreground flex items-center justify-between"
+          className="flex items-center justify-between text-sm font-medium text-foreground"
         >
           <span>Chave de API do Google AI Studio</span>
           {showHelpLink && (
@@ -104,7 +114,7 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
               href="https://aistudio.google.com/app/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-normal"
+              className="inline-flex items-center gap-1 text-xs font-normal text-primary hover:underline"
             >
               Obter chave gratuita no Google
               <ExternalLink className="size-3" />
@@ -122,8 +132,8 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
             spellCheck={false}
             value={apiKey}
             onChange={(e) => {
-              setApiKey(e.target.value);
-              if (fieldError) setFieldError(null);
+              setApiKey(e.target.value)
+              if (fieldError) setFieldError(null)
             }}
             disabled={isPending}
             className="pr-10 font-mono text-xs sm:text-sm"
@@ -131,10 +141,14 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
           <button
             type="button"
             onClick={() => setShowKey(!showKey)}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute top-1/2 right-2.5 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             aria-label={showKey ? "Ocultar chave" : "Exibir chave"}
           >
-            {showKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            {showKey ? (
+              <EyeOff className="size-4" />
+            ) : (
+              <Eye className="size-4" />
+            )}
           </button>
         </div>
 
@@ -156,5 +170,5 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
         )}
       </Button>
     </form>
-  );
+  )
 }

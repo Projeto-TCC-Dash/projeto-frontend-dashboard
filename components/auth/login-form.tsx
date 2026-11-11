@@ -1,11 +1,13 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import { useGoogleLogin } from "@/hooks/use-google-login"
+import { GoogleLoginButton } from "@/components/auth/google-login-button"
+import { loginSchema, type LoginFormData } from "@/lib/validations/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Card,
   CardHeader,
@@ -13,70 +15,81 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
-import Link from "next/link";
+} from "@/components/ui/card"
+import { Loader2, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export function LoginForm() {
-  const router = useRouter();
-  const { login } = useAuth();
+  const router = useRouter()
+  const { login } = useAuth()
+  const {
+    loginWithGoogle,
+    isLoading: isGoogleLoading,
+    error: googleError,
+    clearError: clearGoogleError,
+  } = useGoogleLogin()
 
   const [formData, setFormData] = React.useState<LoginFormData>({
     email: "",
     password: "",
-  });
+  })
   const [fieldErrors, setFieldErrors] = React.useState<
     Partial<Record<keyof LoginFormData, string>>
-  >({});
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  >({})
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false)
+
+  const activeError = errorMessage || googleError
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
     if (fieldErrors[name as keyof LoginFormData]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+      setFieldErrors((prev) => ({ ...prev, [name]: undefined }))
     }
     if (errorMessage) {
-      setErrorMessage(null);
+      setErrorMessage(null)
+    }
+    if (googleError) {
+      clearGoogleError()
     }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErrorMessage(null);
+    e.preventDefault()
+    setErrorMessage(null)
 
-    const validation = loginSchema.safeParse(formData);
+    const validation = loginSchema.safeParse(formData)
     if (!validation.success) {
-      const errors: Partial<Record<keyof LoginFormData, string>> = {};
+      const errors: Partial<Record<keyof LoginFormData, string>> = {}
       for (const issue of validation.error.issues) {
-        const field = issue.path[0] as keyof LoginFormData;
+        const field = issue.path[0] as keyof LoginFormData
         if (!errors[field]) {
-          errors[field] = issue.message;
+          errors[field] = issue.message
         }
       }
-      setFieldErrors(errors);
-      return;
+      setFieldErrors(errors)
+      return
     }
 
-    setFieldErrors({});
-    setIsSubmitting(true);
+    setFieldErrors({})
+    setIsSubmitting(true)
 
     try {
-      const response = await login(validation.data);
+      const response = await login(validation.data)
       if (response.user.hasAiKey) {
-        router.push("/");
+        router.push("/")
       } else {
-        router.push("/onboarding");
+        router.push("/onboarding")
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMessage(err.message);
+        setErrorMessage(err.message)
       } else {
-        setErrorMessage("Falha ao autenticar. Verifique suas credenciais.");
+        setErrorMessage("Falha ao autenticar. Verifique suas credenciais.")
       }
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
@@ -88,15 +101,45 @@ export function LoginForm() {
           Informe seu e-mail e senha cadastrados para acessar o dashboard.
         </CardDescription>
       </CardHeader>
+
+      <div className="px-6 pb-2">
+        <GoogleLoginButton
+          onSuccess={async (idToken) => {
+            setErrorMessage(null)
+            clearGoogleError()
+            try {
+              await loginWithGoogle(idToken)
+            } catch {
+              // Erro já tratado e persistido no estado do hook useGoogleLogin
+            }
+          }}
+          onError={(msg) => setErrorMessage(msg)}
+          isLoading={isGoogleLoading}
+          disabled={isSubmitting}
+          className="w-full"
+        />
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 font-medium text-muted-foreground">
+              ou continue com e-mail
+            </span>
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
-          {errorMessage && (
+          {activeError && (
             <div
               role="alert"
-              className="flex items-center gap-2 p-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20"
+              className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
             >
               <AlertCircle className="size-4 shrink-0" />
-              <span>{errorMessage}</span>
+              <span>{activeError}</span>
             </div>
           )}
 
@@ -146,11 +189,7 @@ export function LoginForm() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -173,5 +212,5 @@ export function LoginForm() {
         </CardFooter>
       </form>
     </Card>
-  );
+  )
 }

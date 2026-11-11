@@ -1,24 +1,28 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useUserProfile } from "@/hooks/use-user-profile";
-import { useAuth } from "@/hooks/use-auth";
-import { ConnectedAccountsSection } from "@/components/security/connected-accounts-section";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import * as React from "react"
+import { useUserProfile } from "@/hooks/use-user-profile"
+import { useAuth } from "@/hooks/use-auth"
+import { ConnectedAccountsSection } from "@/components/security/connected-accounts-section"
 import {
-  LogOut,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { LogOut, Loader2 } from "lucide-react"
 
 export default function SecuritySettingsPage() {
-  const { data: userProfile, isLoading: isProfileLoading, error: profileError } = useUserProfile();
-  const { logout } = useAuth();
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useUserProfile()
+  const { logout } = useAuth()
 
-  const [successBanner, setSuccessBanner] = React.useState<string | null>(null);
-
-  const security = userProfile?.security;
+  const security = userProfile?.security
 
   if (isProfileLoading) {
     return (
@@ -28,24 +32,15 @@ export default function SecuritySettingsPage() {
           Carregando configurações de segurança...
         </span>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-6">
       {profileError && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
-          Não foi possível carregar as informações de segurança. Verifique sua conexão.
-        </div>
-      )}
-
-      {successBanner && (
-        <div
-          data-testid="security-success-banner"
-          className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400"
-        >
-          <CheckCircle2 className="size-5 shrink-0" />
-          <span>{successBanner}</span>
+          Não foi possível carregar as informações de segurança. Verifique sua
+          conexão.
         </div>
       )}
 
@@ -58,9 +53,9 @@ export default function SecuritySettingsPage() {
       />
 
       {/* Seção 2: Encerramento de Sessão (Logout) */}
-      <Card className="shadow-sm border-destructive/20">
+      <Card className="border-destructive/20 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2 text-destructive">
+          <CardTitle className="flex items-center gap-2 text-lg text-destructive">
             <LogOut className="size-5" />
             <span>Sessão & Desconexão</span>
           </CardTitle>
@@ -69,13 +64,14 @@ export default function SecuritySettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-destructive/5 border border-destructive/10">
+          <div className="flex flex-col justify-between gap-4 rounded-lg border border-destructive/10 bg-destructive/5 p-4 sm:flex-row sm:items-center">
             <div className="space-y-0.5">
               <p className="text-sm font-semibold text-foreground">
                 Sair da Conta FinAI
               </p>
               <p className="text-xs text-muted-foreground">
-                Remove os tokens locais de autenticação e redireciona para a tela de login.
+                Remove os tokens locais de autenticação e redireciona para a
+                tela de login.
               </p>
             </div>
 
@@ -85,7 +81,7 @@ export default function SecuritySettingsPage() {
               size="sm"
               onClick={logout}
               data-testid="security-logout-button"
-              className="gap-2 text-xs shrink-0"
+              className="shrink-0 gap-2 text-xs"
             >
               <LogOut className="size-3.5" />
               <span>Sair da Sessão</span>
@@ -94,5 +90,5 @@ export default function SecuritySettingsPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

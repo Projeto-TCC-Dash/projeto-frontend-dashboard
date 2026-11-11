@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
 
 export default function GoalsPage() {
-  redirect("/settings/metas");
-  return null;
+  redirect("/settings/metas")
+  return null
 }

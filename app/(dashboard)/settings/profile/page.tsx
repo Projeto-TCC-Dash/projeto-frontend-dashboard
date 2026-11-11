@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useUserProfile } from "@/hooks/use-user-profile";
-import { UserProfileIdentityForm } from "@/components/profile/user-profile-identity-form";
-import { Loader2 } from "lucide-react";
+import * as React from "react"
+import { useUserProfile } from "@/hooks/use-user-profile"
+import { UserProfileIdentityForm } from "@/components/profile/user-profile-identity-form"
+import { Loader2 } from "lucide-react"
 
 export default function ProfileSettingsPage() {
   const {
@@ -12,7 +12,7 @@ export default function ProfileSettingsPage() {
     error,
     updateIdentity,
     isUpdatingIdentity,
-  } = useUserProfile();
+  } = useUserProfile()
 
   if (isLoading) {
     return (
@@ -22,14 +22,15 @@ export default function ProfileSettingsPage() {
           Carregando informações do perfil...
         </span>
       </div>
-    );
+    )
   }
 
   return (
     <div className="space-y-6">
       {error && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
-          Não foi possível carregar as informações do perfil. Verifique sua conexão.
+          Não foi possível carregar as informações do perfil. Verifique sua
+          conexão.
         </div>
       )}
 
@@ -39,10 +40,10 @@ export default function ProfileSettingsPage() {
         email={userProfile?.email || ""}
         avatarUrl={userProfile?.avatarUrl}
         onSubmit={async (payload) => {
-          await updateIdentity(payload);
+          await updateIdentity(payload)
         }}
         isPending={isUpdatingIdentity}
       />
     </div>
-  );
+  )
 }

@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { User, Shield, Download } from "lucide-react";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { User, Shield, Download } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const SETTINGS_TABS = [
   {
@@ -22,35 +22,38 @@ const SETTINGS_TABS = [
     label: "Exportar Dados",
     icon: Download,
   },
-];
+]
 
 export function SettingsNav({ className }: { className?: string }) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
-    <div className={cn("border-b border-border mb-6", className)}>
-      <nav className="flex space-x-2 sm:space-x-4 overflow-x-auto pb-px" aria-label="Abas de Configurações">
+    <div className={cn("mb-6 border-b border-border", className)}>
+      <nav
+        className="flex space-x-2 overflow-x-auto pb-px sm:space-x-4"
+        aria-label="Abas de Configurações"
+      >
         {SETTINGS_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = pathname === tab.href;
+          const Icon = tab.icon
+          const isActive = pathname === tab.href
 
           return (
             <Link
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex items-center gap-2 py-2.5 px-3 border-b-2 text-sm font-medium transition-colors whitespace-nowrap",
+                "flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
                 isActive
-                  ? "border-primary text-primary font-semibold"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  ? "border-primary font-semibold text-primary"
+                  : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
               )}
             >
               <Icon className="size-4" />
               <span>{tab.label}</span>
             </Link>
-          );
+          )
         })}
       </nav>
     </div>
-  );
+  )
 }

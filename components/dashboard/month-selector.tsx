@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { formatMonthYear, shiftYearMonth } from "@/lib/formatters";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { formatMonthYear, shiftYearMonth } from "@/lib/formatters"
+import { cn } from "@/lib/utils"
 
 export interface MonthSelectorProps {
-  currentMonth: string;
-  onMonthChange: (month: string) => void;
-  disabled?: boolean;
-  className?: string;
+  currentMonth: string
+  onMonthChange: (month: string) => void
+  disabled?: boolean
+  className?: string
 }
 
 export function MonthSelector({
@@ -20,23 +20,23 @@ export function MonthSelector({
   className,
 }: MonthSelectorProps) {
   const handlePreviousMonth = () => {
-    const previous = shiftYearMonth(currentMonth, -1);
-    onMonthChange(previous);
-  };
+    const previous = shiftYearMonth(currentMonth, -1)
+    onMonthChange(previous)
+  }
 
   const handleNextMonth = () => {
-    const next = shiftYearMonth(currentMonth, 1);
-    onMonthChange(next);
-  };
+    const next = shiftYearMonth(currentMonth, 1)
+    onMonthChange(next)
+  }
 
-  const formattedMonth = formatMonthYear(currentMonth);
+  const formattedMonth = formatMonthYear(currentMonth)
 
   return (
     <div
       role="group"
       aria-label="Seletor de competência mensal"
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 p-1 backdrop-blur shadow-sm",
+        "inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 p-1 shadow-sm backdrop-blur",
         className
       )}
     >
@@ -52,8 +52,8 @@ export function MonthSelector({
         <ChevronLeft className="size-4" />
       </Button>
 
-      <div className="flex items-center gap-2 px-3 min-w-[170px] justify-center text-sm font-semibold text-foreground select-none">
-        <Calendar className="size-4 text-primary shrink-0" aria-hidden="true" />
+      <div className="flex min-w-[170px] items-center justify-center gap-2 px-3 text-sm font-semibold text-foreground select-none">
+        <Calendar className="size-4 shrink-0 text-primary" aria-hidden="true" />
         <span>{formattedMonth}</span>
       </div>
 
@@ -69,5 +69,5 @@ export function MonthSelector({
         <ChevronRight className="size-4" />
       </Button>
     </div>
-  );
+  )
 }

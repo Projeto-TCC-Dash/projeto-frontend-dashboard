@@ -1,9 +1,15 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import * as React from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -11,9 +17,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { updateUserProfileSchema, validateAvatarFile } from "@/lib/validations/profile";
-import { resolveAvatarUrl } from "@/lib/formatters";
+} from "@/components/ui/dialog"
+import {
+  updateUserProfileSchema,
+  validateAvatarFile,
+} from "@/lib/validations/profile"
+import { resolveAvatarUrl } from "@/lib/formatters"
 import {
   CheckCircle2,
   AlertCircle,
@@ -22,36 +31,36 @@ import {
   User as UserIcon,
   Camera,
   Trash2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export interface UserProfileIdentitySubmitPayload {
-  name?: string;
-  avatarFile?: File | null;
-  removeAvatar?: boolean;
+  name?: string
+  avatarFile?: File | null
+  removeAvatar?: boolean
 }
 
 export interface UserProfileIdentityFormProps {
-  initialName?: string;
-  email: string;
-  avatarUrl?: string | null;
-  onSubmit: (payload: UserProfileIdentitySubmitPayload) => Promise<unknown>;
-  isPending?: boolean;
-  className?: string;
+  initialName?: string
+  email: string
+  avatarUrl?: string | null
+  onSubmit: (payload: UserProfileIdentitySubmitPayload) => Promise<unknown>
+  isPending?: boolean
+  className?: string
 }
 
 export function getInitials(name?: string, email?: string): string {
   if (name && name.trim()) {
-    const parts = name.trim().split(/\s+/);
+    const parts = name.trim().split(/\s+/)
     if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
     }
-    return parts[0].slice(0, 2).toUpperCase();
+    return parts[0].slice(0, 2).toUpperCase()
   }
   if (email && email.trim()) {
-    return email.trim().slice(0, 2).toUpperCase();
+    return email.trim().slice(0, 2).toUpperCase()
   }
-  return "U";
+  return "U"
 }
 
 export function UserProfileIdentityForm({
@@ -62,99 +71,105 @@ export function UserProfileIdentityForm({
   isPending = false,
   className,
 }: UserProfileIdentityFormProps) {
-  const [name, setName] = React.useState(initialName);
-  const [pendingAvatarFile, setPendingAvatarFile] = React.useState<File | null>(null);
-  const [pendingAvatarPreview, setPendingAvatarPreview] = React.useState<string | null>(null);
-  const [pendingAvatarRemove, setPendingAvatarRemove] = React.useState(false);
+  const [name, setName] = React.useState(initialName)
+  const [pendingAvatarFile, setPendingAvatarFile] = React.useState<File | null>(
+    null
+  )
+  const [pendingAvatarPreview, setPendingAvatarPreview] = React.useState<
+    string | null
+  >(null)
+  const [pendingAvatarRemove, setPendingAvatarRemove] = React.useState(false)
 
-  const [error, setError] = React.useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(
+    null
+  )
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
 
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null)
 
   // Sincroniza se initialName mudar externamente
-  const [prevInitialName, setPrevInitialName] = React.useState(initialName);
+  const [prevInitialName, setPrevInitialName] = React.useState(initialName)
   if (initialName !== prevInitialName) {
-    setPrevInitialName(initialName);
-    setName(initialName || "");
+    setPrevInitialName(initialName)
+    setName(initialName || "")
   }
 
   // Liberação segura de memória para o preview temporário de avatar
   React.useEffect(() => {
     return () => {
       if (pendingAvatarPreview) {
-        URL.revokeObjectURL(pendingAvatarPreview);
+        URL.revokeObjectURL(pendingAvatarPreview)
       }
-    };
-  }, [pendingAvatarPreview]);
+    }
+  }, [pendingAvatarPreview])
 
-  const initials = getInitials(name || initialName, email);
-  const [hasImageError, setHasImageError] = React.useState(false);
+  const initials = getInitials(name || initialName, email)
+  const [hasImageError, setHasImageError] = React.useState(false)
 
-  const resolvedAvatarUrl = resolveAvatarUrl(avatarUrl);
+  const resolvedAvatarUrl = resolveAvatarUrl(avatarUrl)
 
   // Determina qual imagem renderizar (preview local > imagem original > fallback)
-  let activeImage: string | null = null;
+  let activeImage: string | null = null
   if (!pendingAvatarRemove) {
     if (pendingAvatarPreview) {
-      activeImage = pendingAvatarPreview;
+      activeImage = pendingAvatarPreview
     } else if (resolvedAvatarUrl) {
-      activeImage = resolvedAvatarUrl;
+      activeImage = resolvedAvatarUrl
     }
   }
 
   React.useEffect(() => {
-    setHasImageError(false);
-  }, [activeImage]);
+    setHasImageError(false)
+  }, [activeImage])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    e.target.value = "";
-    setError(null);
+    e.target.value = ""
+    setError(null)
 
-    const validation = validateAvatarFile(file);
+    const validation = validateAvatarFile(file)
     if (!validation.valid) {
-      setError(validation.error || "Arquivo de imagem inválido");
-      return;
+      setError(validation.error || "Arquivo de imagem inválido")
+      return
     }
 
     if (pendingAvatarPreview) {
-      URL.revokeObjectURL(pendingAvatarPreview);
+      URL.revokeObjectURL(pendingAvatarPreview)
     }
 
-    const objectUrl = URL.createObjectURL(file);
-    setPendingAvatarPreview(objectUrl);
-    setPendingAvatarFile(file);
-    setPendingAvatarRemove(false);
-  };
+    const objectUrl = URL.createObjectURL(file)
+    setPendingAvatarPreview(objectUrl)
+    setPendingAvatarFile(file)
+    setPendingAvatarRemove(false)
+  }
 
   const handleConfirmRemovePhoto = () => {
     if (pendingAvatarPreview) {
-      URL.revokeObjectURL(pendingAvatarPreview);
-      setPendingAvatarPreview(null);
+      URL.revokeObjectURL(pendingAvatarPreview)
+      setPendingAvatarPreview(null)
     }
-    setPendingAvatarFile(null);
-    setPendingAvatarRemove(true);
-    setDeleteDialogOpen(false);
-  };
+    setPendingAvatarFile(null)
+    setPendingAvatarRemove(true)
+    setDeleteDialogOpen(false)
+  }
 
-  const isNameDirty = name.trim() !== (initialName || "").trim();
-  const isAvatarDirty = pendingAvatarFile !== null || pendingAvatarRemove;
-  const isDirty = isNameDirty || isAvatarDirty;
+  const isNameDirty = name.trim() !== (initialName || "").trim()
+  const isAvatarDirty = pendingAvatarFile !== null || pendingAvatarRemove
+  const isDirty = isNameDirty || isAvatarDirty
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccessMessage(null);
+    e.preventDefault()
+    setError(null)
+    setSuccessMessage(null)
 
     if (isNameDirty) {
-      const validation = updateUserProfileSchema.safeParse({ name });
+      const validation = updateUserProfileSchema.safeParse({ name })
       if (!validation.success) {
-        setError(validation.error.issues[0]?.message || "Nome inválido");
-        return;
+        setError(validation.error.issues[0]?.message || "Nome inválido")
+        return
       }
     }
 
@@ -163,33 +178,34 @@ export function UserProfileIdentityForm({
         name: isNameDirty ? name.trim() : undefined,
         avatarFile: pendingAvatarFile,
         removeAvatar: pendingAvatarRemove,
-      });
+      })
 
       if (pendingAvatarPreview) {
-        URL.revokeObjectURL(pendingAvatarPreview);
-        setPendingAvatarPreview(null);
+        URL.revokeObjectURL(pendingAvatarPreview)
+        setPendingAvatarPreview(null)
       }
-      setPendingAvatarFile(null);
-      setPendingAvatarRemove(false);
+      setPendingAvatarFile(null)
+      setPendingAvatarRemove(false)
 
-      setSuccessMessage("Perfil atualizado com sucesso!");
-      setTimeout(() => setSuccessMessage(null), 4000);
+      setSuccessMessage("Perfil atualizado com sucesso!")
+      setTimeout(() => setSuccessMessage(null), 4000)
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Erro ao atualizar dados do perfil"
-      );
+      )
     }
-  };
+  }
 
   return (
     <Card className={cn("w-full shadow-sm", className)}>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg">
           <UserIcon className="size-5 text-primary" />
           <span>Informações de Identidade</span>
         </CardTitle>
         <CardDescription>
-          Gerencie sua foto de perfil e seus dados de exibição visíveis no sistema.
+          Gerencie sua foto de perfil e seus dados de exibição visíveis no
+          sistema.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -215,11 +231,11 @@ export function UserProfileIdentityForm({
           )}
 
           {/* Seção Integrada de Foto de Perfil */}
-          <div className="flex flex-col sm:flex-row items-center gap-5 p-4 rounded-xl border border-border/60 bg-muted/20">
-            <div className="relative group shrink-0">
+          <div className="flex flex-col items-center gap-5 rounded-xl border border-border/60 bg-muted/20 p-4 sm:flex-row">
+            <div className="group relative shrink-0">
               <div
                 data-testid="avatar-container"
-                className="relative size-20 sm:size-24 rounded-full overflow-hidden border-2 border-border bg-muted flex items-center justify-center shadow-sm"
+                className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-muted shadow-sm sm:size-24"
               >
                 {activeImage && !hasImageError ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -233,7 +249,7 @@ export function UserProfileIdentityForm({
                 ) : (
                   <div
                     data-testid="avatar-fallback"
-                    className="size-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xl sm:text-2xl select-none"
+                    className="flex size-full items-center justify-center bg-primary/10 text-xl font-bold text-primary select-none sm:text-2xl"
                   >
                     {initials}
                   </div>
@@ -246,13 +262,13 @@ export function UserProfileIdentityForm({
                 disabled={isPending}
                 data-testid="avatar-quick-upload-button"
                 aria-label="Alterar foto de perfil"
-                className="absolute bottom-0 right-0 size-7 rounded-full bg-primary text-primary-foreground shadow flex items-center justify-center hover:bg-primary/90 transition-transform active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="absolute right-0 bottom-0 flex size-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow transition-transform hover:bg-primary/90 active:scale-95 disabled:opacity-50"
               >
                 <Camera className="size-3.5" />
               </button>
             </div>
 
-            <div className="flex flex-col items-center sm:items-start space-y-2 text-center sm:text-left flex-1">
+            <div className="flex flex-1 flex-col items-center space-y-2 text-center sm:items-start sm:text-left">
               <div>
                 <h4 className="text-sm font-semibold text-foreground">
                   Foto de Perfil
@@ -261,12 +277,13 @@ export function UserProfileIdentityForm({
                   Formatos suportados: JPG, PNG ou WEBP (até 5MB).
                 </p>
                 {pendingAvatarFile && (
-                  <p className="text-xs text-primary font-medium mt-1">
-                    Nova foto selecionada (será salva ao clicar em Salvar Alterações).
+                  <p className="mt-1 text-xs font-medium text-primary">
+                    Nova foto selecionada (será salva ao clicar em Salvar
+                    Alterações).
                   </p>
                 )}
                 {pendingAvatarRemove && (
-                  <p className="text-xs text-destructive font-medium mt-1">
+                  <p className="mt-1 text-xs font-medium text-destructive">
                     Foto marcada para exclusão (será removida ao salvar).
                   </p>
                 )}
@@ -289,7 +306,7 @@ export function UserProfileIdentityForm({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isPending}
                   data-testid="avatar-upload-button"
-                  className="gap-1.5 text-xs h-8"
+                  className="h-8 gap-1.5 text-xs"
                 >
                   <Camera className="size-3.5" />
                   <span>{activeImage ? "Alterar foto" : "Escolher foto"}</span>
@@ -303,7 +320,7 @@ export function UserProfileIdentityForm({
                     onClick={() => setDeleteDialogOpen(true)}
                     disabled={isPending}
                     data-testid="avatar-delete-button"
-                    className="gap-1.5 text-xs h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    className="h-8 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="size-3.5" />
                     <span>Remover</span>
@@ -314,12 +331,12 @@ export function UserProfileIdentityForm({
           </div>
 
           {/* Campos de Nome e E-mail */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Campo E-mail (Somente leitura) */}
             <div className="space-y-1.5">
               <label
                 htmlFor="user-email-field"
-                className="text-xs font-semibold text-foreground flex items-center gap-1.5"
+                className="flex items-center gap-1.5 text-xs font-semibold text-foreground"
               >
                 <span>E-mail da Conta</span>
                 <span title="Campo protegido">
@@ -332,10 +349,11 @@ export function UserProfileIdentityForm({
                 type="email"
                 value={email}
                 disabled
-                className="bg-muted/50 cursor-not-allowed text-muted-foreground text-sm"
+                className="cursor-not-allowed bg-muted/50 text-sm text-muted-foreground"
               />
               <p className="text-[11px] text-muted-foreground">
-                O e-mail é o identificador único da sua conta e não pode ser alterado diretamente.
+                O e-mail é o identificador único da sua conta e não pode ser
+                alterado diretamente.
               </p>
             </div>
 
@@ -354,8 +372,8 @@ export function UserProfileIdentityForm({
                 placeholder="Ex: Maria da Silva"
                 value={name}
                 onChange={(e) => {
-                  setName(e.target.value);
-                  if (error) setError(null);
+                  setName(e.target.value)
+                  if (error) setError(null)
                 }}
                 disabled={isPending}
                 className="text-sm"
@@ -366,7 +384,7 @@ export function UserProfileIdentityForm({
             </div>
           </div>
 
-          <div className="flex justify-end pt-2 border-t border-border/50">
+          <div className="flex justify-end border-t border-border/50 pt-2">
             <Button
               type="submit"
               disabled={isPending || !isDirty}
@@ -386,7 +404,9 @@ export function UserProfileIdentityForm({
           <DialogHeader>
             <DialogTitle>Remover foto de perfil?</DialogTitle>
             <DialogDescription>
-              A foto será desvinculada do seu perfil e o sistema passará a exibir as iniciais ({initials}). A remoção será efetivada ao clicar em &quot;Salvar Alterações&quot;.
+              A foto será desvinculada do seu perfil e o sistema passará a
+              exibir as iniciais ({initials}). A remoção será efetivada ao
+              clicar em &quot;Salvar Alterações&quot;.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -409,5 +429,5 @@ export function UserProfileIdentityForm({
         </DialogContent>
       </Dialog>
     </Card>
-  );
+  )
 }

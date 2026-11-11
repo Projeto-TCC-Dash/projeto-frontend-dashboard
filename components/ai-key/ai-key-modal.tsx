@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { AiKeyForm } from "./ai-key-form";
+} from "@/components/ui/dialog"
+import { AiKeyForm } from "./ai-key-form"
 
 interface AiKeyModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function AiKeyModal({ open, onOpenChange }: AiKeyModalProps) {
@@ -22,7 +22,9 @@ export function AiKeyModal({ open, onOpenChange }: AiKeyModalProps) {
         <DialogHeader>
           <DialogTitle>Configuração da Chave de IA (BYOK)</DialogTitle>
           <DialogDescription>
-            Insira sua chave do Google AI Studio. O sistema fará um teste ativo de conexão para garantir que os diagnósticos e o assistente operem com sucesso.
+            Insira sua chave do Google AI Studio. O sistema fará um teste ativo
+            de conexão para garantir que os diagnósticos e o assistente operem
+            com sucesso.
           </DialogDescription>
         </DialogHeader>
 
@@ -30,11 +32,11 @@ export function AiKeyModal({ open, onOpenChange }: AiKeyModalProps) {
           onSuccess={() => {
             // Fecha após breve feedback visual
             setTimeout(() => {
-              onOpenChange(false);
-            }, 1200);
+              onOpenChange(false)
+            }, 1200)
           }}
         />
       </DialogContent>
     </Dialog>
-  );
+  )
 }

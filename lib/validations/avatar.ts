@@ -3,4 +3,4 @@ export {
   ALLOWED_AVATAR_TYPES,
   avatarFileSchema,
   validateAvatarFile,
-} from './profile';
+} from "./profile"

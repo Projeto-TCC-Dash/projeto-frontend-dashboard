@@ -1,21 +1,21 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { AlertTriangle, Loader2, X, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { formatCurrencyBRL, formatDateBR } from "@/lib/formatters";
-import type { Transaction } from "@/src/types/api";
+import * as React from "react"
+import { createPortal } from "react-dom"
+import { AlertTriangle, Loader2, X, Trash2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { formatCurrencyBRL, formatDateBR } from "@/lib/formatters"
+import type { Transaction } from "@/src/types/api"
 
 export interface TransactionDeleteDialogProps {
-  isOpen: boolean;
-  transaction?: Transaction | null;
-  onClose: () => void;
-  onConfirm: (transactionId: string) => Promise<void>;
-  isDeleting?: boolean;
+  isOpen: boolean
+  transaction?: Transaction | null
+  onClose: () => void
+  onConfirm: (transactionId: string) => Promise<void>
+  isDeleting?: boolean
 }
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => {}
 
 export function TransactionDeleteDialog({
   isOpen,
@@ -24,67 +24,71 @@ export function TransactionDeleteDialog({
   onConfirm,
   isDeleting = false,
 }: TransactionDeleteDialogProps) {
-  const mounted = React.useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   const handleClose = React.useCallback(() => {
-    if (isDeleting) return;
-    setErrorMsg(null);
-    onClose();
-  }, [isDeleting, onClose]);
+    if (isDeleting) return
+    setErrorMsg(null)
+    onClose()
+  }, [isDeleting, onClose])
 
   // Tecla Escape para fechar
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen && !isDeleting) {
-        handleClose();
+        handleClose()
       }
-    };
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
     }
-  }, [isOpen, isDeleting, handleClose]);
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown)
+      return () => window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isOpen, isDeleting, handleClose])
 
-  if (!isOpen || !mounted || !transaction) return null;
+  if (!isOpen || !mounted || !transaction) return null
 
   const handleDelete = async () => {
-    setErrorMsg(null);
+    setErrorMsg(null)
     try {
-      await onConfirm(transaction.id);
-      setErrorMsg(null);
-      onClose();
+      await onConfirm(transaction.id)
+      setErrorMsg(null)
+      onClose()
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMsg(err.message);
+        setErrorMsg(err.message)
       } else {
-        setErrorMsg("Ocorreu um erro ao excluir a transação. Tente novamente.");
+        setErrorMsg("Ocorreu um erro ao excluir a transação. Tente novamente.")
       }
     }
-  };
+  }
 
-  const isIncome = transaction.amount > 0;
+  const isIncome = transaction.amount > 0
 
   return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-transaction-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isDeleting) {
-          handleClose();
+          handleClose()
         }
       }}
     >
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950 sm:p-7 animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-md animate-in overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl duration-200 zoom-in-95 sm:p-7 dark:border-zinc-800 dark:bg-zinc-950">
         {/* Botão fechar */}
         <button
           type="button"
           aria-label="Fechar"
           onClick={handleClose}
           disabled={isDeleting}
-          className="absolute right-4 top-4 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 disabled:opacity-50"
+          className="absolute top-4 right-4 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
         >
           <X className="h-5 w-5" />
         </button>
@@ -108,7 +112,7 @@ export function TransactionDeleteDialog({
         </div>
 
         {/* Card com detalhes da transação */}
-        <div className="mt-5 rounded-xl border border-zinc-100 bg-zinc-50/75 p-4 dark:border-zinc-850 dark:bg-zinc-900/40">
+        <div className="dark:border-zinc-850 mt-5 rounded-xl border border-zinc-100 bg-zinc-50/75 p-4 dark:bg-zinc-900/40">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <span className="block truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -145,7 +149,7 @@ export function TransactionDeleteDialog({
             variant="outline"
             onClick={handleClose}
             disabled={isDeleting}
-            className="w-full sm:w-auto text-xs"
+            className="w-full text-xs sm:w-auto"
           >
             Cancelar
           </Button>
@@ -154,7 +158,7 @@ export function TransactionDeleteDialog({
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold"
+            className="w-full bg-rose-600 text-xs font-semibold text-white hover:bg-rose-700 sm:w-auto"
           >
             {isDeleting ? (
               <>
@@ -169,5 +173,5 @@ export function TransactionDeleteDialog({
       </div>
     </div>,
     document.body
-  );
+  )
 }

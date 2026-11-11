@@ -1,22 +1,28 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 
 interface ChatDrawerContextValue {
-  isOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-  toggleDrawer: () => void;
+  isOpen: boolean
+  openDrawer: () => void
+  closeDrawer: () => void
+  toggleDrawer: () => void
 }
 
-const ChatDrawerContext = React.createContext<ChatDrawerContextValue | undefined>(undefined);
+const ChatDrawerContext = React.createContext<
+  ChatDrawerContextValue | undefined
+>(undefined)
 
-export function ChatDrawerProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = React.useState(false);
+export function ChatDrawerProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [isOpen, setIsOpen] = React.useState(false)
 
-  const openDrawer = React.useCallback(() => setIsOpen(true), []);
-  const closeDrawer = React.useCallback(() => setIsOpen(false), []);
-  const toggleDrawer = React.useCallback(() => setIsOpen((prev) => !prev), []);
+  const openDrawer = React.useCallback(() => setIsOpen(true), [])
+  const closeDrawer = React.useCallback(() => setIsOpen(false), [])
+  const toggleDrawer = React.useCallback(() => setIsOpen((prev) => !prev), [])
 
   const value = React.useMemo(
     () => ({
@@ -26,17 +32,17 @@ export function ChatDrawerProvider({ children }: { children: React.ReactNode }) 
       toggleDrawer,
     }),
     [isOpen, openDrawer, closeDrawer, toggleDrawer]
-  );
+  )
 
   return (
     <ChatDrawerContext.Provider value={value}>
       {children}
     </ChatDrawerContext.Provider>
-  );
+  )
 }
 
 export function useChatDrawer(): ChatDrawerContextValue {
-  const context = React.useContext(ChatDrawerContext);
+  const context = React.useContext(ChatDrawerContext)
   return (
     context ?? {
       isOpen: false,
@@ -44,5 +50,5 @@ export function useChatDrawer(): ChatDrawerContextValue {
       closeDrawer: () => {},
       toggleDrawer: () => {},
     }
-  );
+  )
 }

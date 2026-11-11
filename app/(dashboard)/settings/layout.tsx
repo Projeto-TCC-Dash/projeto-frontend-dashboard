@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { usePathname } from "next/navigation";
-import { SettingsNav } from "@/components/settings/settings-nav";
+import * as React from "react"
+import { usePathname } from "next/navigation"
+import { SettingsNav } from "@/components/settings/settings-nav"
 
 export default function SettingsLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const pathname = usePathname();
-  const isMetas = pathname?.startsWith("/settings/metas");
+  const pathname = usePathname()
+  const isMetas = pathname?.startsWith("/settings/metas")
 
   if (isMetas) {
-    return <>{children}</>;
+    return <>{children}</>
   }
 
   return (
@@ -23,7 +23,8 @@ export default function SettingsLayout({
           Configurações da Conta
         </h1>
         <p className="text-sm text-muted-foreground">
-          Gerencie seus dados de identidade, configure a segurança da conta e exporte relatórios financeiros completos.
+          Gerencie seus dados de identidade, configure a segurança da conta e
+          exporte relatórios financeiros completos.
         </p>
       </div>
 
@@ -31,5 +32,5 @@ export default function SettingsLayout({
 
       <div>{children}</div>
     </div>
-  );
+  )
 }

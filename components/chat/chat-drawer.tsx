@@ -1,33 +1,33 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import { X, Maximize2 } from "lucide-react";
-import { useChatDrawer } from "./chat-drawer-context";
-import { ChatPanel } from "./chat-panel";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { useRouter } from "next/navigation"
+import { X, Maximize2 } from "lucide-react"
+import { useChatDrawer } from "./chat-drawer-context"
+import { ChatPanel } from "./chat-panel"
+import { cn } from "@/lib/utils"
 
 export function ChatDrawer() {
-  const router = useRouter();
-  const { isOpen, closeDrawer } = useChatDrawer();
+  const router = useRouter()
+  const { isOpen, closeDrawer } = useChatDrawer()
 
   // Fecha gaveta com a tecla Escape
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        closeDrawer();
+        closeDrawer()
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, closeDrawer]);
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, closeDrawer])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleExpandToFullScreen = () => {
-    closeDrawer();
-    router.push("/chat");
-  };
+    closeDrawer()
+    router.push("/chat")
+  }
 
   return (
     <div
@@ -38,15 +38,15 @@ export function ChatDrawer() {
       <div
         onClick={closeDrawer}
         data-testid="chat-drawer-backdrop"
-        className="fixed inset-0 bg-background/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 animate-in bg-background/60 backdrop-blur-xs transition-opacity duration-200 fade-in"
       />
 
       {/* Painel Lateral Deslizante */}
       <div
         data-testid="chat-drawer-container"
         className={cn(
-          "relative z-10 flex h-full w-full max-w-md md:max-w-lg flex-col bg-background border-l border-border/80 shadow-2xl",
-          "animate-in slide-in-from-right duration-300"
+          "relative z-10 flex h-full w-full max-w-md flex-col border-l border-border/80 bg-background shadow-2xl md:max-w-lg",
+          "animate-in duration-300 slide-in-from-right"
         )}
       >
         <ChatPanel
@@ -60,7 +60,7 @@ export function ChatDrawer() {
                 onClick={handleExpandToFullScreen}
                 aria-label="Expandir para tela cheia"
                 data-testid="expand-to-fullscreen-button"
-                className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 title="Expandir para tela cheia (/chat)"
               >
                 <Maximize2 className="size-3.5" />
@@ -70,7 +70,7 @@ export function ChatDrawer() {
                 onClick={closeDrawer}
                 aria-label="Fechar painel"
                 data-testid="close-drawer-button"
-                className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
@@ -79,5 +79,5 @@ export function ChatDrawer() {
         />
       </div>
     </div>
-  );
+  )
 }

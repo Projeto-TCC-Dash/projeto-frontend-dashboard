@@ -1,23 +1,28 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
-import { CANONICAL_CATEGORIES, TRANSACTION_SOURCES, Category, TransactionSource } from "@/src/types/api";
-import { shiftYearMonth } from "@/lib/formatters";
-import { Button } from "@/components/ui/button";
-import { useAccounts } from "@/hooks/use-accounts";
+import * as React from "react"
+import { ChevronLeft, ChevronRight, Filter } from "lucide-react"
+import {
+  CANONICAL_CATEGORIES,
+  TRANSACTION_SOURCES,
+  Category,
+  TransactionSource,
+} from "@/src/types/api"
+import { shiftYearMonth } from "@/lib/formatters"
+import { Button } from "@/components/ui/button"
+import { useAccounts } from "@/hooks/use-accounts"
 
 export interface TransactionFiltersProps {
-  month: string;
-  category?: Category;
-  source?: TransactionSource;
-  accountId?: string;
+  month: string
+  category?: Category
+  source?: TransactionSource
+  accountId?: string
   onFilterChange: (filters: {
-    month: string;
-    category?: Category;
-    source?: TransactionSource;
-    accountId?: string;
-  }) => void;
+    month: string
+    category?: Category
+    source?: TransactionSource
+    accountId?: string
+  }) => void
 }
 
 export function TransactionFilters({
@@ -27,7 +32,7 @@ export function TransactionFilters({
   accountId,
   onFilterChange,
 }: TransactionFiltersProps) {
-  const { accounts } = useAccounts();
+  const { accounts } = useAccounts()
 
   const handlePrevMonth = () => {
     onFilterChange({
@@ -35,8 +40,8 @@ export function TransactionFilters({
       category,
       source,
       accountId,
-    });
-  };
+    })
+  }
 
   const handleNextMonth = () => {
     onFilterChange({
@@ -44,8 +49,8 @@ export function TransactionFilters({
       category,
       source,
       accountId,
-    });
-  };
+    })
+  }
 
   const handleMonthInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
@@ -54,39 +59,39 @@ export function TransactionFilters({
         category,
         source,
         accountId,
-      });
+      })
     }
-  };
+  }
 
   const handleCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
+    const val = e.target.value
     onFilterChange({
       month,
       category: val ? (val as Category) : undefined,
       source,
       accountId,
-    });
-  };
+    })
+  }
 
   const handleSourceSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
+    const val = e.target.value
     onFilterChange({
       month,
       category,
       source: val ? (val as TransactionSource) : undefined,
       accountId,
-    });
-  };
+    })
+  }
 
   const handleAccountSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
+    const val = e.target.value
     onFilterChange({
       month,
       category,
       source,
       accountId: val ? val : undefined,
-    });
-  };
+    })
+  }
 
   const handleClearFilters = () => {
     onFilterChange({
@@ -94,11 +99,11 @@ export function TransactionFilters({
       category: undefined,
       source: undefined,
       accountId: undefined,
-    });
-  };
+    })
+  }
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:flex-row sm:items-end sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex flex-wrap items-end gap-3">
         {/* Seletor de Mês */}
         <div className="flex flex-col gap-1.5">
@@ -125,7 +130,7 @@ export function TransactionFilters({
               value={month}
               onChange={handleMonthInput}
               aria-label="Mês de Competência"
-              className="h-9 rounded-md border border-zinc-300 bg-white px-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="h-9 rounded-md border border-zinc-300 bg-white px-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
             <Button
               type="button"
@@ -141,7 +146,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Categoria */}
-        <div className="flex flex-col gap-1.5 min-w-[150px]">
+        <div className="flex min-w-[150px] flex-col gap-1.5">
           <label
             htmlFor="filter-category"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -153,7 +158,7 @@ export function TransactionFilters({
             value={category ?? ""}
             onChange={handleCategorySelect}
             aria-label="Categoria"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as categorias</option>
             {CANONICAL_CATEGORIES.map((cat) => (
@@ -165,7 +170,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Origem */}
-        <div className="flex flex-col gap-1.5 min-w-[120px]">
+        <div className="flex min-w-[120px] flex-col gap-1.5">
           <label
             htmlFor="filter-source"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -177,7 +182,7 @@ export function TransactionFilters({
             value={source ?? ""}
             onChange={handleSourceSelect}
             aria-label="Origem"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as origens</option>
             {TRANSACTION_SOURCES.map((src) => (
@@ -189,7 +194,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Conta Bancária */}
-        <div className="flex flex-col gap-1.5 min-w-[150px]">
+        <div className="flex min-w-[150px] flex-col gap-1.5">
           <label
             htmlFor="filter-account"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -201,7 +206,7 @@ export function TransactionFilters({
             value={accountId ?? ""}
             onChange={handleAccountSelect}
             aria-label="Conta Bancária"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as contas</option>
             {accounts.map((acc) => (
@@ -227,5 +232,5 @@ export function TransactionFilters({
         </Button>
       )}
     </div>
-  );
+  )
 }
