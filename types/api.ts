@@ -1,1 +1,1 @@
-export * from '@/src/types/api';
+export * from "@/src/types/api"

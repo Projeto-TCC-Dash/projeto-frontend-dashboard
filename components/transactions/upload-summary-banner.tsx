@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { CheckCircle2, X } from "lucide-react";
-import { UploadTransactionsResponse } from "@/src/types/api";
-import { Button } from "@/components/ui/button";
+import * as React from "react"
+import { CheckCircle2, X } from "lucide-react"
+import { UploadTransactionsResponse } from "@/src/types/api"
+import { Button } from "@/components/ui/button"
 
 export interface UploadSummaryBannerProps {
-  summary: UploadTransactionsResponse;
-  onDismiss: () => void;
+  summary: UploadTransactionsResponse
+  onDismiss: () => void
 }
 
 export function UploadSummaryBanner({
@@ -15,7 +15,7 @@ export function UploadSummaryBanner({
   onDismiss,
 }: UploadSummaryBannerProps) {
   return (
-    <div className="relative flex flex-col justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/30 sm:flex-row sm:items-center">
+    <div className="relative flex flex-col justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-sm sm:flex-row sm:items-center dark:border-emerald-900/60 dark:bg-emerald-950/30">
       <div className="flex items-start gap-3 sm:items-center">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-white">
           <CheckCircle2 className="size-5" />
@@ -53,5 +53,5 @@ export function UploadSummaryBanner({
         </Button>
       </div>
     </div>
-  );
+  )
 }

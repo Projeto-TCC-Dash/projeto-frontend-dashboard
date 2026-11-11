@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-19
 
-**Status**: Ready
+**Status**: Implemented
 
 **Input**: User description: "Criar tela e componentes de perfil financeiro voluntário consumindo GET /api/user/profile e PUT /api/user/profile, com regime de renda (CLT, PJ_AUTONOMO, PUBLIC_SERVANT, etc.), renda declarada em BRL, seleção múltipla de metas financeiras e perfil de risco, banner contextual no dashboard e invalidação reativa de cache."
 

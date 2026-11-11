@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
-const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         destination: `${backendUrl}/api/:path*`,
       },
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

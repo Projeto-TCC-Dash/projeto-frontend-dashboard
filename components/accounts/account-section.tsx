@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 import {
   Landmark,
   CreditCard,
@@ -8,16 +8,16 @@ import {
   Banknote,
   Wallet,
   type LucideIcon,
-} from "lucide-react";
-import { formatCurrencyBRL } from "@/lib/formatters";
-import { Badge } from "@/components/ui/badge";
-import { AccountCard } from "./account-card";
-import { cn } from "@/lib/utils";
+} from "lucide-react"
+import { formatCurrencyBRL } from "@/lib/formatters"
+import { Badge } from "@/components/ui/badge"
+import { AccountCard } from "./account-card"
+import { cn } from "@/lib/utils"
 import {
   ACCOUNT_TYPE_LABELS,
   type Account,
   type AccountType,
-} from "@/src/types/api";
+} from "@/src/types/api"
 
 const SECTION_ICONS: Record<AccountType, LucideIcon> = {
   CHECKING: Landmark,
@@ -25,13 +25,13 @@ const SECTION_ICONS: Record<AccountType, LucideIcon> = {
   INVESTMENT: TrendingUp,
   CASH: Banknote,
   OTHER: Wallet,
-};
+}
 
 export interface AccountSectionProps {
-  type: AccountType;
-  accounts: Account[];
-  onEditAccount?: (account: Account) => void;
-  onDeleteAccount?: (account: Account) => void;
+  type: AccountType
+  accounts: Account[]
+  onEditAccount?: (account: Account) => void
+  onDeleteAccount?: (account: Account) => void
 }
 
 export function AccountSection({
@@ -40,14 +40,14 @@ export function AccountSection({
   onEditAccount,
   onDeleteAccount,
 }: AccountSectionProps) {
-  const Icon = SECTION_ICONS[type] || Wallet;
-  const label = ACCOUNT_TYPE_LABELS[type] || type;
+  const Icon = SECTION_ICONS[type] || Wallet
+  const label = ACCOUNT_TYPE_LABELS[type] || type
 
   const subtotal = React.useMemo(() => {
-    return accounts.reduce((acc, account) => acc + (account.balance || 0), 0);
-  }, [accounts]);
+    return accounts.reduce((acc, account) => acc + (account.balance || 0), 0)
+  }, [accounts])
 
-  const isNegative = subtotal < 0;
+  const isNegative = subtotal < 0
 
   return (
     <section className="space-y-3">
@@ -58,7 +58,7 @@ export function AccountSection({
             <Icon className="size-4" />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground tracking-tight flex items-center gap-2">
+            <h3 className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
               {label}
               <Badge variant="outline" className="text-xs font-normal">
                 {accounts.length}
@@ -68,10 +68,12 @@ export function AccountSection({
         </div>
 
         <div className="text-right">
-          <span className="text-xs text-muted-foreground mr-1.5">Subtotal:</span>
+          <span className="mr-1.5 text-xs text-muted-foreground">
+            Subtotal:
+          </span>
           <span
             className={cn(
-              "font-semibold text-sm tracking-tight",
+              "text-sm font-semibold tracking-tight",
               isNegative ? "text-destructive" : "text-foreground"
             )}
           >
@@ -82,7 +84,7 @@ export function AccountSection({
 
       {/* Grid de Cards ou Estado Vazio da Seção */}
       {accounts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+        <div className="grid grid-cols-1 gap-4 pt-1 md:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => (
             <AccountCard
               key={account.id}
@@ -98,5 +100,5 @@ export function AccountSection({
         </div>
       )}
     </section>
-  );
+  )
 }

@@ -1,19 +1,22 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { ReceiptText, AlertCircle, Sparkles } from "lucide-react";
-import { getCurrentYearMonth } from "@/lib/formatters";
-import { useTransactions, TransactionFilters as ITransactionFilters } from "@/hooks/use-transactions";
-import { useUploadTransactions } from "@/hooks/use-upload-transactions";
-import { useUpdateTransaction } from "@/hooks/use-update-transaction";
-import { useCategorizeTransactions } from "@/hooks/use-categorize-transactions";
-import { TransactionFilters } from "@/components/transactions/transaction-filters";
-import { TransactionTable } from "@/components/transactions/transaction-table";
-import { TransactionDropzone } from "@/components/transactions/transaction-dropzone";
-import { UploadSummaryBanner } from "@/components/transactions/upload-summary-banner";
-import { TransactionEditDialog } from "@/components/transactions/transaction-edit-dialog";
-import { CategorizeButton } from "@/components/transactions/categorize-button";
-import { AiKeyModal } from "@/components/ai-key/ai-key-modal";
+import * as React from "react"
+import { ReceiptText, AlertCircle, Sparkles } from "lucide-react"
+import { getCurrentYearMonth } from "@/lib/formatters"
+import {
+  useTransactions,
+  TransactionFilters as ITransactionFilters,
+} from "@/hooks/use-transactions"
+import { useUploadTransactions } from "@/hooks/use-upload-transactions"
+import { useUpdateTransaction } from "@/hooks/use-update-transaction"
+import { useCategorizeTransactions } from "@/hooks/use-categorize-transactions"
+import { TransactionFilters } from "@/components/transactions/transaction-filters"
+import { TransactionTable } from "@/components/transactions/transaction-table"
+import { TransactionDropzone } from "@/components/transactions/transaction-dropzone"
+import { UploadSummaryBanner } from "@/components/transactions/upload-summary-banner"
+import { TransactionEditDialog } from "@/components/transactions/transaction-edit-dialog"
+import { CategorizeButton } from "@/components/transactions/categorize-button"
+import { AiKeyModal } from "@/components/ai-key/ai-key-modal"
 import {
   Category,
   TransactionSource,
@@ -21,7 +24,7 @@ import {
   UploadTransactionsResponse,
   UpdateTransactionDTO,
   CategorizeResponse,
-} from "@/src/types/api";
+} from "@/src/types/api"
 
 export default function TransactionsPage() {
   const [filters, setFilters] = React.useState<ITransactionFilters>({
@@ -29,78 +32,81 @@ export default function TransactionsPage() {
     category: undefined,
     source: undefined,
     accountId: undefined,
-  });
+  })
 
-  const [uploadSummary, setUploadSummary] = React.useState<UploadTransactionsResponse | null>(null);
-  const [uploadError, setUploadError] = React.useState<string | null>(null);
-  const [categorizeSummary, setCategorizeSummary] = React.useState<CategorizeResponse | null>(null);
-  const [categorizeError, setCategorizeError] = React.useState<string | null>(null);
-  const [editingTransaction, setEditingTransaction] = React.useState<Transaction | null>(null);
-  const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false);
+  const [uploadSummary, setUploadSummary] =
+    React.useState<UploadTransactionsResponse | null>(null)
+  const [uploadError, setUploadError] = React.useState<string | null>(null)
+  const [categorizeSummary, setCategorizeSummary] =
+    React.useState<CategorizeResponse | null>(null)
+  const [categorizeError, setCategorizeError] = React.useState<string | null>(
+    null
+  )
+  const [editingTransaction, setEditingTransaction] =
+    React.useState<Transaction | null>(null)
+  const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false)
 
-  const { transactions, isLoading, error } = useTransactions(filters);
-  const { upload, isUploading } = useUploadTransactions();
-  const { updateTransaction, isUpdating } = useUpdateTransaction();
-  const {
-    categorize,
-    isCategorizing,
-    hasAiKey,
-  } = useCategorizeTransactions();
+  const { transactions, isLoading, error } = useTransactions(filters)
+  const { upload, isUploading } = useUploadTransactions()
+  const { updateTransaction, isUpdating } = useUpdateTransaction()
+  const { categorize, isCategorizing, hasAiKey } = useCategorizeTransactions()
 
   const handleFilterChange = (newFilters: {
-    month: string;
-    category?: Category;
-    source?: TransactionSource;
-    accountId?: string;
+    month: string
+    category?: Category
+    source?: TransactionSource
+    accountId?: string
   }) => {
-    setFilters(newFilters);
-  };
+    setFilters(newFilters)
+  }
 
   const handleFileSelected = async (file: File, accountId?: string) => {
-    setUploadError(null);
-    setUploadSummary(null);
+    setUploadError(null)
+    setUploadSummary(null)
     try {
-      const summary = await upload({ file, accountId });
-      setUploadSummary(summary);
+      const summary = await upload({ file, accountId })
+      setUploadSummary(summary)
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Erro ao processar o extrato.";
-      setUploadError(message);
+      const message =
+        err instanceof Error ? err.message : "Erro ao processar o extrato."
+      setUploadError(message)
     }
-  };
+  }
 
   const handleCategorize = async () => {
-    setCategorizeError(null);
-    setCategorizeSummary(null);
+    setCategorizeError(null)
+    setCategorizeSummary(null)
     try {
-      const result = await categorize();
-      setCategorizeSummary(result);
+      const result = await categorize()
+      setCategorizeSummary(result)
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Erro ao categorizar transações.";
-      setCategorizeError(message);
+      const message =
+        err instanceof Error ? err.message : "Erro ao categorizar transações."
+      setCategorizeError(message)
     }
-  };
+  }
 
   const handleOpenEdit = (tx: Transaction) => {
-    setEditingTransaction(tx);
-  };
+    setEditingTransaction(tx)
+  }
 
   const handleCloseEdit = () => {
-    setEditingTransaction(null);
-  };
+    setEditingTransaction(null)
+  }
 
   const handleSaveEdit = async (data: UpdateTransactionDTO) => {
-    if (!editingTransaction) return;
+    if (!editingTransaction) return
 
     try {
       await updateTransaction({
         id: editingTransaction.id,
         data,
-      });
-      setEditingTransaction(null);
+      })
+      setEditingTransaction(null)
     } catch (err) {
-      console.error("Falha ao salvar edição:", err);
+      console.error("Falha ao salvar edição:", err)
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -116,7 +122,8 @@ export default function TransactionsPage() {
             </h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Audite, filtre e organize suas receitas e despesas por competência mensal.
+            Audite, filtre e organize suas receitas e despesas por competência
+            mensal.
           </p>
         </div>
 
@@ -151,17 +158,21 @@ export default function TransactionsPage() {
           <div className="flex items-center gap-3">
             <Sparkles className="size-5 text-primary" />
             <div>
-              <p className="font-semibold">Categorização Inteligente Concluída!</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos comerciais analisados e{" "}
-                <strong>{categorizeSummary.transactionsUpdated}</strong> transações reclassificadas em toda a sua conta.
+              <p className="font-semibold">
+                Categorização Inteligente Concluída!
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
+                comerciais analisados e{" "}
+                <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
+                transações reclassificadas em toda a sua conta.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setCategorizeSummary(null)}
-            className="text-xs text-muted-foreground hover:text-foreground font-medium"
+            className="text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             Fechar
           </button>
@@ -217,10 +228,7 @@ export default function TransactionsPage() {
       />
 
       {/* Modal de Configuração de Chave de IA (BYOK) */}
-      <AiKeyModal
-        open={aiKeyModalOpen}
-        onOpenChange={setAiKeyModalOpen}
-      />
+      <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />
     </div>
-  );
+  )
 }

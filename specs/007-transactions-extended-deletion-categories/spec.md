@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-23
 
-**Status**: Ready
+**Status**: Implemented
 
 **Input**: User description: "Estender módulo de transações adicionando suporte às 11 categorias canônicas (incluindo Pagamento de Fatura e Investimentos), ação de exclusão via DELETE /api/transactions/:id com diálogo de confirmação, seletor de conta no upload de extratos e filtro por conta na listagem."
 

@@ -1,17 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TransactionTable } from "./transaction-table";
-import { Transaction } from "@/src/types/api";
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { render, screen, fireEvent } from "@testing-library/react"
+import * as React from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { TransactionTable } from "./transaction-table"
+import { Transaction } from "@/src/types/api"
 
 describe("TransactionTable component", () => {
-  let queryClient: QueryClient;
+  let queryClient: QueryClient
 
   function renderWithProviders(ui: React.ReactElement) {
     return render(
       <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-    );
+    )
   }
 
   beforeEach(() => {
@@ -20,8 +20,8 @@ describe("TransactionTable component", () => {
         queries: { retry: false },
         mutations: { retry: false },
       },
-    });
-  });
+    })
+  })
   const mockTransactions: Transaction[] = [
     {
       id: "tx-1",
@@ -43,7 +43,7 @@ describe("TransactionTable component", () => {
       category: "Receita",
       source: "CSV",
     },
-  ];
+  ]
 
   it("renders transaction rows with formatted date, descriptions, account and badges", () => {
     const txWithAccount: Transaction[] = [
@@ -62,28 +62,30 @@ describe("TransactionTable component", () => {
         accountId: undefined,
         account: undefined,
       },
-    ];
+    ]
 
-    renderWithProviders(<TransactionTable transactions={txWithAccount} isLoading={false} />);
+    renderWithProviders(
+      <TransactionTable transactions={txWithAccount} isLoading={false} />
+    )
 
-    expect(screen.getByText("Data")).toBeDefined();
-    expect(screen.getByText("Descrição")).toBeDefined();
-    expect(screen.getByText("Categoria")).toBeDefined();
-    expect(screen.getByText("Conta")).toBeDefined();
-    expect(screen.getByText("Origem")).toBeDefined();
-    expect(screen.getByText("Valor")).toBeDefined();
+    expect(screen.getByText("Data")).toBeDefined()
+    expect(screen.getByText("Descrição")).toBeDefined()
+    expect(screen.getByText("Categoria")).toBeDefined()
+    expect(screen.getByText("Conta")).toBeDefined()
+    expect(screen.getByText("Origem")).toBeDefined()
+    expect(screen.getByText("Valor")).toBeDefined()
 
-    expect(screen.getByText("iFood Refeição")).toBeDefined();
-    expect(screen.getByText("Salário")).toBeDefined();
-    expect(screen.getByText("15/10/2026")).toBeDefined();
-    expect(screen.getByText("05/10/2026")).toBeDefined();
-    expect(screen.getByText("Alimentação")).toBeDefined();
-    expect(screen.getByText("Receita")).toBeDefined();
-    expect(screen.getByText("Nubank")).toBeDefined();
-    expect(screen.getByText("—")).toBeDefined();
-    expect(screen.getByText("OFX")).toBeDefined();
-    expect(screen.getByText("CSV")).toBeDefined();
-  });
+    expect(screen.getByText("iFood Refeição")).toBeDefined()
+    expect(screen.getByText("Salário")).toBeDefined()
+    expect(screen.getByText("15/10/2026")).toBeDefined()
+    expect(screen.getByText("05/10/2026")).toBeDefined()
+    expect(screen.getByText("Alimentação")).toBeDefined()
+    expect(screen.getByText("Receita")).toBeDefined()
+    expect(screen.getByText("Nubank")).toBeDefined()
+    expect(screen.getByText("—")).toBeDefined()
+    expect(screen.getByText("OFX")).toBeDefined()
+    expect(screen.getByText("CSV")).toBeDefined()
+  })
 
   it("renders badges for new canonical categories: Pagamento de Fatura and Investimentos", () => {
     const extendedTransactions: Transaction[] = [
@@ -107,56 +109,59 @@ describe("TransactionTable component", () => {
         category: "Investimentos",
         source: "CSV",
       },
-    ];
+    ]
 
     renderWithProviders(
-      <TransactionTable
-        transactions={extendedTransactions}
-        isLoading={false}
-      />
-    );
+      <TransactionTable transactions={extendedTransactions} isLoading={false} />
+    )
 
-    expect(screen.getByText("Pagamento de Fatura")).toBeDefined();
-    expect(screen.getByText("Investimentos")).toBeDefined();
-  });
+    expect(screen.getByText("Pagamento de Fatura")).toBeDefined()
+    expect(screen.getByText("Investimentos")).toBeDefined()
+  })
 
   it("calls onEdit with transaction when edit button is clicked", () => {
-    const onEdit = vi.fn();
+    const onEdit = vi.fn()
     renderWithProviders(
       <TransactionTable
         transactions={mockTransactions}
         isLoading={false}
         onEdit={onEdit}
       />
-    );
+    )
 
-    const editButtons = screen.getAllByRole("button", { name: /Editar transação/i });
-    fireEvent.click(editButtons[0]);
-    expect(onEdit).toHaveBeenCalledWith(mockTransactions[0]);
-  });
+    const editButtons = screen.getAllByRole("button", {
+      name: /Editar transação/i,
+    })
+    fireEvent.click(editButtons[0])
+    expect(onEdit).toHaveBeenCalledWith(mockTransactions[0])
+  })
 
   it("calls onDelete or opens delete dialog when delete button is clicked", () => {
-    const onDelete = vi.fn();
+    const onDelete = vi.fn()
     renderWithProviders(
       <TransactionTable
         transactions={mockTransactions}
         isLoading={false}
         onDelete={onDelete}
       />
-    );
+    )
 
-    const deleteButtons = screen.getAllByRole("button", { name: /Excluir transação/i });
-    fireEvent.click(deleteButtons[0]);
-    expect(onDelete).toHaveBeenCalledWith(mockTransactions[0]);
-  });
+    const deleteButtons = screen.getAllByRole("button", {
+      name: /Excluir transação/i,
+    })
+    fireEvent.click(deleteButtons[0])
+    expect(onDelete).toHaveBeenCalledWith(mockTransactions[0])
+  })
 
   it("renders empty state when transactions list is empty", () => {
-    renderWithProviders(<TransactionTable transactions={[]} isLoading={false} />);
-    expect(screen.getByText(/Nenhuma transação encontrada/i)).toBeDefined();
-  });
+    renderWithProviders(
+      <TransactionTable transactions={[]} isLoading={false} />
+    )
+    expect(screen.getByText(/Nenhuma transação encontrada/i)).toBeDefined()
+  })
 
   it("renders loading skeleton or spinner when isLoading is true", () => {
-    renderWithProviders(<TransactionTable transactions={[]} isLoading={true} />);
-    expect(screen.getByText(/Carregando transações/i)).toBeDefined();
-  });
-});
+    renderWithProviders(<TransactionTable transactions={[]} isLoading={true} />)
+    expect(screen.getByText(/Carregando transações/i)).toBeDefined()
+  })
+})

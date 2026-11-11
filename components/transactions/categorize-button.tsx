@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Sparkles, Loader2, Key } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import * as React from "react"
+import { Sparkles, Loader2, Key } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export interface CategorizeButtonProps {
-  hasAiKey: boolean;
-  isCategorizing?: boolean;
-  onCategorize: () => void;
-  onOpenAiKeyModal: () => void;
+  hasAiKey: boolean
+  isCategorizing?: boolean
+  onCategorize: () => void
+  onOpenAiKeyModal: () => void
 }
 
 export function CategorizeButton({
@@ -30,7 +30,7 @@ export function CategorizeButton({
         <Key className="mr-1.5 size-4 text-amber-600 dark:text-amber-400" />
         Ativar IA para Categorizar
       </Button>
-    );
+    )
   }
 
   return (
@@ -39,7 +39,7 @@ export function CategorizeButton({
       size="sm"
       disabled={isCategorizing}
       onClick={onCategorize}
-      className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-all"
+      className="bg-emerald-600 text-white shadow-sm transition-all hover:bg-emerald-700"
       aria-label="Categorizar com IA"
     >
       {isCategorizing ? (
@@ -54,5 +54,5 @@ export function CategorizeButton({
         </>
       )}
     </Button>
-  );
+  )
 }

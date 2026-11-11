@@ -1,11 +1,16 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Loader2, Info } from "lucide-react";
-import { Transaction, Category, CANONICAL_CATEGORIES, UpdateTransactionDTO } from "@/src/types/api";
-import { formatCurrencyBRL } from "@/lib/formatters";
-import { updateTransactionSchema } from "@/lib/validations/transaction";
-import { useAccounts } from "@/hooks/use-accounts";
+import * as React from "react"
+import { Loader2, Info } from "lucide-react"
+import {
+  Transaction,
+  Category,
+  CANONICAL_CATEGORIES,
+  UpdateTransactionDTO,
+} from "@/src/types/api"
+import { formatCurrencyBRL } from "@/lib/formatters"
+import { updateTransactionSchema } from "@/lib/validations/transaction"
+import { useAccounts } from "@/hooks/use-accounts"
 import {
   Dialog,
   DialogContent,
@@ -13,22 +18,22 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 export interface TransactionEditDialogProps {
-  isOpen: boolean;
-  transaction: Transaction | null;
-  onClose: () => void;
-  onSave: (data: UpdateTransactionDTO) => void;
-  isSaving?: boolean;
+  isOpen: boolean
+  transaction: Transaction | null
+  onClose: () => void
+  onSave: (data: UpdateTransactionDTO) => void
+  isSaving?: boolean
 }
 
 interface TransactionEditFormProps {
-  transaction: Transaction;
-  onClose: () => void;
-  onSave: (data: UpdateTransactionDTO) => void;
-  isSaving: boolean;
+  transaction: Transaction
+  onClose: () => void
+  onSave: (data: UpdateTransactionDTO) => void
+  isSaving: boolean
 }
 
 function TransactionEditForm({
@@ -39,39 +44,41 @@ function TransactionEditForm({
 }: TransactionEditFormProps) {
   const [cleanDescription, setCleanDescription] = React.useState(
     transaction.cleanDescription || transaction.rawDescription
-  );
-  const [category, setCategory] = React.useState<Category>(transaction.category);
+  )
+  const [category, setCategory] = React.useState<Category>(transaction.category)
   const [accountId, setAccountId] = React.useState<string>(
     transaction.accountId || transaction.account?.id || ""
-  );
-  const [validationError, setValidationError] = React.useState<string | null>(null);
+  )
+  const [validationError, setValidationError] = React.useState<string | null>(
+    null
+  )
 
-  const { accounts } = useAccounts();
+  const { accounts } = useAccounts()
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError(null);
+    e.preventDefault()
+    setValidationError(null)
 
-    const cleanAccountId = accountId.trim() ? accountId.trim() : null;
+    const cleanAccountId = accountId.trim() ? accountId.trim() : null
 
     const parsed = updateTransactionSchema.safeParse({
       cleanDescription,
       category,
       accountId: cleanAccountId,
-    });
+    })
 
     if (!parsed.success) {
-      const firstIssue = parsed.error.issues[0];
-      setValidationError(firstIssue ? firstIssue.message : "Dados inválidos");
-      return;
+      const firstIssue = parsed.error.issues[0]
+      setValidationError(firstIssue ? firstIssue.message : "Dados inválidos")
+      return
     }
 
     onSave({
       cleanDescription: cleanDescription.trim(),
       category,
       accountId: cleanAccountId,
-    });
-  };
+    })
+  }
 
   return (
     <>
@@ -84,7 +91,7 @@ function TransactionEditForm({
         <div className="mt-2 space-y-1">
           <div className="flex justify-between">
             <span className="text-zinc-500">Descrição original:</span>
-            <span className="font-mono text-zinc-900 dark:text-zinc-100 font-medium truncate max-w-[220px]">
+            <span className="max-w-[220px] truncate font-mono font-medium text-zinc-900 dark:text-zinc-100">
               {transaction.rawDescription || "—"}
             </span>
           </div>
@@ -117,7 +124,7 @@ function TransactionEditForm({
             onChange={(e) => setCleanDescription(e.target.value)}
             placeholder="Ex: Supermercado Semanal"
             disabled={isSaving}
-            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </div>
 
@@ -133,7 +140,7 @@ function TransactionEditForm({
             value={category}
             onChange={(e) => setCategory(e.target.value as Category)}
             disabled={isSaving}
-            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             {CANONICAL_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
@@ -155,7 +162,7 @@ function TransactionEditForm({
             value={accountId}
             onChange={(e) => setAccountId(e.target.value)}
             disabled={isSaving}
-            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-9 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Nenhuma conta vinculada</option>
             {accounts.map((acc) => (
@@ -184,7 +191,7 @@ function TransactionEditForm({
           <Button
             type="submit"
             disabled={isSaving}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="bg-emerald-600 text-white hover:bg-emerald-700"
           >
             {isSaving ? (
               <>
@@ -198,7 +205,7 @@ function TransactionEditForm({
         </DialogFooter>
       </form>
     </>
-  );
+  )
 }
 
 export function TransactionEditDialog({
@@ -208,7 +215,7 @@ export function TransactionEditDialog({
   onSave,
   isSaving = false,
 }: TransactionEditDialogProps) {
-  if (!transaction) return null;
+  if (!transaction) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -229,5 +236,5 @@ export function TransactionEditDialog({
         />
       </DialogContent>
     </Dialog>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { AlertTriangle, Loader2, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { Account } from "@/src/types/api";
+import * as React from "react"
+import { createPortal } from "react-dom"
+import { AlertTriangle, Loader2, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import type { Account } from "@/src/types/api"
 
 export interface AccountDeleteDialogProps {
-  isOpen: boolean;
-  account?: Account | null;
-  onClose: () => void;
-  onConfirm: (accountId: string, cascade: boolean) => Promise<void>;
-  isDeleting?: boolean;
+  isOpen: boolean
+  account?: Account | null
+  onClose: () => void
+  onConfirm: (accountId: string, cascade: boolean) => Promise<void>
+  isDeleting?: boolean
 }
 
 export function AccountDeleteDialog({
@@ -22,56 +22,56 @@ export function AccountDeleteDialog({
   onConfirm,
   isDeleting = false,
 }: AccountDeleteDialogProps) {
-  const [mounted, setMounted] = React.useState(false);
-  const [cascade, setCascade] = React.useState(false);
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [mounted, setMounted] = React.useState(false)
+  const [cascade, setCascade] = React.useState(false)
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   React.useEffect(() => {
     if (isOpen) {
-      setCascade(false);
-      setErrorMsg(null);
+      setCascade(false)
+      setErrorMsg(null)
     }
-  }, [isOpen, account]);
+  }, [isOpen, account])
 
   // Tecla Escape para fechar
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen && !isDeleting) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, isDeleting, onClose]);
-
-  if (!isOpen || !mounted || !account) return null;
-
-  const handleDelete = async () => {
-    setErrorMsg(null);
-    try {
-      await onConfirm(account.id, cascade);
-      onClose();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMsg(err.message);
-      } else {
-        setErrorMsg("Não foi possível excluir a conta. Tente novamente.");
+        onClose()
       }
     }
-  };
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, isDeleting, onClose])
+
+  if (!isOpen || !mounted || !account) return null
+
+  const handleDelete = async () => {
+    setErrorMsg(null)
+    try {
+      await onConfirm(account.id, cascade)
+      onClose()
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message)
+      } else {
+        setErrorMsg("Não foi possível excluir a conta. Tente novamente.")
+      }
+    }
+  }
 
   const dialogContent = (
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
     >
       <div
-        className="relative w-full max-w-md rounded-2xl border border-destructive/30 bg-card p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md animate-in rounded-2xl border border-destructive/30 bg-card p-6 shadow-2xl duration-200 zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabeçalho */}
@@ -84,7 +84,7 @@ export function AccountDeleteDialog({
               <h2 className="text-lg font-bold text-foreground">
                 Excluir Conta Financeira
               </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="mt-0.5 text-xs text-muted-foreground">
                 Esta ação é permanente e não poderá ser desfeita.
               </p>
             </div>
@@ -102,23 +102,24 @@ export function AccountDeleteDialog({
         </div>
 
         {/* Mensagem principal */}
-        <div className="mt-4 text-sm text-foreground space-y-2">
+        <div className="mt-4 space-y-2 text-sm text-foreground">
           <p>
             Tem certeza que deseja excluir a conta{" "}
-            <strong className="text-foreground font-semibold">
+            <strong className="font-semibold text-foreground">
               &quot;{account.name}&quot;
             </strong>
             ?
           </p>
           <p className="text-xs text-muted-foreground">
-            O saldo desta conta deixará de compor seu patrimônio líquido consolidado.
+            O saldo desta conta deixará de compor seu patrimônio líquido
+            consolidado.
           </p>
         </div>
 
         {/* Alerta de Erro Adaptativo */}
         {errorMsg && (
-          <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive flex items-start gap-2">
-            <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             <div className="space-y-1">
               <p className="font-semibold">Aviso de Exclusão</p>
               <p>{errorMsg}</p>
@@ -135,20 +136,25 @@ export function AccountDeleteDialog({
               : "border-border/80 bg-muted/30"
           )}
         >
-          <label className="flex items-start gap-3 cursor-pointer select-none">
+          <label className="flex cursor-pointer items-start gap-3 select-none">
             <input
               type="checkbox"
               checked={cascade}
-              onChange={(e) => setCascade(e.target.value !== undefined ? e.target.checked : false)}
+              onChange={(e) =>
+                setCascade(
+                  e.target.value !== undefined ? e.target.checked : false
+                )
+              }
               disabled={isDeleting}
-              className="size-4 mt-0.5 rounded border-input text-destructive focus:ring-destructive cursor-pointer"
+              className="mt-0.5 size-4 cursor-pointer rounded border-input text-destructive focus:ring-destructive"
             />
             <div className="space-y-0.5">
-              <span className="text-xs font-semibold text-foreground block">
+              <span className="block text-xs font-semibold text-foreground">
                 Excluir também todas as transações associadas a esta conta
               </span>
-              <span className="text-[11px] text-muted-foreground block">
-                Se desmarcado, a exclusão falhará caso a conta ainda possua transações vinculadas.
+              <span className="block text-[11px] text-muted-foreground">
+                Se desmarcado, a exclusão falhará caso a conta ainda possua
+                transações vinculadas.
               </span>
             </div>
           </label>
@@ -173,7 +179,7 @@ export function AccountDeleteDialog({
           >
             {isDeleting ? (
               <>
-                <Loader2 className="size-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 Excluindo...
               </>
             ) : (
@@ -183,7 +189,7 @@ export function AccountDeleteDialog({
         </div>
       </div>
     </div>
-  );
+  )
 
-  return createPortal(dialogContent, document.body);
+  return createPortal(dialogContent, document.body)
 }

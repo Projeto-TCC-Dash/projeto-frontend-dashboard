@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-24
 
-**Status**: Ready
+**Status**: Implemented
 
 **Input**: User description: "Atualizar o dashboard financeiro para exibir card segregado de Quitação de Faturas (invoiceSettlements), recalcular saldo líquido sem duplicidade contábil, ajustar gráfico de distribuição para as 11 categorias canônicas e exibir diagnóstico da IA com metas de reserva calibradas pelo perfil de renda e metas do usuário."
 

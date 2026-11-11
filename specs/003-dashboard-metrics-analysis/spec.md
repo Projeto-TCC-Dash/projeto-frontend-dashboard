@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-19
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Criar tela de dashboard com métricas consolidadas (receitas, despesas, saldo, taxa de poupança), gráfico de distribuição de categorias e parecer analítico mensal em Markdown via GET /api/analysis"
 
