@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
+import { registerSchema, type RegisterFormData } from "@/lib/validations/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Card,
   CardHeader,
@@ -13,71 +13,71 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
-import Link from "next/link";
+} from "@/components/ui/card"
+import { Loader2, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export function RegisterForm() {
-  const router = useRouter();
-  const { register } = useAuth();
+  const router = useRouter()
+  const { register } = useAuth()
 
   const [formData, setFormData] = React.useState<RegisterFormData>({
     email: "",
     password: "",
     confirmPassword: "",
-  });
+  })
   const [fieldErrors, setFieldErrors] = React.useState<
     Partial<Record<keyof RegisterFormData, string>>
-  >({});
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+  >({})
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
     if (fieldErrors[name as keyof RegisterFormData]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+      setFieldErrors((prev) => ({ ...prev, [name]: undefined }))
     }
     if (errorMessage) {
-      setErrorMessage(null);
+      setErrorMessage(null)
     }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErrorMessage(null);
+    e.preventDefault()
+    setErrorMessage(null)
 
-    const validation = registerSchema.safeParse(formData);
+    const validation = registerSchema.safeParse(formData)
     if (!validation.success) {
-      const errors: Partial<Record<keyof RegisterFormData, string>> = {};
+      const errors: Partial<Record<keyof RegisterFormData, string>> = {}
       for (const issue of validation.error.issues) {
-        const field = issue.path[0] as keyof RegisterFormData;
+        const field = issue.path[0] as keyof RegisterFormData
         if (!errors[field]) {
-          errors[field] = issue.message;
+          errors[field] = issue.message
         }
       }
-      setFieldErrors(errors);
-      return;
+      setFieldErrors(errors)
+      return
     }
 
-    setFieldErrors({});
-    setIsSubmitting(true);
+    setFieldErrors({})
+    setIsSubmitting(true)
 
     try {
       await register({
         email: validation.data.email,
         password: validation.data.password,
-      });
+      })
       // Novo usuário registrado é direcionado para o onboarding obrigatório da chave de IA
-      router.push("/onboarding");
+      router.push("/onboarding")
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMessage(err.message);
+        setErrorMessage(err.message)
       } else {
-        setErrorMessage("Erro ao criar conta. Tente novamente mais tarde.");
+        setErrorMessage("Erro ao criar conta. Tente novamente mais tarde.")
       }
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
@@ -86,7 +86,8 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle>Criar Nova Conta</CardTitle>
         <CardDescription>
-          Cadastre seu e-mail para ter acesso ao dashboard e aos diagnósticos financeiros com IA.
+          Cadastre seu e-mail para ter acesso ao dashboard e aos diagnósticos
+          financeiros com IA.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -94,7 +95,7 @@ export function RegisterForm() {
           {errorMessage && (
             <div
               role="alert"
-              className="flex items-center gap-2 p-3 text-sm rounded-lg bg-destructive/10 text-destructive border border-destructive/20"
+              className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
             >
               <AlertCircle className="size-4 shrink-0" />
               <span>{errorMessage}</span>
@@ -171,11 +172,7 @@ export function RegisterForm() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -198,5 +195,5 @@ export function RegisterForm() {
         </CardFooter>
       </form>
     </Card>
-  );
+  )
 }

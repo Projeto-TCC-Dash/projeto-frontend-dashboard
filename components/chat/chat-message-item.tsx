@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Sparkles, User, AlertCircle, RefreshCw, Square } from "lucide-react";
-import { ChatMessage } from "@/src/types/api";
-import { MarkdownRenderer } from "@/lib/markdown-renderer";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { Sparkles, User, AlertCircle, RefreshCw, Square } from "lucide-react"
+import { ChatMessage } from "@/src/types/api"
+import { MarkdownRenderer } from "@/lib/markdown-renderer"
+import { cn } from "@/lib/utils"
 
 export interface ChatMessageItemProps {
-  message: ChatMessage;
-  onRetry?: () => void;
-  className?: string;
+  message: ChatMessage
+  onRetry?: () => void
+  className?: string
 }
 
 export const ChatMessageItem = React.memo(function ChatMessageItem({
@@ -17,20 +17,20 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
   onRetry,
   className,
 }: ChatMessageItemProps) {
-  const isUser = message.role === "user";
-  const isStreaming = message.status === "streaming";
-  const isInterrupted = message.status === "interrupted";
-  const isError = message.status === "error";
+  const isUser = message.role === "user"
+  const isStreaming = message.status === "streaming"
+  const isInterrupted = message.status === "interrupted"
+  const isError = message.status === "error"
 
   const formattedTime = React.useMemo(() => {
-    if (!message.timestamp) return "";
+    if (!message.timestamp) return ""
     try {
-      const d = new Date(message.timestamp);
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const d = new Date(message.timestamp)
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     } catch {
-      return "";
+      return ""
     }
-  }, [message.timestamp]);
+  }, [message.timestamp])
 
   return (
     <div
@@ -43,7 +43,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
     >
       {/* Ícone do Assistente */}
       {!isUser && (
-        <div className="flex size-8 shrink-0 select-none items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shadow-xs">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary shadow-xs select-none">
           <Sparkles className="size-4" />
         </div>
       )}
@@ -51,10 +51,10 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
       {/* Conteúdo da Mensagem */}
       <div
         className={cn(
-          "flex max-w-[85%] sm:max-w-[75%] flex-col rounded-2xl px-4 py-3 text-sm shadow-xs transition-all",
+          "flex max-w-[85%] flex-col rounded-2xl px-4 py-3 text-sm shadow-xs transition-all sm:max-w-[75%]",
           isUser
-            ? "bg-primary text-primary-foreground rounded-tr-xs"
-            : "bg-card border border-border/70 text-card-foreground rounded-tl-xs"
+            ? "rounded-tr-xs bg-primary text-primary-foreground"
+            : "rounded-tl-xs border border-border/70 bg-card text-card-foreground"
         )}
       >
         {/* Cabeçalho do Papel */}
@@ -74,8 +74,8 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
               {message.content ? (
                 <MarkdownRenderer content={message.content} />
               ) : isStreaming ? (
-                <span className="text-muted-foreground italic flex items-center gap-1.5 py-1">
-                  <span className="inline-block size-2 rounded-full bg-primary animate-ping" />
+                <span className="flex items-center gap-1.5 py-1 text-muted-foreground italic">
+                  <span className="inline-block size-2 animate-ping rounded-full bg-primary" />
                   Analisando contexto financeiro...
                 </span>
               ) : null}
@@ -84,7 +84,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
               {isStreaming && (
                 <span
                   data-testid="streaming-cursor"
-                  className="inline-block w-1.5 h-4 ml-1 bg-primary animate-pulse align-middle"
+                  className="ml-1 inline-block h-4 w-1.5 animate-pulse bg-primary align-middle"
                   aria-hidden="true"
                 />
               )}
@@ -95,7 +95,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
         {/* Indicador de Resposta Interrompida */}
         {isInterrupted && (
           <div
-            className="mt-2.5 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium pt-2 border-t border-border/50"
+            className="mt-2.5 flex items-center gap-1.5 border-t border-border/50 pt-2 text-xs font-medium text-amber-600 dark:text-amber-400"
             data-testid="message-interrupted-badge"
           >
             <Square className="size-3 fill-current" />
@@ -106,18 +106,20 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
         {/* Alerta Inline de Erro com Botão "Tentar novamente" */}
         {isError && (
           <div
-            className="mt-3 flex flex-col gap-2 rounded-lg bg-destructive/10 border border-destructive/20 p-2.5 text-xs text-destructive"
+            className="mt-3 flex flex-col gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive"
             data-testid="message-error-box"
           >
             <div className="flex items-start gap-1.5">
-              <AlertCircle className="size-4 shrink-0 mt-0.5" />
-              <span>{message.error || "Ocorreu uma falha na geração da resposta."}</span>
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span>
+                {message.error || "Ocorreu uma falha na geração da resposta."}
+              </span>
             </div>
             {onRetry && (
               <button
                 type="button"
                 onClick={onRetry}
-                className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-destructive text-white hover:bg-destructive/90 transition-colors font-medium cursor-pointer shadow-xs"
+                className="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-md bg-destructive px-2.5 py-1 font-medium text-white shadow-xs transition-colors hover:bg-destructive/90"
                 data-testid="message-retry-button"
               >
                 <RefreshCw className="size-3" />
@@ -130,10 +132,10 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
 
       {/* Ícone do Usuário */}
       {isUser && (
-        <div className="flex size-8 shrink-0 select-none items-center justify-center rounded-lg bg-secondary text-secondary-foreground border border-border/80 shadow-xs">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-secondary text-secondary-foreground shadow-xs select-none">
           <User className="size-4" />
         </div>
       )}
     </div>
-  );
-});
+  )
+})

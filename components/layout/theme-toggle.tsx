@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import * as React from "react"
+import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
+import { Moon, Sun } from "lucide-react"
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const emptySubscribe = React.useCallback(() => () => {}, []);
+  const { resolvedTheme, setTheme } = useTheme()
+  const emptySubscribe = React.useCallback(() => () => {}, [])
   const mounted = React.useSyncExternalStore(
     emptySubscribe,
     () => true,
     () => false
-  );
+  )
 
   if (!mounted) {
     return (
@@ -25,10 +25,10 @@ export function ThemeToggle() {
       >
         <span className="size-4" />
       </Button>
-    );
+    )
   }
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = resolvedTheme === "dark"
 
   return (
     <Button
@@ -45,5 +45,5 @@ export function ThemeToggle() {
         <Moon className="size-4 text-slate-700 transition-transform hover:-rotate-12" />
       )}
     </Button>
-  );
+  )
 }

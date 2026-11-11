@@ -1,96 +1,102 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { UploadCloud, FileText, AlertCircle, Loader2, Building2 } from "lucide-react";
-import { validateStatementFile } from "@/lib/validations/transaction";
-import { useAccounts } from "@/hooks/use-accounts";
+import * as React from "react"
+import {
+  UploadCloud,
+  FileText,
+  AlertCircle,
+  Loader2,
+  Building2,
+} from "lucide-react"
+import { validateStatementFile } from "@/lib/validations/transaction"
+import { useAccounts } from "@/hooks/use-accounts"
 
 export interface TransactionDropzoneProps {
-  onFileSelected: (file: File, accountId?: string) => void;
-  isUploading?: boolean;
+  onFileSelected: (file: File, accountId?: string) => void
+  isUploading?: boolean
 }
 
 export function TransactionDropzone({
   onFileSelected,
   isUploading = false,
 }: TransactionDropzoneProps) {
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [selectedAccountId, setSelectedAccountId] = React.useState<string>("");
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = React.useState(false)
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+  const [selectedAccountId, setSelectedAccountId] = React.useState<string>("")
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  const { accounts } = useAccounts();
+  const { accounts } = useAccounts()
 
   const processFile = (file: File) => {
-    setErrorMessage(null);
-    const validation = validateStatementFile(file);
+    setErrorMessage(null)
+    const validation = validateStatementFile(file)
 
     if (!validation.isValid) {
-      setErrorMessage(validation.error ?? "Arquivo inválido");
-      return;
+      setErrorMessage(validation.error ?? "Arquivo inválido")
+      return
     }
 
-    onFileSelected(file, selectedAccountId ? selectedAccountId : undefined);
-  };
+    onFileSelected(file, selectedAccountId ? selectedAccountId : undefined)
+  }
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
     if (!isUploading) {
-      setIsDragging(true);
+      setIsDragging(true)
     }
-  };
+  }
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
 
-    if (isUploading) return;
+    if (isUploading) return
 
-    const files = e.dataTransfer.files;
-    if (!files || files.length === 0) return;
+    const files = e.dataTransfer.files
+    if (!files || files.length === 0) return
 
     if (files.length > 1) {
-      setErrorMessage("Por favor, selecione apenas um arquivo por vez.");
-      return;
+      setErrorMessage("Por favor, selecione apenas um arquivo por vez.")
+      return
     }
 
-    processFile(files[0]);
-  };
+    processFile(files[0])
+  }
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+    const files = e.target.files
+    if (!files || files.length === 0) return
 
     if (files.length > 1) {
-      setErrorMessage("Por favor, selecione apenas um arquivo por vez.");
-      return;
+      setErrorMessage("Por favor, selecione apenas um arquivo por vez.")
+      return
     }
 
-    processFile(files[0]);
+    processFile(files[0])
     // Reset file input so same file can be selected again if needed
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ""
     }
-  };
+  }
 
   const handleClickZone = () => {
     if (!isUploading && fileInputRef.current) {
-      fileInputRef.current.click();
+      fileInputRef.current.click()
     }
-  };
+  }
 
   return (
     <div className="space-y-3">
       {/* Seletor de Conta Bancária de Origem */}
-      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
+      <div className="flex flex-col gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-900/40">
         <div className="flex items-center gap-2">
           <Building2 className="size-4 text-zinc-500 dark:text-zinc-400" />
           <label
@@ -106,7 +112,7 @@ export function TransactionDropzone({
           value={selectedAccountId}
           onChange={(e) => setSelectedAccountId(e.target.value)}
           disabled={isUploading}
-          className="h-9 w-full sm:w-72 rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="h-9 w-full rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:w-72 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         >
           <option value="">Sem conta vinculada / Padrão</option>
           {accounts.map((acc) => (
@@ -123,12 +129,12 @@ export function TransactionDropzone({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleClickZone}
-        className={`group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 cursor-pointer ${
+        className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 ${
           isUploading
             ? "pointer-events-none border-zinc-300 bg-zinc-50/50 opacity-80 dark:border-zinc-800 dark:bg-zinc-900/20"
             : isDragging
-            ? "border-emerald-500 bg-emerald-500/10 scale-[1.01] shadow-md dark:border-emerald-400 dark:bg-emerald-500/20"
-            : "border-zinc-300 bg-white hover:border-emerald-500/60 hover:bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-emerald-500/40 dark:hover:bg-zinc-900/50"
+              ? "scale-[1.01] border-emerald-500 bg-emerald-500/10 shadow-md dark:border-emerald-400 dark:bg-emerald-500/20"
+              : "border-zinc-300 bg-white hover:border-emerald-500/60 hover:bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-emerald-500/40 dark:hover:bg-zinc-900/50"
         }`}
       >
         <input
@@ -190,5 +196,5 @@ export function TransactionDropzone({
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -1,35 +1,36 @@
-import { z } from "zod";
-import { CANONICAL_CATEGORIES } from "@/src/types/api";
+import { z } from "zod"
+import { CANONICAL_CATEGORIES } from "@/src/types/api"
 
-export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
-export const ALLOWED_STATEMENT_EXTENSIONS = [".ofx", ".csv"] as const;
+export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024 // 10MB
+export const ALLOWED_STATEMENT_EXTENSIONS = [".ofx", ".csv"] as const
 
 export interface FileValidationResult {
-  isValid: boolean;
-  error?: string;
+  isValid: boolean
+  error?: string
 }
 
 export function validateStatementFile(file: File): FileValidationResult {
-  const fileName = file.name.toLowerCase();
+  const fileName = file.name.toLowerCase()
   const hasValidExtension = ALLOWED_STATEMENT_EXTENSIONS.some((ext) =>
     fileName.endsWith(ext)
-  );
+  )
 
   if (!hasValidExtension) {
     return {
       isValid: false,
-      error: "Formato de arquivo não suportado. Por favor, envie um arquivo .OFX ou .CSV.",
-    };
+      error:
+        "Formato de arquivo não suportado. Por favor, envie um arquivo .OFX ou .CSV.",
+    }
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
     return {
       isValid: false,
       error: "O tamanho do arquivo excede o limite máximo permitido de 10MB.",
-    };
+    }
   }
 
-  return { isValid: true };
+  return { isValid: true }
 }
 
 export const updateTransactionSchema = z.object({
@@ -41,6 +42,6 @@ export const updateTransactionSchema = z.object({
     message: "Selecione uma categoria canônica válida",
   }),
   accountId: z.string().trim().nullable().optional(),
-});
+})
 
-export type UpdateTransactionFormData = z.infer<typeof updateTransactionSchema>;
+export type UpdateTransactionFormData = z.infer<typeof updateTransactionSchema>

@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useTransactions } from "./use-transactions";
-import { Transaction } from "@/src/types/api";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
+import { renderHook, waitFor } from "@testing-library/react"
+import * as React from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useTransactions } from "./use-transactions"
+import { Transaction } from "@/src/types/api"
 
 describe("useTransactions Hook", () => {
-  let queryClient: QueryClient;
+  let queryClient: QueryClient
 
   const mockTransactions: Transaction[] = [
     {
@@ -29,27 +29,27 @@ describe("useTransactions Hook", () => {
       category: "Receita",
       source: "SEED",
     },
-  ];
+  ]
 
   beforeEach(() => {
-    localStorage.clear();
-    localStorage.setItem("auth_token", "test-token");
-    vi.restoreAllMocks();
+    localStorage.clear()
+    localStorage.setItem("auth_token", "test-token")
+    vi.restoreAllMocks()
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
       },
-    });
-  });
+    })
+  })
 
   afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+    vi.unstubAllGlobals()
+  })
 
   function wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
+    )
   }
 
   it("fetches transactions for given month successfully", async () => {
@@ -57,34 +57,33 @@ describe("useTransactions Hook", () => {
       ok: true,
       headers: new Headers({ "content-type": "application/json" }),
       json: async () => mockTransactions,
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(
-      () => useTransactions({ month: "2026-10" }),
-      { wrapper }
-    );
+    const { result } = renderHook(() => useTransactions({ month: "2026-10" }), {
+      wrapper,
+    })
 
-    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isLoading).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
+      expect(result.current.isSuccess).toBe(true)
+    })
 
-    expect(result.current.transactions).toEqual(mockTransactions);
+    expect(result.current.transactions).toEqual(mockTransactions)
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/transactions?month=2026-10"),
       expect.anything()
-    );
-  });
+    )
+  })
 
   it("includes category and source in query params when provided", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       headers: new Headers({ "content-type": "application/json" }),
       json: async () => [mockTransactions[0]],
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
     const { result } = renderHook(
       () =>
@@ -94,28 +93,28 @@ describe("useTransactions Hook", () => {
           source: "OFX",
         }),
       { wrapper }
-    );
+    )
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
+      expect(result.current.isSuccess).toBe(true)
+    })
 
-    expect(result.current.transactions).toHaveLength(1);
+    expect(result.current.transactions).toHaveLength(1)
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringMatching(
         /\/api\/transactions\?.*month=2026-10.*category=Alimenta%C3%A7%C3%A3o.*source=OFX/
       ),
       expect.anything()
-    );
-  });
+    )
+  })
 
   it("includes accountId in query params and query key when provided", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       headers: new Headers({ "content-type": "application/json" }),
       json: async () => [mockTransactions[0]],
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
     const { result } = renderHook(
       () =>
@@ -124,19 +123,19 @@ describe("useTransactions Hook", () => {
           accountId: "acc-nubank",
         }),
       { wrapper }
-    );
+    )
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
+      expect(result.current.isSuccess).toBe(true)
+    })
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringMatching(
         /\/api\/transactions\?.*month=2026-10.*accountId=acc-nubank/
       ),
       expect.anything()
-    );
-  });
+    )
+  })
 
   it("handles fetch error gracefully", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
@@ -144,19 +143,18 @@ describe("useTransactions Hook", () => {
       status: 500,
       headers: new Headers({ "content-type": "application/json" }),
       json: async () => ({ message: "Erro interno no servidor" }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(
-      () => useTransactions({ month: "2026-10" }),
-      { wrapper }
-    );
+    const { result } = renderHook(() => useTransactions({ month: "2026-10" }), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(result.current.isError).toBe(true);
-    });
+      expect(result.current.isError).toBe(true)
+    })
 
-    expect(result.current.error).toBeDefined();
-    expect(result.current.transactions).toEqual([]);
-  });
-});
+    expect(result.current.error).toBeDefined()
+    expect(result.current.transactions).toEqual([])
+  })
+})

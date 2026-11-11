@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { X, Loader2, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { formatBrlCurrency, parseBrlToNumber } from "@/lib/formatters";
+import * as React from "react"
+import { createPortal } from "react-dom"
+import { X, Loader2, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { formatBrlCurrency, parseBrlToNumber } from "@/lib/formatters"
 import {
   ACCOUNT_TYPES,
   ACCOUNT_TYPE_LABELS,
   type Account,
   type AccountType,
   type CreateAccountDTO,
-} from "@/src/types/api";
+} from "@/src/types/api"
 
 export const PRESET_COLORS = [
   "#2563EB", // Azul Royal
@@ -24,14 +24,14 @@ export const PRESET_COLORS = [
   "#EF4444", // Vermelho
   "#F59E0B", // Âmbar
   "#64748B", // Grafite
-];
+]
 
 export interface AccountFormDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  accountToEdit?: Account | null;
-  onSubmit: (data: CreateAccountDTO) => Promise<void>;
-  isSubmitting?: boolean;
+  isOpen: boolean
+  onClose: () => void
+  accountToEdit?: Account | null
+  onSubmit: (data: CreateAccountDTO) => Promise<void>
+  isSubmitting?: boolean
 }
 
 export function AccountFormDialog({
@@ -41,65 +41,65 @@ export function AccountFormDialog({
   onSubmit,
   isSubmitting = false,
 }: AccountFormDialogProps) {
-  const [mounted, setMounted] = React.useState(false);
-  const [name, setName] = React.useState("");
-  const [type, setType] = React.useState<AccountType>("CHECKING");
-  const [initialBalanceStr, setInitialBalanceStr] = React.useState("");
-  const [institution, setInstitution] = React.useState("");
-  const [color, setColor] = React.useState("#2563EB");
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+  const [mounted, setMounted] = React.useState(false)
+  const [name, setName] = React.useState("")
+  const [type, setType] = React.useState<AccountType>("CHECKING")
+  const [initialBalanceStr, setInitialBalanceStr] = React.useState("")
+  const [institution, setInstitution] = React.useState("")
+  const [color, setColor] = React.useState("#2563EB")
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   // Preenche dados ao abrir/editar
   React.useEffect(() => {
     if (accountToEdit) {
-      setName(accountToEdit.name);
-      setType(accountToEdit.type);
-      setInitialBalanceStr(formatBrlCurrency(accountToEdit.initialBalance));
-      setInstitution(accountToEdit.institution || "");
-      setColor(accountToEdit.color || "#2563EB");
+      setName(accountToEdit.name)
+      setType(accountToEdit.type)
+      setInitialBalanceStr(formatBrlCurrency(accountToEdit.initialBalance))
+      setInstitution(accountToEdit.institution || "")
+      setColor(accountToEdit.color || "#2563EB")
     } else {
-      setName("");
-      setType("CHECKING");
-      setInitialBalanceStr("");
-      setInstitution("");
-      setColor("#2563EB");
+      setName("")
+      setType("CHECKING")
+      setInitialBalanceStr("")
+      setInstitution("")
+      setColor("#2563EB")
     }
-    setErrorMsg(null);
-  }, [accountToEdit, isOpen]);
+    setErrorMsg(null)
+  }, [accountToEdit, isOpen])
 
   // Tecla Escape para fechar
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen && !isSubmitting) {
-        onClose();
+        onClose()
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, isSubmitting, onClose]);
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, isSubmitting, onClose])
 
-  if (!isOpen || !mounted) return null;
+  if (!isOpen || !mounted) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
+    e.preventDefault()
+    setErrorMsg(null)
 
-    const trimmedName = name.trim();
+    const trimmedName = name.trim()
     if (!trimmedName) {
-      setErrorMsg("O nome da conta é obrigatório.");
-      return;
+      setErrorMsg("O nome da conta é obrigatório.")
+      return
     }
 
     if (trimmedName.length > 50) {
-      setErrorMsg("O nome deve ter no máximo 50 caracteres.");
-      return;
+      setErrorMsg("O nome deve ter no máximo 50 caracteres.")
+      return
     }
 
-    const parsedBalance = parseBrlToNumber(initialBalanceStr) ?? 0;
+    const parsedBalance = parseBrlToNumber(initialBalanceStr) ?? 0
 
     try {
       await onSubmit({
@@ -108,36 +108,36 @@ export function AccountFormDialog({
         initialBalance: parsedBalance,
         institution: institution.trim() || undefined,
         color,
-      });
-      onClose();
+      })
+      onClose()
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setErrorMsg(err.message);
+        setErrorMsg(err.message)
       } else {
-        setErrorMsg("Ocorreu um erro ao salvar a conta.");
+        setErrorMsg("Ocorreu um erro ao salvar a conta.")
       }
     }
-  };
+  }
 
-  const isEditing = !!accountToEdit;
+  const isEditing = !!accountToEdit
 
   const dialogContent = (
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
     >
       <div
-        className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg animate-in rounded-2xl border border-border bg-card p-6 shadow-2xl duration-200 zoom-in-95"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between pb-4 border-b border-border/60">
+        <div className="flex items-center justify-between border-b border-border/60 pb-4">
           <div>
             <h2 className="text-lg font-bold text-foreground">
               {isEditing ? "Editar Conta Financeira" : "Nova Conta Financeira"}
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               {isEditing
                 ? "Atualize os metadados e saldo inicial da conta."
                 : "Informe os dados da instituição para controle de saldos."}
@@ -166,7 +166,7 @@ export function AccountFormDialog({
           <div className="space-y-1.5">
             <label
               htmlFor="account-name"
-              className="text-xs font-semibold text-foreground uppercase tracking-wider"
+              className="text-xs font-semibold tracking-wider text-foreground uppercase"
             >
               Nome da Conta *
             </label>
@@ -185,7 +185,7 @@ export function AccountFormDialog({
           <div className="space-y-1.5">
             <label
               htmlFor="account-type"
-              className="text-xs font-semibold text-foreground uppercase tracking-wider"
+              className="text-xs font-semibold tracking-wider text-foreground uppercase"
             >
               Tipo de Conta *
             </label>
@@ -194,7 +194,7 @@ export function AccountFormDialog({
               value={type}
               onChange={(e) => setType(e.target.value as AccountType)}
               disabled={isSubmitting}
-              className="w-full h-10 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
             >
               {ACCOUNT_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -204,12 +204,12 @@ export function AccountFormDialog({
             </select>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Saldo Inicial */}
             <div className="space-y-1.5">
               <label
                 htmlFor="account-balance"
-                className="text-xs font-semibold text-foreground uppercase tracking-wider"
+                className="text-xs font-semibold tracking-wider text-foreground uppercase"
               >
                 Saldo Inicial (R$)
               </label>
@@ -226,7 +226,7 @@ export function AccountFormDialog({
             <div className="space-y-1.5">
               <label
                 htmlFor="account-institution"
-                className="text-xs font-semibold text-foreground uppercase tracking-wider"
+                className="text-xs font-semibold tracking-wider text-foreground uppercase"
               >
                 Instituição Financeira
               </label>
@@ -243,7 +243,7 @@ export function AccountFormDialog({
 
           {/* Seletor de Cores */}
           <div className="space-y-2 pt-1">
-            <label className="text-xs font-semibold text-foreground uppercase tracking-wider block">
+            <label className="block text-xs font-semibold tracking-wider text-foreground uppercase">
               Cor de Identificação
             </label>
             <div className="flex flex-wrap items-center gap-2">
@@ -254,8 +254,9 @@ export function AccountFormDialog({
                   onClick={() => setColor(preset)}
                   disabled={isSubmitting}
                   className={cn(
-                    "size-8 rounded-full flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring",
-                    color.toUpperCase() === preset.toUpperCase() && "ring-2 ring-primary ring-offset-2"
+                    "flex size-8 items-center justify-center rounded-full transition-transform hover:scale-110 focus:ring-2 focus:ring-ring focus:outline-none",
+                    color.toUpperCase() === preset.toUpperCase() &&
+                      "ring-2 ring-primary ring-offset-2"
                   )}
                   style={{ backgroundColor: preset }}
                   aria-label={`Cor ${preset}`}
@@ -266,16 +267,16 @@ export function AccountFormDialog({
                 </button>
               ))}
 
-              <div className="flex items-center gap-1.5 ml-1">
+              <div className="ml-1 flex items-center gap-1.5">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   disabled={isSubmitting}
-                  className="size-8 rounded-lg cursor-pointer border border-input bg-background p-0.5"
+                  className="size-8 cursor-pointer rounded-lg border border-input bg-background p-0.5"
                   aria-label="Escolher cor personalizada"
                 />
-                <span className="text-xs font-mono text-muted-foreground uppercase">
+                <span className="font-mono text-xs text-muted-foreground uppercase">
                   {color}
                 </span>
               </div>
@@ -283,7 +284,7 @@ export function AccountFormDialog({
           </div>
 
           {/* Rodapé e Ações */}
-          <div className="flex items-center justify-end gap-2 pt-4 border-t border-border/60">
+          <div className="flex items-center justify-end gap-2 border-t border-border/60 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -295,7 +296,7 @@ export function AccountFormDialog({
             <Button type="submit" disabled={isSubmitting} className="min-w-28">
               {isSubmitting ? (
                 <>
-                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Salvando...
                 </>
               ) : isEditing ? (
@@ -308,7 +309,7 @@ export function AccountFormDialog({
         </form>
       </div>
     </div>
-  );
+  )
 
-  return createPortal(dialogContent, document.body);
+  return createPortal(dialogContent, document.body)
 }

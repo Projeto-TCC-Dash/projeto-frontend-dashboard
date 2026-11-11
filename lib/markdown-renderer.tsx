@@ -1,8 +1,8 @@
-import React from "react";
+import React from "react"
 
 interface MarkdownRendererProps {
-  content: string;
-  className?: string;
+  content: string
+  className?: string
 }
 
 /**
@@ -10,16 +10,19 @@ interface MarkdownRendererProps {
  * Converte blocos Markdown (títulos, listas, parágrafos, ênfases) em elementos React nativos
  * com sanitização intrínseca (sem dangerouslySetInnerHTML).
  */
-export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
+export function MarkdownRenderer({
+  content,
+  className = "",
+}: MarkdownRendererProps) {
   if (!content || !content.trim()) {
-    return null;
+    return null
   }
 
-  const lines = content.split("\n");
-  const elements: React.ReactNode[] = [];
-  let currentListItems: string[] = [];
-  let currentListType: "ul" | "ol" | null = null;
-  let elementIndex = 0;
+  const lines = content.split("\n")
+  const elements: React.ReactNode[] = []
+  let currentListItems: string[] = []
+  let currentListType: "ul" | "ol" | null = null
+  let elementIndex = 0
 
   const flushList = () => {
     if (currentListItems.length > 0 && currentListType) {
@@ -27,129 +30,129 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
         elements.push(
           <ul
             key={`list-${elementIndex++}`}
-            className="my-3 list-disc space-y-1.5 pl-5 text-sm text-foreground/90 leading-relaxed"
+            className="my-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-foreground/90"
           >
             {currentListItems.map((item, i) => (
               <li key={`ul-item-${i}`}>{renderInlineMarkdown(item)}</li>
             ))}
           </ul>
-        );
+        )
       } else {
         elements.push(
           <ol
             key={`list-${elementIndex++}`}
-            className="my-3 list-decimal space-y-1.5 pl-5 text-sm text-foreground/90 leading-relaxed"
+            className="my-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-foreground/90"
           >
             {currentListItems.map((item, i) => (
               <li key={`ol-item-${i}`}>{renderInlineMarkdown(item)}</li>
             ))}
           </ol>
-        );
+        )
       }
-      currentListItems = [];
-      currentListType = null;
+      currentListItems = []
+      currentListType = null
     }
-  };
+  }
 
   for (let i = 0; i < lines.length; i++) {
-    const rawLine = lines[i];
-    const trimmed = rawLine.trim();
+    const rawLine = lines[i]
+    const trimmed = rawLine.trim()
 
     if (!trimmed) {
-      flushList();
-      continue;
+      flushList()
+      continue
     }
 
     // Headings
     if (trimmed.startsWith("### ")) {
-      flushList();
+      flushList()
       elements.push(
         <h3
           key={`h3-${elementIndex++}`}
-          className="mt-4 mb-2 text-base font-semibold text-foreground tracking-tight"
+          className="mt-4 mb-2 text-base font-semibold tracking-tight text-foreground"
         >
           {renderInlineMarkdown(trimmed.slice(4))}
         </h3>
-      );
-      continue;
+      )
+      continue
     }
 
     if (trimmed.startsWith("## ")) {
-      flushList();
+      flushList()
       elements.push(
         <h2
           key={`h2-${elementIndex++}`}
-          className="mt-5 mb-2 text-lg font-bold text-foreground tracking-tight border-b border-border/40 pb-1"
+          className="mt-5 mb-2 border-b border-border/40 pb-1 text-lg font-bold tracking-tight text-foreground"
         >
           {renderInlineMarkdown(trimmed.slice(3))}
         </h2>
-      );
-      continue;
+      )
+      continue
     }
 
     if (trimmed.startsWith("# ")) {
-      flushList();
+      flushList()
       elements.push(
         <h1
           key={`h1-${elementIndex++}`}
-          className="mt-6 mb-3 text-xl font-extrabold text-foreground tracking-tight"
+          className="mt-6 mb-3 text-xl font-extrabold tracking-tight text-foreground"
         >
           {renderInlineMarkdown(trimmed.slice(2))}
         </h1>
-      );
-      continue;
+      )
+      continue
     }
 
     // Unordered list items: "- " or "* "
     if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       if (currentListType && currentListType !== "ul") {
-        flushList();
+        flushList()
       }
-      currentListType = "ul";
-      currentListItems.push(trimmed.slice(2));
-      continue;
+      currentListType = "ul"
+      currentListItems.push(trimmed.slice(2))
+      continue
     }
 
     // Ordered list items: "1. " or "2. "
-    const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+    const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/)
     if (orderedMatch) {
       if (currentListType && currentListType !== "ol") {
-        flushList();
+        flushList()
       }
-      currentListType = "ol";
-      currentListItems.push(orderedMatch[2]);
-      continue;
+      currentListType = "ol"
+      currentListItems.push(orderedMatch[2])
+      continue
     }
 
     // Blockquote: "> "
     if (trimmed.startsWith("> ")) {
-      flushList();
+      flushList()
       elements.push(
         <blockquote
           key={`quote-${elementIndex++}`}
-          className="my-3 border-l-4 border-primary/50 bg-muted/30 py-2 px-3.5 rounded-r-md text-sm italic text-muted-foreground"
+          className="my-3 rounded-r-md border-l-4 border-primary/50 bg-muted/30 px-3.5 py-2 text-sm text-muted-foreground italic"
         >
           {renderInlineMarkdown(trimmed.slice(2))}
         </blockquote>
-      );
-      continue;
+      )
+      continue
     }
 
     // Regular paragraph
-    flushList();
+    flushList()
     elements.push(
       <p
         key={`p-${elementIndex++}`}
-        className="my-2.5 text-sm text-foreground/90 leading-relaxed"
+        className="my-2.5 text-sm leading-relaxed text-foreground/90"
       >
         {renderInlineMarkdown(trimmed)}
       </p>
-    );
+    )
   }
 
-  flushList();
+  flushList()
 
-  return <div className={`space-y-1 text-left ${className}`}>{elements}</div>;
+  return <div className={`space-y-1 text-left ${className}`}>{elements}</div>
 }
 
 /**
@@ -157,36 +160,60 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
  */
 function renderInlineMarkdown(text: string): React.ReactNode {
   // Regex para capturar **bold**, *italic*, `code`
-  const parts: React.ReactNode[] = [];
-  let remaining = text;
-  let keyIdx = 0;
+  const parts: React.ReactNode[] = []
+  let remaining = text
+  let keyIdx = 0
 
   while (remaining.length > 0) {
     // Check for bold: **text**
-    const boldMatch = remaining.match(/^([\s\S]*?)\*\*(.+?)\*\*([\s\S]*)$/);
+    const boldMatch = remaining.match(/^([\s\S]*?)\*\*(.+?)\*\*([\s\S]*)$/)
     // Check for inline code: `code`
-    const codeMatch = remaining.match(/^([\s\S]*?)`([^`]+)`([\s\S]*)$/);
+    const codeMatch = remaining.match(/^([\s\S]*?)`([^`]+)`([\s\S]*)$/)
     // Check for italic: *text* or _text_
-    const italicMatch = remaining.match(/^([\s\S]*?)\*([^*]+)\*([\s\S]*)$/);
+    const italicMatch = remaining.match(/^([\s\S]*?)\*([^*]+)\*([\s\S]*)$/)
 
     // Identify which pattern appears earliest
     const candidates = [
-      boldMatch ? { type: "bold", prefix: boldMatch[1], content: boldMatch[2], rest: boldMatch[3], pos: boldMatch[1].length } : null,
-      codeMatch ? { type: "code", prefix: codeMatch[1], content: codeMatch[2], rest: codeMatch[3], pos: codeMatch[1].length } : null,
-      italicMatch ? { type: "italic", prefix: italicMatch[1], content: italicMatch[2], rest: italicMatch[3], pos: italicMatch[1].length } : null,
-    ].filter((c): c is NonNullable<typeof c> => c !== null);
+      boldMatch
+        ? {
+            type: "bold",
+            prefix: boldMatch[1],
+            content: boldMatch[2],
+            rest: boldMatch[3],
+            pos: boldMatch[1].length,
+          }
+        : null,
+      codeMatch
+        ? {
+            type: "code",
+            prefix: codeMatch[1],
+            content: codeMatch[2],
+            rest: codeMatch[3],
+            pos: codeMatch[1].length,
+          }
+        : null,
+      italicMatch
+        ? {
+            type: "italic",
+            prefix: italicMatch[1],
+            content: italicMatch[2],
+            rest: italicMatch[3],
+            pos: italicMatch[1].length,
+          }
+        : null,
+    ].filter((c): c is NonNullable<typeof c> => c !== null)
 
     if (candidates.length === 0) {
-      parts.push(remaining);
-      break;
+      parts.push(remaining)
+      break
     }
 
     // Sort by earliest match in the string
-    candidates.sort((a, b) => a.pos - b.pos);
-    const first = candidates[0];
+    candidates.sort((a, b) => a.pos - b.pos)
+    const first = candidates[0]
 
     if (first.prefix) {
-      parts.push(first.prefix);
+      parts.push(first.prefix)
     }
 
     if (first.type === "bold") {
@@ -194,26 +221,26 @@ function renderInlineMarkdown(text: string): React.ReactNode {
         <strong key={`b-${keyIdx++}`} className="font-semibold text-foreground">
           {first.content}
         </strong>
-      );
+      )
     } else if (first.type === "code") {
       parts.push(
         <code
           key={`c-${keyIdx++}`}
-          className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground border border-border/50"
+          className="rounded border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground"
         >
           {first.content}
         </code>
-      );
+      )
     } else if (first.type === "italic") {
       parts.push(
-        <em key={`i-${keyIdx++}`} className="italic text-foreground">
+        <em key={`i-${keyIdx++}`} className="text-foreground italic">
           {first.content}
         </em>
-      );
+      )
     }
 
-    remaining = first.rest;
+    remaining = first.rest
   }
 
-  return <>{parts}</>;
+  return <>{parts}</>
 }

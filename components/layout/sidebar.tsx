@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   Wallet,
   ReceiptText,
-  UserCheck,
+  Target,
   BotMessageSquare,
   Sparkles,
 } from "lucide-react";
@@ -17,7 +17,7 @@ export const SIDEBAR_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Contas e Cartões", icon: Wallet },
   { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
-  { href: "/settings/profile", label: "Perfil Financeiro", icon: UserCheck },
+  { href: "/settings/metas", label: "Perfil e Metas", icon: Target },
   { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },
 ];
 

@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { Transaction, Category, TransactionSource } from "@/src/types/api";
+import { useQuery } from "@tanstack/react-query"
+import { apiClient } from "@/lib/api-client"
+import { Transaction, Category, TransactionSource } from "@/src/types/api"
 
 export interface TransactionFilters {
-  month: string;
-  category?: Category;
-  source?: TransactionSource;
-  accountId?: string;
+  month: string
+  category?: Category
+  source?: TransactionSource
+  accountId?: string
 }
 
 export function useTransactions(filters: TransactionFilters) {
@@ -20,7 +20,7 @@ export function useTransactions(filters: TransactionFilters) {
       source: filters.source,
       accountId: filters.accountId,
     },
-  ] as const;
+  ] as const
 
   const query = useQuery<Transaction[], Error>({
     queryKey,
@@ -30,14 +30,14 @@ export function useTransactions(filters: TransactionFilters) {
         category: filters.category,
         source: filters.source,
         accountId: filters.accountId,
-      };
+      }
 
-      return apiClient.get<Transaction[]>("/api/transactions", { params });
+      return apiClient.get<Transaction[]>("/api/transactions", { params })
     },
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
     enabled: Boolean(filters.month),
-  });
+  })
 
   return {
     transactions: query.data ?? [],
@@ -47,5 +47,5 @@ export function useTransactions(filters: TransactionFilters) {
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
-  };
+  }
 }

@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { renderHook, waitFor, act } from "@testing-library/react";
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useFinancialAnalysis } from "./use-financial-analysis";
-import { FinancialAnalysis } from "@/src/types/api";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
+import { renderHook, waitFor, act } from "@testing-library/react"
+import * as React from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useFinancialAnalysis } from "./use-financial-analysis"
+import { FinancialAnalysis } from "@/src/types/api"
 
 describe("useFinancialAnalysis Hook", () => {
-  let queryClient: QueryClient;
+  let queryClient: QueryClient
 
   const mockAnalysis: FinancialAnalysis = {
     cached: true,
@@ -29,27 +29,27 @@ describe("useFinancialAnalysis Hook", () => {
     },
     generatedAt: "2026-10-19T10:00:00Z",
     expiresAt: "2026-10-20T10:00:00Z",
-  };
+  }
 
   beforeEach(() => {
-    localStorage.clear();
-    localStorage.setItem("auth_token", "test-token");
-    vi.restoreAllMocks();
+    localStorage.clear()
+    localStorage.setItem("auth_token", "test-token")
+    vi.restoreAllMocks()
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
       },
-    });
-  });
+    })
+  })
 
   afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+    vi.unstubAllGlobals()
+  })
 
   function wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
+    )
   }
 
   it("fetches financial analysis for given month successfully", async () => {
@@ -57,36 +57,39 @@ describe("useFinancialAnalysis Hook", () => {
       ok: true,
       headers: new Headers({ "content-type": "application/json" }),
       json: async () => mockAnalysis,
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), { wrapper });
+    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), {
+      wrapper,
+    })
 
-    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isLoading).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
+      expect(result.current.isSuccess).toBe(true)
+    })
 
-    expect(result.current.analysis).toEqual(mockAnalysis);
-    expect(result.current.metrics?.netBalance).toBe(3500);
-    expect(result.current.metrics?.savingsRate).toBe(35.0);
+    expect(result.current.analysis).toEqual(mockAnalysis)
+    expect(result.current.metrics?.netBalance).toBe(3500)
+    expect(result.current.metrics?.savingsRate).toBe(35.0)
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/analysis/2026-10"),
       expect.objectContaining({
         method: "GET",
         headers: expect.any(Headers),
       })
-    );
-  });
+    )
+  })
 
   it("triggers manual forceRefresh via refreshAnalysis and updates query data", async () => {
     const freshAnalysis: FinancialAnalysis = {
       ...mockAnalysis,
       cached: false,
-      diagnosis: "### Novo Parecer Atualizado\n\nDiagnóstico recém-gerado pelo Gemini.",
+      diagnosis:
+        "### Novo Parecer Atualizado\n\nDiagnóstico recém-gerado pelo Gemini.",
       generatedAt: "2026-10-19T12:00:00Z",
-    };
+    }
 
     const fetchMock = vi
       .fn()
@@ -99,68 +102,83 @@ describe("useFinancialAnalysis Hook", () => {
         ok: true,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => freshAnalysis,
-      });
+      })
 
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), { wrapper });
+    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
+      expect(result.current.isSuccess).toBe(true)
+    })
 
-    expect(result.current.analysis?.cached).toBe(true);
+    expect(result.current.analysis?.cached).toBe(true)
 
-    let refreshResult: FinancialAnalysis | null = null;
+    let refreshResult: FinancialAnalysis | null = null
     await act(async () => {
-      refreshResult = await result.current.refreshAnalysis();
-    });
+      refreshResult = await result.current.refreshAnalysis()
+    })
 
-    expect(refreshResult).toEqual(freshAnalysis);
-    expect(result.current.analysis?.cached).toBe(false);
-    expect(result.current.analysis?.diagnosis).toContain("Novo Parecer Atualizado");
+    expect(refreshResult).toEqual(freshAnalysis)
+    expect(result.current.analysis?.cached).toBe(false)
+    expect(result.current.analysis?.diagnosis).toContain(
+      "Novo Parecer Atualizado"
+    )
     expect(fetchMock).toHaveBeenLastCalledWith(
       expect.stringContaining("/api/analysis/2026-10?forceRefresh=true"),
       expect.anything()
-    );
-  });
+    )
+  })
 
   it("handles HTTP 403 (chave de IA ausente) properly", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
       status: 403,
       headers: new Headers({ "content-type": "application/json" }),
-      json: async () => ({ message: "Chave do Gemini não configurada", code: "AI_KEY_NOT_CONFIGURED" }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+      json: async () => ({
+        message: "Chave do Gemini não configurada",
+        code: "AI_KEY_NOT_CONFIGURED",
+      }),
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
-    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), { wrapper });
+    const { result } = renderHook(() => useFinancialAnalysis("2026-10"), {
+      wrapper,
+    })
 
     await waitFor(() => {
-      expect(result.current.isError).toBe(true);
-    });
+      expect(result.current.isError).toBe(true)
+    })
 
-    expect(result.current.error?.message).toBe("Chave do Gemini não configurada");
-  });
+    expect(result.current.error?.message).toBe(
+      "Chave do Gemini não configurada"
+    )
+  })
 
   it("handles HTTP 503 (alta demanda temporária) properly", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
       status: 503,
       headers: new Headers({ "content-type": "application/json" }),
-      json: async () => ({ message: "Serviço upstream sob alta demanda temporária" }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+      json: async () => ({
+        message: "Serviço upstream sob alta demanda temporária",
+      }),
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
     const { result } = renderHook(
       () => useFinancialAnalysis("2026-10", { retry: false }),
       { wrapper }
-    );
+    )
 
     await waitFor(() => {
-      expect(result.current.isError).toBe(true);
-    });
+      expect(result.current.isError).toBe(true)
+    })
 
-    expect(result.current.error?.message).toBe("Serviço upstream sob alta demanda temporária");
-  });
-});
+    expect(result.current.error?.message).toBe(
+      "Serviço upstream sob alta demanda temporária"
+    )
+  })
+})

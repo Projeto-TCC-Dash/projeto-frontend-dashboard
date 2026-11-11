@@ -1,5 +1,7 @@
 # 🧭 Guia Mestre de Construção do Frontend com Spec-Kit
 
+> 📌 **Nota de Governança e Versão**: A versão viva e oficial da Constituição Técnica mantida pelo Spec Kit reside em [`.specify/memory/constitution.md`](.specify/memory/constitution.md) (versão 1.2.0, ratificada com 9 princípios fundamentais). O roadmap estratégico e o status de entrega de cada ciclo estão centralizados em [`ROADMAP.md`](ROADMAP.md).
+
 Este documento contém todo o contexto arquitetural, regras de governança, contratos de API e a esteira de comandos pronta para criar o **Dashboard Financeiro Inteligente (Frontend)** utilizando o **Spec-Kit**, 100% alinhado às capacidades mais recentes do backend (incluindo Contas Bancárias, Exclusão de Transações, Contabilidade de Faturas e Perfil Financeiro com Calibragem de IA).
 
 ---
