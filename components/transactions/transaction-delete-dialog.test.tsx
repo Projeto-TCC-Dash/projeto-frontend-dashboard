@@ -118,4 +118,23 @@ describe("TransactionDeleteDialog Component", () => {
     const cancelBtn = screen.getByRole("button", { name: /Cancelar/i })
     expect(cancelBtn.hasAttribute("disabled")).toBe(true)
   })
+
+  it("applies viewport max height, overflow scrolling, and touch close button classes", () => {
+    render(
+      <TransactionDeleteDialog
+        isOpen={true}
+        transaction={mockTransaction}
+        onClose={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+
+    const heading = screen.getByText("Excluir Transação")
+    const panel = heading.closest("[class*='max-h-[90dvh]']")
+    expect(panel).not.toBeNull()
+    expect(panel).toHaveClass("overflow-y-auto", "p-4", "sm:p-6")
+
+    const closeBtn = screen.getByRole("button", { name: "Fechar" })
+    expect(closeBtn).toHaveClass("size-10", "sm:size-8")
+  })
 })

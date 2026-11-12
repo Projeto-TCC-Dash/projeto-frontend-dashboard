@@ -48,4 +48,24 @@ describe("DashboardHeader Component", () => {
 
     expect(screen.getByText(/ia desativada/i)).toBeInTheDocument()
   })
+
+  it("applies responsive container wrapping and full-width mobile CTA layout", () => {
+    render(
+      <DashboardHeader
+        currentMonth="2026-10"
+        onMonthChange={vi.fn()}
+        hasAiKey={true}
+      />
+    )
+
+    const ctaLink = screen.getByRole("link", { name: /extratos & transações/i })
+    expect(ctaLink.className).toContain("w-full")
+    expect(ctaLink.className).toContain("sm:w-auto")
+
+    const selectorGroup = screen.getByRole("group", {
+      name: /seletor de competência mensal/i,
+    })
+    expect(selectorGroup.className).toContain("w-full")
+    expect(selectorGroup.className).toContain("sm:w-auto")
+  })
 })

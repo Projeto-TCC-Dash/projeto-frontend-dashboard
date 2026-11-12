@@ -182,4 +182,26 @@ describe("TransactionEditDialog component", () => {
     fireEvent.click(cancelBtn)
     expect(onClose).toHaveBeenCalled()
   })
+
+  it("handles long raw descriptions safely and renders responsive footer buttons", () => {
+    const longDescription =
+      "PAGAMENTO_EXTENSO_SEM_ESPACOS_PARA_TESTAR_OVERFLOW_HORIZONTAL_EM_320PX_1234567890"
+    render(
+      <TransactionEditDialog
+        isOpen={true}
+        transaction={{ ...mockTx, rawDescription: longDescription }}
+        onClose={vi.fn()}
+        onSave={vi.fn()}
+        isSaving={false}
+      />
+    )
+
+    const descSpan = screen.getByText(longDescription)
+    expect(descSpan).toHaveClass("min-w-0", "truncate")
+
+    const cancelBtn = screen.getByRole("button", { name: /Cancelar/i })
+    const saveBtn = screen.getByRole("button", { name: /Salvar Alterações/i })
+    expect(cancelBtn).toHaveClass("w-full", "sm:w-auto")
+    expect(saveBtn).toHaveClass("w-full", "sm:w-auto")
+  })
 })

@@ -45,7 +45,7 @@ export function ChatDrawer() {
       <div
         data-testid="chat-drawer-container"
         className={cn(
-          "relative z-10 flex h-full w-full max-w-md flex-col border-l border-border/80 bg-background shadow-2xl md:max-w-lg",
+          "relative z-10 flex h-dvh w-full flex-col border-l border-border/80 bg-background shadow-2xl sm:max-w-md md:max-w-lg",
           "animate-in duration-300 slide-in-from-right"
         )}
       >
@@ -54,23 +54,23 @@ export function ChatDrawer() {
           onClose={closeDrawer}
           className="h-full rounded-none border-0 shadow-none"
           headerAction={
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <button
                 type="button"
                 onClick={handleExpandToFullScreen}
                 aria-label="Expandir para tela cheia"
                 data-testid="expand-to-fullscreen-button"
-                className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:size-8"
                 title="Expandir para tela cheia (/chat)"
               >
-                <Maximize2 className="size-3.5" />
+                <Maximize2 className="size-4 sm:size-3.5" />
               </button>
               <button
                 type="button"
                 onClick={closeDrawer}
                 aria-label="Fechar painel"
                 data-testid="close-drawer-button"
-                className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:size-8"
               >
                 <X className="size-4" />
               </button>

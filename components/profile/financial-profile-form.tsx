@@ -110,7 +110,7 @@ export function FinancialProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="min-w-0 space-y-6 sm:space-y-8">
       {/* Banner de Voluntariedade e LGPD */}
       <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
         <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -154,7 +154,7 @@ export function FinancialProfileForm({
                   type="button"
                   key={type}
                   onClick={() => setIncomeType(type)}
-                  className={`flex items-center justify-between rounded-lg border p-3.5 text-left text-sm font-medium transition-all ${
+                  className={`flex min-h-11 items-center justify-between gap-2 rounded-lg border p-3.5 text-left text-sm font-medium transition-all ${
                     isSelected
                       ? "border-primary bg-primary/10 text-primary shadow-sm"
                       : "border-border hover:border-primary/40 hover:bg-muted/50"
@@ -231,7 +231,7 @@ export function FinancialProfileForm({
                   type="button"
                   key={goal}
                   onClick={() => toggleGoal(goal)}
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                  className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-medium transition-all sm:px-4 sm:text-sm ${
                     isSelected
                       ? "border-primary bg-primary text-primary-foreground shadow"
                       : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-muted"
@@ -272,7 +272,7 @@ export function FinancialProfileForm({
                       : "border-border hover:border-primary/40 hover:bg-muted/50"
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-semibold text-foreground">
                       {risk === "CONSERVATIVE" && "Conservador"}
                       {risk === "MODERATE" && "Moderado"}
@@ -292,7 +292,11 @@ export function FinancialProfileForm({
 
       {/* Ações */}
       <div className="flex items-center justify-end gap-3 pt-4">
-        <Button type="submit" disabled={isPending} className="min-w-[160px]">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="min-h-10 w-full sm:min-h-9 sm:w-auto sm:min-w-[160px]"
+        >
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -70,7 +70,7 @@ export function ChatMessageList({
         onScroll={handleScroll}
         data-testid="chat-message-list-container"
         className={cn(
-          "h-full space-y-2 overflow-y-auto scroll-smooth px-4 py-4",
+          "h-full space-y-2 overflow-y-auto scroll-smooth px-3 py-3 sm:px-4 sm:py-4",
           className
         )}
       >
@@ -94,7 +94,7 @@ export function ChatMessageList({
           onClick={scrollToBottom}
           aria-label="Rolar para o final da conversa"
           data-testid="scroll-to-bottom-button"
-          className="absolute right-6 bottom-4 z-10 flex size-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-all hover:bg-primary/90"
+          className="absolute right-4 bottom-4 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-all hover:bg-primary/90 sm:right-6 sm:size-8"
         >
           <ArrowDown className="size-4" />
         </button>

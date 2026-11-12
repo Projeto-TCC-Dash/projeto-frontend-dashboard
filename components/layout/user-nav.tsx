@@ -38,18 +38,23 @@ export function UserNav() {
   if (!user) return null
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
+    <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
       <Link
         href="/settings/profile"
-        className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="flex min-h-10 items-center gap-2 rounded-lg border border-border/50 bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:min-h-0 sm:gap-2.5 sm:px-2.5"
         title="Configurações da Conta e Perfil"
+        aria-label={
+          displayName
+            ? `Perfil de ${displayName}`
+            : "Configurações da Conta e Perfil"
+        }
       >
         {avatarUrl && !imageError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={avatarUrl}
             alt={`Foto de perfil de ${displayName}`}
-            className="size-6 rounded-full border border-border object-cover"
+            className="size-6 shrink-0 rounded-full border border-border object-cover"
             onError={() => setImageError(true)}
           />
         ) : (
@@ -58,7 +63,7 @@ export function UserNav() {
           </div>
         )}
 
-        <div className="flex max-w-[140px] flex-col text-left sm:max-w-[180px]">
+        <div className="hidden max-w-[140px] flex-col text-left sm:flex sm:max-w-[180px]">
           <span className="truncate text-xs font-medium text-foreground">
             {displayName}
           </span>
@@ -74,7 +79,7 @@ export function UserNav() {
         variant="ghost"
         size="sm"
         onClick={logout}
-        className="gap-1.5 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+        className="size-10 shrink-0 gap-1.5 px-0 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:h-8 sm:w-auto sm:px-2.5"
         title="Encerrar sessão"
         aria-label="Encerrar sessão"
       >

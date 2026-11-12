@@ -130,7 +130,7 @@ export function MarkdownRenderer({
       elements.push(
         <blockquote
           key={`quote-${elementIndex++}`}
-          className="my-3 rounded-r-md border-l-4 border-primary/50 bg-muted/30 px-3.5 py-2 text-sm text-muted-foreground italic"
+          className="my-3 rounded-r-md border-l-4 border-primary/50 bg-muted/30 px-3.5 py-2 text-sm [overflow-wrap:anywhere] break-words text-muted-foreground italic"
         >
           {renderInlineMarkdown(trimmed.slice(2))}
         </blockquote>
@@ -143,7 +143,7 @@ export function MarkdownRenderer({
     elements.push(
       <p
         key={`p-${elementIndex++}`}
-        className="my-2.5 text-sm leading-relaxed text-foreground/90"
+        className="my-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] break-words text-foreground/90"
       >
         {renderInlineMarkdown(trimmed)}
       </p>
@@ -152,7 +152,13 @@ export function MarkdownRenderer({
 
   flushList()
 
-  return <div className={`space-y-1 text-left ${className}`}>{elements}</div>
+  return (
+    <div
+      className={`max-w-full min-w-0 space-y-1 overflow-x-auto text-left [overflow-wrap:anywhere] break-words ${className}`}
+    >
+      {elements}
+    </div>
+  )
 }
 
 /**
@@ -226,7 +232,7 @@ function renderInlineMarkdown(text: string): React.ReactNode {
       parts.push(
         <code
           key={`c-${keyIdx++}`}
-          className="rounded border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground"
+          className="rounded border border-border/50 bg-muted px-1.5 py-0.5 font-mono text-xs [overflow-wrap:anywhere] break-words text-foreground"
         >
           {first.content}
         </code>

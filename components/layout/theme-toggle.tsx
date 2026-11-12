@@ -19,7 +19,7 @@ export function ThemeToggle() {
       <Button
         variant="ghost"
         size="icon"
-        className="size-9 rounded-lg"
+        className="size-10 shrink-0 rounded-lg sm:size-9"
         aria-label="Alternar tema"
         disabled
       >
@@ -34,7 +34,7 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="size-9 rounded-lg text-muted-foreground hover:text-foreground"
+      className="size-10 shrink-0 rounded-lg text-muted-foreground hover:text-foreground sm:size-9"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       title={`Alternar para tema ${isDark ? "claro" : "escuro"} (Atalho: D)`}
       aria-label="Alternar tema"

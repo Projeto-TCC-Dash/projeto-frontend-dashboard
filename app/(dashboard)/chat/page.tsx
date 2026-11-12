@@ -10,15 +10,15 @@ export const metadata: Metadata = {
 
 export default function ChatPage() {
   return (
-    <div className="flex h-[calc(100vh-6.5rem)] flex-col space-y-4">
+    <div className="flex h-[calc(100dvh-6.5rem)] min-h-[420px] min-w-0 flex-col space-y-3 sm:space-y-4">
       {/* Cabeçalho da Página */}
       <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Consultor Financeiro Virtual
             </h1>
-            <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               <Sparkles className="size-3" />
               Gemini Streaming
             </span>

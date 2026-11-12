@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { BorderBeam } from "@/components/ui/border-beam"
 import {
   FinancialAnalysis,
   FinancialProfile,
@@ -45,7 +46,14 @@ export interface AiDiagnosisCardProps {
   className?: string
   financialProfile?: FinancialProfile | null
   monthlyExpenses?: number
+  /** Iguala a altura ao slot do Bento Grid no desktop (`xl:`), fixando cabeçalho e rolando apenas o corpo. */
+  matchedDesktopHeight?: boolean
 }
+
+const MATCHED_CARD_CLASSES =
+  "xl:absolute xl:inset-0 xl:flex xl:flex-col xl:overflow-hidden"
+const MATCHED_HEADER_CLASSES = "xl:shrink-0"
+const MATCHED_BODY_CLASSES = "xl:flex-1 xl:min-h-0 xl:overflow-y-auto"
 
 export function AiDiagnosisCard({
   analysis,
@@ -59,21 +67,28 @@ export function AiDiagnosisCard({
   className,
   financialProfile,
   monthlyExpenses,
+  matchedDesktopHeight = false,
 }: AiDiagnosisCardProps) {
   // 1. Estado quando o usuário não possui chave de IA configurada (BYOK Fallback)
   if (!hasAiKey) {
     return (
       <Card
         className={cn(
-          "border-amber-200/60 bg-gradient-to-br from-amber-500/5 via-card to-card dark:border-amber-900/40",
+          "min-w-0 overflow-hidden border-amber-200/60 bg-gradient-to-br from-amber-500/5 via-card to-card dark:border-amber-900/40",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
           className
         )}
         data-testid="ai-diagnosis-card-byok-required"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
+          <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-400">
+              <div className="shrink-0 rounded-lg bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-400">
                 <Key className="size-5" />
               </div>
               <CardTitle className="text-base sm:text-lg">
@@ -88,14 +103,17 @@ export function AiDiagnosisCard({
           <Button
             type="button"
             onClick={onOpenAiKeyModal}
-            className="gap-2 self-start bg-amber-600 text-white shadow-sm transition-all hover:bg-amber-700 sm:self-auto"
+            className="min-h-10 w-full gap-2 bg-amber-600 text-white shadow-sm transition-all hover:bg-amber-700 sm:min-h-9 sm:w-auto sm:shrink-0"
             aria-label="Configurar Chave de IA"
           >
             <Key className="size-4" />
             Configurar Chave de IA
           </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
           <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-amber-300/60 bg-amber-50/50 p-5 text-sm text-muted-foreground sm:flex-row dark:border-amber-900/60 dark:bg-amber-950/20">
             <div className="shrink-0 rounded-full bg-amber-500/10 p-2.5 text-amber-600 dark:text-amber-400">
               <Sparkles className="size-5" />
@@ -128,17 +146,23 @@ export function AiDiagnosisCard({
     return (
       <Card
         className={cn(
-          "border-rose-200/60 bg-rose-50/20 dark:border-rose-900/40 dark:bg-rose-950/10",
+          "min-w-0 overflow-hidden border-rose-200/60 bg-rose-50/20 dark:border-rose-900/40 dark:bg-rose-950/10",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
           className
         )}
         data-testid="ai-diagnosis-card-error"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-rose-500/10 p-1.5 text-rose-600 dark:text-rose-400">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
+          <div className="flex min-w-0 items-start gap-2.5 sm:items-center">
+            <div className="shrink-0 rounded-lg bg-rose-500/10 p-1.5 text-rose-600 dark:text-rose-400">
               <AlertTriangle className="size-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <CardTitle className="text-base sm:text-lg">
                 Diagnóstico Temporariamente Indisponível
               </CardTitle>
@@ -156,15 +180,18 @@ export function AiDiagnosisCard({
               variant="outline"
               size="sm"
               onClick={onRetry}
-              className="gap-1.5 self-start sm:self-auto"
+              className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto sm:shrink-0"
             >
               <RefreshCw className="size-3.5" />
               Tentar novamente
             </Button>
           )}
         </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground">
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
+          <p className="text-xs break-words text-muted-foreground">
             {error.message ||
               "Tente atualizar o parecer ou aguarde alguns minutos."}
           </p>
@@ -177,17 +204,32 @@ export function AiDiagnosisCard({
   if (isLoading) {
     return (
       <Card
-        className={cn("animate-pulse border-border", className)}
+        className={cn(
+          "min-w-0 animate-pulse overflow-hidden border-border",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
+          className
+        )}
         data-testid="ai-diagnosis-card-loading"
       >
-        <CardHeader className="flex flex-col pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2">
-            <div className="h-5 w-52 rounded bg-muted" />
-            <div className="h-4 w-72 rounded bg-muted" />
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
+          <div className="min-w-0 space-y-2">
+            <div className="h-5 w-52 max-w-full rounded bg-muted" />
+            <div className="h-4 w-72 max-w-full rounded bg-muted" />
           </div>
-          <div className="h-9 w-36 rounded bg-muted" />
+          <div className="h-9 w-36 max-w-full rounded bg-muted" />
         </CardHeader>
-        <CardContent className="space-y-4 pt-2">
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(
+            "space-y-4 pt-2",
+            matchedDesktopHeight && MATCHED_BODY_CLASSES
+          )}
+        >
           <div className="space-y-2">
             <div className="h-4 w-full rounded bg-muted" />
             <div className="h-4 w-5/6 rounded bg-muted" />
@@ -203,12 +245,21 @@ export function AiDiagnosisCard({
   if (!analysis) {
     return (
       <Card
-        className={cn("border-border", className)}
+        className={cn(
+          "min-w-0 overflow-hidden border-border",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
+          className
+        )}
         data-testid="ai-diagnosis-card-empty"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="size-5 text-primary" />
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <Sparkles className="size-5 shrink-0 text-primary" />
             <CardTitle>Diagnóstico Mensal com IA</CardTitle>
           </div>
           {onRefresh && (
@@ -216,15 +267,18 @@ export function AiDiagnosisCard({
               size="sm"
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="gap-1.5 self-start sm:self-auto"
+              className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto sm:shrink-0"
             >
               <Sparkles className="size-4" />
               Gerar Análise
             </Button>
           )}
         </CardHeader>
-        <CardContent>
-          <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
+          <div className="rounded-xl border border-dashed border-border p-5 text-center text-sm text-muted-foreground sm:p-6">
             Nenhuma análise gerada para a competência selecionada. Clique em
             &quot;Gerar Análise&quot; para acionar o consultor.
           </div>
@@ -244,16 +298,23 @@ export function AiDiagnosisCard({
   return (
     <Card
       className={cn(
-        "overflow-hidden border-border transition-all duration-200",
+        "relative min-w-0 overflow-hidden border-border transition-all duration-200",
+        matchedDesktopHeight && MATCHED_CARD_CLASSES,
         className
       )}
       data-testid="ai-diagnosis-card"
     >
-      <CardHeader className="flex flex-col gap-4 border-b border-border/40 pb-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
+      <BorderBeam state={isRefreshing ? "active" : "subtle"} />
+      <CardHeader
+        className={cn(
+          "flex flex-col gap-4 border-b border-border/40 pb-3 sm:flex-row sm:items-center sm:justify-between",
+          matchedDesktopHeight && MATCHED_HEADER_CLASSES
+        )}
+      >
+        <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2">
-              <Sparkles className="size-5 text-primary" />
+              <Sparkles className="size-5 shrink-0 text-primary" />
               <CardTitle className="text-base sm:text-lg">
                 Parecer do Consultor Financeiro
               </CardTitle>
@@ -287,7 +348,7 @@ export function AiDiagnosisCard({
             size="sm"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="shrink-0 gap-2 self-start sm:self-auto"
+            className="min-h-10 w-full shrink-0 gap-2 sm:min-h-8 sm:w-auto"
             title="Ignora o cache e solicita nova análise ao Gemini"
             aria-label="Recalcular Diagnóstico"
           >
@@ -302,7 +363,13 @@ export function AiDiagnosisCard({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-5">
+      <CardContent
+        data-testid="ai-diagnosis-body"
+        className={cn(
+          "space-y-6 pt-5",
+          matchedDesktopHeight && MATCHED_BODY_CLASSES
+        )}
+      >
         {/* Diretriz Calibrada de Reserva de Emergência sob Medida */}
         <div
           className="space-y-2 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 sm:p-5"
@@ -365,7 +432,7 @@ export function AiDiagnosisCard({
 
         {/* Texto do Parecer em Markdown Sanitizado */}
         <div
-          className="prose prose-sm dark:prose-invert max-w-none"
+          className="prose prose-sm dark:prose-invert max-w-none min-w-0 [overflow-wrap:anywhere] break-words"
           data-testid="diagnosis-markdown-content"
         >
           <MarkdownRenderer content={analysis.diagnosis} />
@@ -374,12 +441,12 @@ export function AiDiagnosisCard({
         {/* Lista de Recomendações Práticas */}
         {analysis.recommendations && analysis.recommendations.length > 0 && (
           <div
-            className="space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5"
+            className="min-w-0 space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5"
             data-testid="diagnosis-recommendations-section"
           >
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Lightbulb className="size-4 text-amber-500" />
+                <Lightbulb className="size-4 shrink-0 text-amber-500" />
                 <span>Recomendações Práticas para o seu Orçamento</span>
               </div>
               {activeGoals.length > 0 && (
@@ -396,21 +463,21 @@ export function AiDiagnosisCard({
                       variant="secondary"
                       className="px-2 py-0.5 text-[10px] font-normal"
                     >
-                      <Target className="mr-1 size-3 text-primary" />
+                      <Target className="mr-1 size-3 shrink-0 text-primary" />
                       {FINANCIAL_GOAL_LABELS[goal] || goal}
                     </Badge>
                   ))}
                 </div>
               )}
             </div>
-            <ul className="grid gap-2 sm:grid-cols-1">
+            <ul className="grid min-w-0 gap-2 sm:grid-cols-1">
               {analysis.recommendations.map((rec, index) => (
                 <li
                   key={`rec-${index}`}
-                  className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-card/60 p-2.5 text-xs leading-relaxed text-foreground/90 sm:text-sm"
+                  className="flex min-w-0 items-start gap-2.5 rounded-lg border border-border/50 bg-card/60 p-2.5 text-xs leading-relaxed text-foreground/90 sm:text-sm"
                 >
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-500" />
-                  <span>{rec}</span>
+                  <span className="min-w-0 break-words">{rec}</span>
                 </li>
               ))}
             </ul>

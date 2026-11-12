@@ -162,7 +162,7 @@ export function QuickSuggestionChips({
   }, [cachedAnalysis])
 
   return (
-    <div className={cn("mx-auto w-full max-w-lg py-2", className)}>
+    <div className={cn("mx-auto w-full max-w-lg min-w-0 py-2", className)}>
       <div className="mb-4 text-center">
         <h3 className="text-sm font-semibold tracking-tight text-foreground">
           Sugestões rápidas para começar
@@ -186,7 +186,7 @@ export function QuickSuggestionChips({
               onClick={() => onSelect(chip.prompt)}
               data-testid={`quick-chip-${chip.id}`}
               className={cn(
-                "group relative flex items-start gap-3 rounded-xl border border-border/80 bg-card/60 p-3 text-left transition-all hover:border-primary/40 hover:bg-card hover:shadow-xs",
+                "group relative flex min-h-11 items-start gap-3 rounded-xl border border-border/80 bg-card/60 p-3 text-left transition-all hover:border-primary/40 hover:bg-card hover:shadow-xs",
                 "focus:ring-2 focus:ring-primary/30 focus:outline-none",
                 disabled && "pointer-events-none cursor-not-allowed opacity-50"
               )}
@@ -195,12 +195,12 @@ export function QuickSuggestionChips({
                 <Icon className="size-3.5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="mb-0.5 flex items-center justify-between gap-1">
+                <div className="mb-0.5 flex items-center justify-between gap-1.5">
                   <span className="truncate text-xs font-semibold text-foreground transition-colors group-hover:text-primary">
                     {chip.label}
                   </span>
                   {chip.badge && (
-                    <span className="py-0.2 rounded-full border border-border/60 bg-secondary px-1.5 text-[10px] font-medium text-secondary-foreground">
+                    <span className="py-0.2 shrink-0 rounded-full border border-border/60 bg-secondary px-1.5 text-[10px] font-medium text-secondary-foreground">
                       {chip.badge}
                     </span>
                   )}
