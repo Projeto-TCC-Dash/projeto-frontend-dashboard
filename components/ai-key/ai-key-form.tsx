@@ -106,7 +106,7 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
       <div className="space-y-1.5">
         <label
           htmlFor="apiKey"
-          className="flex items-center justify-between text-sm font-medium text-foreground"
+          className="flex flex-wrap items-center justify-between gap-1.5 text-sm font-medium text-foreground"
         >
           <span>Chave de API do Google AI Studio</span>
           {showHelpLink && (
@@ -114,10 +114,10 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
               href="https://aistudio.google.com/app/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-normal text-primary hover:underline"
+              className="inline-flex min-h-8 items-center gap-1 text-xs font-normal text-primary hover:underline sm:min-h-0"
             >
               Obter chave gratuita no Google
-              <ExternalLink className="size-3" />
+              <ExternalLink className="size-3 shrink-0" />
             </a>
           )}
         </label>
@@ -136,12 +136,12 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
               if (fieldError) setFieldError(null)
             }}
             disabled={isPending}
-            className="pr-10 font-mono text-xs sm:text-sm"
+            className="pr-11 font-mono text-xs sm:text-sm"
           />
           <button
             type="button"
             onClick={() => setShowKey(!showKey)}
-            className="absolute top-1/2 right-2.5 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute top-1/2 right-1 flex size-9 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground sm:right-2 sm:size-7"
             aria-label={showKey ? "Ocultar chave" : "Exibir chave"}
           >
             {showKey ? (
@@ -157,7 +157,7 @@ export function AiKeyForm({ onSuccess, showHelpLink = true }: AiKeyFormProps) {
 
       <Button
         type="submit"
-        className="w-full"
+        className="min-h-10 w-full text-center whitespace-normal"
         disabled={isPending || apiKey.trim().length === 0}
       >
         {isPending ? (

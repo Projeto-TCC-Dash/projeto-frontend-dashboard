@@ -15,7 +15,7 @@ export default function DashboardLayout({
       <ChatDrawerProvider>
         <div className="flex min-h-screen flex-col bg-background text-foreground">
           <Navbar />
-          <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pb-8 lg:px-8">
             {children}
           </main>
           <ChatDrawer />

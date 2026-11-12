@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "./dialog"
 
 describe("Dialog component", () => {
@@ -67,5 +68,36 @@ describe("Dialog component", () => {
     const closeBtn = screen.getByRole("button", { name: /Fechar/i })
     fireEvent.click(closeBtn)
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it("enforces dynamic viewport max-height containment and stacked mobile footer", () => {
+    render(
+      <Dialog open={true} onOpenChange={vi.fn()}>
+        <DialogContent data-testid="dialog-panel" onClose={vi.fn()}>
+          <DialogHeader>
+            <DialogTitle>Modal Responsivo</DialogTitle>
+          </DialogHeader>
+          <p>Conteúdo longo</p>
+          <DialogFooter data-testid="dialog-footer">
+            <button type="button">Cancelar</button>
+            <button type="button">Confirmar</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
+
+    const panel = screen.getByTestId("dialog-panel")
+    expect(panel.className).toContain("max-h-[90dvh]")
+    expect(panel.className).toContain("overflow-y-auto")
+    expect(panel.className).toContain("p-4")
+    expect(panel.className).toContain("sm:p-6")
+
+    const closeBtn = screen.getByRole("button", { name: /Fechar/i })
+    expect(closeBtn.className).toContain("size-10")
+    expect(closeBtn.className).toContain("sm:size-8")
+
+    const footer = screen.getByTestId("dialog-footer")
+    expect(footer.className).toContain("flex-col-reverse")
+    expect(footer.className).toContain("sm:flex-row")
   })
 })

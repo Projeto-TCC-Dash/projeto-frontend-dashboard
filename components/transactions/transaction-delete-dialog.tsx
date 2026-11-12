@@ -74,21 +74,21 @@ export function TransactionDeleteDialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-transaction-title"
-      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-3 backdrop-blur-sm duration-200 fade-in sm:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isDeleting) {
           handleClose()
         }
       }}
     >
-      <div className="relative w-full max-w-md animate-in overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl duration-200 zoom-in-95 sm:p-7 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="relative max-h-[90dvh] w-full max-w-md animate-in overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xl duration-200 zoom-in-95 sm:p-6 dark:border-zinc-800 dark:bg-zinc-950">
         {/* Botão fechar */}
         <button
           type="button"
           aria-label="Fechar"
           onClick={handleClose}
           disabled={isDeleting}
-          className="absolute top-4 right-4 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          className="absolute top-3 right-3 flex size-10 items-center justify-center rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50 sm:top-4 sm:right-4 sm:size-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
         >
           <X className="h-5 w-5" />
         </button>
@@ -149,7 +149,7 @@ export function TransactionDeleteDialog({
             variant="outline"
             onClick={handleClose}
             disabled={isDeleting}
-            className="w-full text-xs sm:w-auto"
+            className="min-h-10 w-full text-xs sm:min-h-9 sm:w-auto"
           >
             Cancelar
           </Button>
@@ -158,7 +158,7 @@ export function TransactionDeleteDialog({
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="w-full bg-rose-600 text-xs font-semibold text-white hover:bg-rose-700 sm:w-auto"
+            className="min-h-10 w-full bg-rose-600 text-xs font-semibold text-white hover:bg-rose-700 sm:min-h-9 sm:w-auto"
           >
             {isDeleting ? (
               <>

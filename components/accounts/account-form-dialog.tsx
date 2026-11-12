@@ -125,16 +125,16 @@ export function AccountFormDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-3 backdrop-blur-sm duration-200 fade-in sm:p-4"
     >
       <div
-        className="relative w-full max-w-lg animate-in rounded-2xl border border-border bg-card p-6 shadow-2xl duration-200 zoom-in-95"
+        className="relative max-h-[90dvh] w-full max-w-lg animate-in overflow-y-auto rounded-2xl border border-border bg-card p-4 shadow-2xl duration-200 zoom-in-95 sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between border-b border-border/60 pb-4">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
+        <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-4">
+          <div className="min-w-0">
+            <h2 className="text-base font-bold text-foreground sm:text-lg">
               {isEditing ? "Editar Conta Financeira" : "Nova Conta Financeira"}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -148,7 +148,7 @@ export function AccountFormDialog({
             size="sm"
             onClick={onClose}
             disabled={isSubmitting}
-            className="size-8 p-0 text-muted-foreground hover:text-foreground"
+            className="size-10 shrink-0 p-0 text-muted-foreground hover:text-foreground sm:size-8"
             aria-label="Fechar"
           >
             <X className="size-4" />
@@ -284,16 +284,21 @@ export function AccountFormDialog({
           </div>
 
           {/* Rodapé e Ações */}
-          <div className="flex items-center justify-end gap-2 border-t border-border/60 pt-4">
+          <div className="flex flex-col-reverse gap-2 border-t border-border/60 pt-4 sm:flex-row sm:items-center sm:justify-end">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="min-w-28">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto sm:min-w-28"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />

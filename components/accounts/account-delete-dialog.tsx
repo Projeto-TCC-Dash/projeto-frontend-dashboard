@@ -68,20 +68,20 @@ export function AccountDeleteDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm duration-200 fade-in"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-3 backdrop-blur-sm duration-200 fade-in sm:p-4"
     >
       <div
-        className="relative w-full max-w-md animate-in rounded-2xl border border-destructive/30 bg-card p-6 shadow-2xl duration-200 zoom-in-95"
+        className="relative max-h-[90dvh] w-full max-w-md animate-in overflow-y-auto rounded-2xl border border-destructive/30 bg-card p-4 shadow-2xl duration-200 zoom-in-95 sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabeçalho */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
               <AlertTriangle className="size-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-foreground">
+            <div className="min-w-0">
+              <h2 className="text-base font-bold text-foreground sm:text-lg">
                 Excluir Conta Financeira
               </h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -94,7 +94,7 @@ export function AccountDeleteDialog({
             size="sm"
             onClick={onClose}
             disabled={isDeleting}
-            className="size-8 p-0 text-muted-foreground hover:text-foreground"
+            className="size-10 shrink-0 p-0 text-muted-foreground hover:text-foreground sm:size-8"
             aria-label="Fechar"
           >
             <X className="size-4" />
@@ -161,12 +161,13 @@ export function AccountDeleteDialog({
         </div>
 
         {/* Ações */}
-        <div className="mt-6 flex items-center justify-end gap-2">
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
             disabled={isDeleting}
+            className="min-h-10 w-full sm:min-h-9 sm:w-auto"
           >
             Cancelar
           </Button>
@@ -175,7 +176,7 @@ export function AccountDeleteDialog({
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="min-w-32"
+            className="min-h-10 w-full sm:min-h-9 sm:w-auto sm:min-w-32"
           >
             {isDeleting ? (
               <>

@@ -24,7 +24,7 @@ export function CategorizeButton({
         variant="outline"
         size="sm"
         onClick={onOpenAiKeyModal}
-        className="border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60"
+        className="min-h-10 w-full border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:text-amber-900 sm:min-h-8 sm:w-auto dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-950/60"
         aria-label="Ativar IA para Categorizar"
       >
         <Key className="mr-1.5 size-4 text-amber-600 dark:text-amber-400" />
@@ -39,7 +39,7 @@ export function CategorizeButton({
       size="sm"
       disabled={isCategorizing}
       onClick={onCategorize}
-      className="bg-emerald-600 text-white shadow-sm transition-all hover:bg-emerald-700"
+      className="min-h-10 w-full bg-emerald-600 text-white shadow-sm transition-all hover:bg-emerald-700 sm:min-h-8 sm:w-auto"
       aria-label="Categorizar com IA"
     >
       {isCategorizing ? (

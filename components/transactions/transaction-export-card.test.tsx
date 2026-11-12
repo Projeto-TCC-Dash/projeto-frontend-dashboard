@@ -132,4 +132,15 @@ describe("TransactionExportCard Component", () => {
       )
     })
   })
+
+  it("deve empilhar os campos de intervalo customizado em telas pequenas (grid-cols-1 sm:grid-cols-2)", () => {
+    render(<TransactionExportCard />, { wrapper })
+
+    const periodSelect = screen.getByTestId("period-type-select")
+    fireEvent.change(periodSelect, { target: { value: "range" } })
+
+    const dateRangeGrid = screen.getByTestId("export-date-range-grid")
+    expect(dateRangeGrid.className).toContain("grid-cols-1")
+    expect(dateRangeGrid.className).toContain("sm:grid-cols-2")
+  })
 })

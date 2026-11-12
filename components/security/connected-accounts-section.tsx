@@ -65,7 +65,7 @@ function ConnectGoogleButtonView({
       onClick={onClick}
       disabled={isLinking}
       data-testid="link-google-button"
-      className="w-full gap-1.5 text-xs sm:w-auto"
+      className="min-h-10 w-full gap-1.5 text-xs sm:min-h-8 sm:w-auto"
     >
       {isLinking ? (
         <Loader2 className="size-3.5 animate-spin" />
@@ -240,8 +240,8 @@ export function ConnectedAccountsSection({
         )}
 
         {/* Linha Google */}
-        <div className="flex flex-col justify-between gap-4 rounded-lg border border-border/70 bg-card/50 p-4 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3.5 sm:items-center">
+        <div className="flex min-w-0 flex-col justify-between gap-4 rounded-lg border border-border/70 bg-card/50 p-4 sm:flex-row sm:items-center">
+          <div className="flex min-w-0 items-start gap-3.5 sm:items-center">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-sm font-bold">
               {/* Ícone de Google SVG */}
               <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
@@ -264,8 +264,8 @@ export function ConnectedAccountsSection({
               </svg>
             </div>
 
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-semibold text-foreground">
                   Google
                 </span>
@@ -285,7 +285,7 @@ export function ConnectedAccountsSection({
               </div>
 
               {googleLinked ? (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs [overflow-wrap:anywhere] break-words text-muted-foreground">
                   Vinculado a{" "}
                   <strong className="text-foreground">
                     {googleEmail || "sua conta Google"}
@@ -300,7 +300,7 @@ export function ConnectedAccountsSection({
             </div>
           </div>
 
-          <div className="shrink-0 sm:self-center">
+          <div className="w-full shrink-0 sm:w-auto sm:self-center">
             {googleLinked ? (
               <Button
                 type="button"
@@ -309,7 +309,7 @@ export function ConnectedAccountsSection({
                 onClick={handleUnlinkClick}
                 disabled={isUnlinking}
                 data-testid="unlink-google-button"
-                className="w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive sm:w-auto"
+                className="min-h-10 w-full gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive sm:min-h-8 sm:w-auto"
               >
                 {isUnlinking ? (
                   <Loader2 className="size-3.5 animate-spin" />
@@ -366,6 +366,7 @@ export function ConnectedAccountsSection({
               type="button"
               onClick={() => setBlockedDialogOpen(false)}
               data-testid="close-blocked-dialog-button"
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Compreendi
             </Button>
@@ -397,6 +398,7 @@ export function ConnectedAccountsSection({
               variant="outline"
               onClick={() => setConfirmUnlinkDialogOpen(false)}
               disabled={isUnlinking}
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Cancelar
             </Button>
@@ -406,7 +408,7 @@ export function ConnectedAccountsSection({
               onClick={handleConfirmUnlink}
               disabled={isUnlinking}
               data-testid="confirm-unlink-button"
-              className="gap-2"
+              className="min-h-10 w-full gap-2 sm:min-h-9 sm:w-auto"
             >
               {isUnlinking && <Loader2 className="size-4 animate-spin" />}
               <span>Sim, desvincular</span>

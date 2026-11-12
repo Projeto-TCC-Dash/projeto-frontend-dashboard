@@ -119,4 +119,37 @@ describe("components/chat/chat-drawer", () => {
     render(<DrawerTestWrapper initialOpen={false} />)
     expect(screen.queryByTestId("chat-floating-button")).not.toBeInTheDocument()
   })
+
+  it("deve aplicar altura dinâmica h-dvh, largura fluida responsiva e alvos táteis ao drawer e botão flutuante", () => {
+    render(<DrawerTestWrapper initialOpen={false} />)
+
+    const floatingBtn = screen.getByTestId("chat-floating-button")
+    expect(floatingBtn).toHaveClass(
+      "right-4",
+      "bottom-4",
+      "sm:right-6",
+      "sm:bottom-6",
+      "min-h-11",
+      "min-w-11"
+    )
+
+    fireEvent.click(floatingBtn)
+
+    const drawerContainer = screen.getByTestId("chat-drawer-container")
+    expect(drawerContainer).toHaveClass(
+      "h-dvh",
+      "w-full",
+      "sm:max-w-md",
+      "md:max-w-lg"
+    )
+
+    expect(screen.getByTestId("expand-to-fullscreen-button")).toHaveClass(
+      "size-10",
+      "sm:size-8"
+    )
+    expect(screen.getByTestId("close-drawer-button")).toHaveClass(
+      "size-10",
+      "sm:size-8"
+    )
+  })
 })

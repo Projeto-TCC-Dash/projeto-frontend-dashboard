@@ -19,7 +19,7 @@ export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
   const isNegative = account.balance < 0
 
   return (
-    <Card className="relative overflow-hidden border border-border/60 bg-card p-5 shadow-sm transition-all hover:shadow-md">
+    <Card className="relative min-w-0 overflow-hidden border border-border/60 bg-card p-4 shadow-sm transition-all hover:shadow-md sm:p-5">
       {/* Barra de cor de destaque da conta */}
       <div
         className="absolute top-0 left-0 h-full w-1.5"
@@ -52,7 +52,7 @@ export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => onEdit(account)}
-              className="size-8 p-0 text-muted-foreground hover:text-foreground"
+              className="size-10 p-0 text-muted-foreground hover:text-foreground sm:size-8"
               aria-label="Editar conta"
             >
               <Edit2 className="size-3.5" />
@@ -64,7 +64,7 @@ export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => onDelete(account)}
-              className="size-8 p-0 text-muted-foreground hover:text-destructive"
+              className="size-10 p-0 text-muted-foreground hover:text-destructive sm:size-8"
               aria-label="Excluir conta"
             >
               <Trash2 className="size-3.5" />
@@ -73,18 +73,18 @@ export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-end justify-between border-t border-border/40 pt-2">
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-2 border-t border-border/40 pt-2">
         <div>
           <Badge variant="secondary" className="text-xs font-normal">
             {ACCOUNT_TYPE_LABELS[account.type] || account.type}
           </Badge>
         </div>
 
-        <div className="text-right">
+        <div className="min-w-0 text-right">
           <p className="text-xs text-muted-foreground">Saldo Atual</p>
           <p
             className={cn(
-              "text-lg font-bold tracking-tight",
+              "min-w-0 text-base font-bold tracking-tight break-words tabular-nums sm:text-lg",
               isNegative ? "text-destructive" : "text-foreground"
             )}
           >

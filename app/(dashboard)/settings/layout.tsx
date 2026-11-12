@@ -17,9 +17,9 @@ export default function SettingsLayout({
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl min-w-0 space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Configurações da Conta
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -30,7 +30,7 @@ export default function SettingsLayout({
 
       <SettingsNav />
 
-      <div>{children}</div>
+      <div className="min-w-0">{children}</div>
     </div>
   )
 }

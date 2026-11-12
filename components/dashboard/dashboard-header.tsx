@@ -26,15 +26,15 @@ export function DashboardHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-6 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6",
+        "flex flex-col gap-5 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 sm:gap-6 sm:p-6",
         className
       )}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Bloco de Título e Status */}
-        <div className="space-y-1.5">
+        <div className="min-w-0 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
               Painel Financeiro Inteligente
             </h1>
             {hasAiKey ? (
@@ -59,7 +59,7 @@ export function DashboardHeader({
         </div>
 
         {/* Bloco de Ações e Navegação por Mês */}
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center lg:shrink-0">
           <MonthSelector
             currentMonth={currentMonth}
             onMonthChange={onMonthChange}
@@ -70,7 +70,7 @@ export function DashboardHeader({
             href="/transactions"
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
-              "gap-1.5 font-medium shadow-sm"
+              "min-h-10 w-full justify-center gap-1.5 font-medium shadow-sm sm:min-h-8 sm:w-auto"
             )}
           >
             <span>Extratos & Transações</span>

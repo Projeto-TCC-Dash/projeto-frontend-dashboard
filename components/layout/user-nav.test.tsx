@@ -103,4 +103,41 @@ describe("UserNav Component", () => {
 
     expect(mockLogout).toHaveBeenCalledTimes(1)
   })
+
+  it("ocultará texto longo do perfil abaixo de sm preservando aria-label e áreas táteis no mobile", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: "1",
+        email: "debora.muito.longo@exemplo.com",
+        hasAiKey: true,
+      },
+      logout: mockLogout,
+    } as unknown as ReturnType<typeof useAuth>)
+
+    vi.mocked(useUserProfile).mockReturnValue({
+      data: {
+        id: "1",
+        email: "debora.muito.longo@exemplo.com",
+        name: "Débora Goulart Sobrenome Extenso",
+        avatarUrl: null,
+        hasAiKey: true,
+      },
+    } as unknown as ReturnType<typeof useUserProfile>)
+
+    render(<UserNav />)
+
+    const profileLink = screen.getByRole("link", {
+      name: /Débora Goulart Sobrenome Extenso/i,
+    })
+    expect(profileLink.className).toContain("min-h-10")
+
+    const nameEl = screen.getByText("Débora Goulart Sobrenome Extenso")
+    const textContainer = nameEl.parentElement
+    expect(textContainer?.className).toContain("hidden")
+    expect(textContainer?.className).toContain("sm:flex")
+
+    const logoutBtn = screen.getByRole("button", { name: /Encerrar sessão/i })
+    expect(logoutBtn.className).toContain("size-10")
+    expect(logoutBtn.className).toContain("sm:w-auto")
+  })
 })

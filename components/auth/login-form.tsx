@@ -94,7 +94,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full min-w-0">
       <CardHeader>
         <CardTitle>Entrar na Conta</CardTitle>
         <CardDescription>
@@ -124,7 +124,7 @@ export function LoginForm() {
             <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 font-medium text-muted-foreground">
+            <span className="bg-card px-2 text-center font-medium text-muted-foreground">
               ou continue com e-mail
             </span>
           </div>
@@ -136,10 +136,10 @@ export function LoginForm() {
           {activeError && (
             <div
               role="alert"
-              className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
+              className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm break-words text-destructive"
             >
-              <AlertCircle className="size-4 shrink-0" />
-              <span>{activeError}</span>
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span className="min-w-0 flex-1">{activeError}</span>
             </div>
           )}
 
@@ -189,7 +189,11 @@ export function LoginForm() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="min-h-10 w-full"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />

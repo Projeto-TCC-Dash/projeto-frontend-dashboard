@@ -120,15 +120,15 @@ export default function AccountsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 pb-10">
+    <div className="mx-auto max-w-6xl min-w-0 space-y-6 pb-6 sm:space-y-8 sm:pb-10">
       {/* Cabeçalho da Página */}
       <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Wallet className="size-6" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Gestão de Contas & Cartões
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -138,7 +138,10 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        <Button onClick={handleOpenCreate} className="shrink-0 gap-2">
+        <Button
+          onClick={handleOpenCreate}
+          className="min-h-10 w-full shrink-0 gap-2 sm:min-h-9 sm:w-auto"
+        >
           <Plus className="size-4" />
           <span>Nova Conta</span>
         </Button>
@@ -159,10 +162,10 @@ export default function AccountsPage() {
       )}
 
       {/* Card de Destaque: Patrimônio Líquido Total */}
-      <Card className="relative overflow-hidden border border-border/80 bg-gradient-to-br from-card via-card to-muted/20 p-6 shadow-sm">
+      <Card className="relative overflow-hidden border border-border/80 bg-gradient-to-br from-card via-card to-muted/20 p-4 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 Patrimônio Líquido Total
               </span>
@@ -173,7 +176,7 @@ export default function AccountsPage() {
             <div className="flex items-baseline gap-2">
               <p
                 className={cn(
-                  "text-3xl font-extrabold tracking-tight sm:text-4xl",
+                  "min-w-0 text-2xl font-extrabold tracking-tight break-words tabular-nums sm:text-3xl lg:text-4xl",
                   isNetWorthNegative ? "text-destructive" : "text-foreground"
                 )}
               >
@@ -188,16 +191,16 @@ export default function AccountsPage() {
 
           <div
             className={cn(
-              "flex size-14 shrink-0 items-center justify-center self-start rounded-2xl sm:self-auto",
+              "flex size-12 shrink-0 items-center justify-center self-start rounded-2xl sm:size-14 sm:self-auto",
               isNetWorthNegative
                 ? "bg-destructive/10 text-destructive"
                 : "bg-emerald-500/10 text-emerald-500"
             )}
           >
             {isNetWorthNegative ? (
-              <TrendingDown className="size-7" />
+              <TrendingDown className="size-6 sm:size-7" />
             ) : (
-              <TrendingUp className="size-7" />
+              <TrendingUp className="size-6 sm:size-7" />
             )}
           </div>
         </div>
@@ -205,7 +208,7 @@ export default function AccountsPage() {
 
       {/* Seções Temáticas Verticais */}
       {accounts.length === 0 ? (
-        <div className="space-y-4 rounded-2xl border border-dashed border-border p-12 text-center">
+        <div className="space-y-4 rounded-2xl border border-dashed border-border p-6 text-center sm:p-12">
           <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <Building2 className="size-6" />
           </div>
@@ -218,7 +221,10 @@ export default function AccountsPage() {
               para começar a acompanhar seu patrimônio consolidado.
             </p>
           </div>
-          <Button onClick={handleOpenCreate} className="gap-2">
+          <Button
+            onClick={handleOpenCreate}
+            className="min-h-10 w-full gap-2 sm:min-h-9 sm:w-auto"
+          >
             <Plus className="size-4" />
             <span>Criar Primeira Conta</span>
           </Button>

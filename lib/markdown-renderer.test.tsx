@@ -43,4 +43,23 @@ describe("MarkdownRenderer", () => {
     const { container } = render(<MarkdownRenderer content="" />)
     expect(container.firstChild).toBeNull()
   })
+
+  it("applies overflow containment and word wrapping for continuous URLs and inline code", () => {
+    const longUrl = `https://financeiro.exemplo.com/relatorios/${"a".repeat(80)}`
+    const longCode = `TOKEN_CONTINUO_SEM_ESPACOS_${"X".repeat(60)}`
+    const md = `Veja o link ${longUrl} e use \`${longCode}\` na consulta.`
+
+    const { container } = render(<MarkdownRenderer content={md} />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root).toHaveClass(
+      "min-w-0",
+      "max-w-full",
+      "overflow-x-auto",
+      "break-words",
+      "[overflow-wrap:anywhere]"
+    )
+
+    const codeEl = screen.getByText(longCode)
+    expect(codeEl).toHaveClass("break-words", "[overflow-wrap:anywhere]")
+  })
 })

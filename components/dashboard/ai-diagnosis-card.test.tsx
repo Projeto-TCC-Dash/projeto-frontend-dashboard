@@ -205,4 +205,152 @@ describe("AiDiagnosisCard Component", () => {
       screen.getByText("Criar / Expandir Reserva de Emergência")
     ).toBeInTheDocument()
   })
+
+  it("activates BorderBeam when isRefreshing is true, softens on ready, and hides on error/byok/empty/reduced-motion", () => {
+    const { rerender } = render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        isRefreshing={true}
+      />
+    )
+    expect(screen.getByTestId("border-beam")).toHaveAttribute(
+      "data-beam-state",
+      "active"
+    )
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        isRefreshing={false}
+      />
+    )
+    expect(screen.getByTestId("border-beam")).toHaveAttribute(
+      "data-beam-state",
+      "subtle"
+    )
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={false}
+        isRefreshing={true}
+      />
+    )
+    expect(screen.queryByTestId("border-beam")).toBeNull()
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        error={new Error("Falha")}
+      />
+    )
+    expect(screen.queryByTestId("border-beam")).toBeNull()
+
+    rerender(<AiDiagnosisCard analysis={null} hasAiKey={true} />)
+    expect(screen.queryByTestId("border-beam")).toBeNull()
+
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) =>
+        ({
+          matches: true,
+          media: query,
+          onchange: null,
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        }) as unknown as MediaQueryList
+    )
+    rerender(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        isRefreshing={true}
+      />
+    )
+    expect(screen.queryByTestId("border-beam")).toBeNull()
+  })
+
+  it("matches desktop left-column height with pinned header and scrollable body when matchedDesktopHeight is enabled", () => {
+    const { rerender } = render(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={true}
+        onRefresh={vi.fn()}
+        matchedDesktopHeight
+      />
+    )
+
+    const readyCard = screen.getByTestId("ai-diagnosis-card")
+    expect(readyCard.className).toContain("xl:absolute")
+    expect(readyCard.className).toContain("xl:inset-0")
+    expect(readyCard.className).toContain("xl:flex-col")
+
+    const readyBody = screen.getByTestId("ai-diagnosis-body")
+    expect(readyBody.className).toContain("xl:flex-1")
+    expect(readyBody.className).toContain("xl:min-h-0")
+    expect(readyBody.className).toContain("xl:overflow-y-auto")
+
+    const refreshBtn = screen.getByRole("button", {
+      name: /recalcular diagnóstico/i,
+    })
+    expect(readyBody).not.toContainElement(refreshBtn)
+    expect(refreshBtn.closest("[class*='xl:shrink-0']")).not.toBeNull()
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={sampleAnalysis}
+        hasAiKey={false}
+        onOpenAiKeyModal={vi.fn()}
+        matchedDesktopHeight
+      />
+    )
+    expect(
+      screen.getByTestId("ai-diagnosis-card-byok-required").className
+    ).toContain("xl:inset-0")
+    expect(screen.getByTestId("ai-diagnosis-body").className).toContain(
+      "xl:overflow-y-auto"
+    )
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={null}
+        hasAiKey={true}
+        error={new Error("Erro 503")}
+        onRetry={vi.fn()}
+        matchedDesktopHeight
+      />
+    )
+    expect(screen.getByTestId("ai-diagnosis-card-error").className).toContain(
+      "xl:inset-0"
+    )
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={null}
+        hasAiKey={true}
+        onRefresh={vi.fn()}
+        matchedDesktopHeight
+      />
+    )
+    expect(screen.getByTestId("ai-diagnosis-card-empty").className).toContain(
+      "xl:inset-0"
+    )
+
+    rerender(
+      <AiDiagnosisCard
+        analysis={null}
+        isLoading={true}
+        hasAiKey={true}
+        matchedDesktopHeight
+      />
+    )
+    expect(screen.getByTestId("ai-diagnosis-card-loading").className).toContain(
+      "xl:inset-0"
+    )
+  })
 })

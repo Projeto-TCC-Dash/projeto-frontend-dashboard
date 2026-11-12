@@ -188,7 +188,7 @@ export function UserAvatarUploader({
           </p>
         )}
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1 sm:justify-start">
           <input
             ref={fileInputRef}
             type="file"
@@ -205,7 +205,7 @@ export function UserAvatarUploader({
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading || isDeleting}
             data-testid="avatar-upload-button"
-            className="gap-1.5 text-xs"
+            className="min-h-10 gap-1.5 text-xs sm:min-h-8"
           >
             {isUploading ? (
               <Loader2 className="size-3.5 animate-spin" />
@@ -223,7 +223,7 @@ export function UserAvatarUploader({
               onClick={() => setDeleteDialogOpen(true)}
               disabled={isUploading || isDeleting}
               data-testid="avatar-delete-button"
-              className="gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="min-h-10 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive sm:min-h-8"
             >
               {isDeleting ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -254,6 +254,7 @@ export function UserAvatarUploader({
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDeleting}
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Cancelar
             </Button>
@@ -263,7 +264,7 @@ export function UserAvatarUploader({
               onClick={handleConfirmDelete}
               disabled={isDeleting}
               data-testid="avatar-confirm-delete-button"
-              className="gap-2"
+              className="min-h-10 w-full gap-2 sm:min-h-9 sm:w-auto"
             >
               {isDeleting && <Loader2 className="size-4 animate-spin" />}
               <span>Sim, remover foto</span>

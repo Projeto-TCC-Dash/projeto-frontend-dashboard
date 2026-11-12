@@ -85,25 +85,27 @@ function TransactionEditForm({
       {/* Painel de Auditoria e Referência Original */}
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400">
         <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300">
-          <Info className="size-3.5" />
+          <Info className="size-3.5 shrink-0" />
           <span>Referência de Auditoria Bancária</span>
         </div>
-        <div className="mt-2 space-y-1">
-          <div className="flex justify-between">
-            <span className="text-zinc-500">Descrição original:</span>
-            <span className="max-w-[220px] truncate font-mono font-medium text-zinc-900 dark:text-zinc-100">
+        <div className="mt-2 space-y-1.5 sm:space-y-1">
+          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+            <span className="shrink-0 text-zinc-500">Descrição original:</span>
+            <span className="min-w-0 truncate font-mono font-medium text-zinc-900 sm:max-w-[220px] dark:text-zinc-100">
               {transaction.rawDescription || "—"}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-zinc-500">Valor registrado:</span>
-            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+            <span className="shrink-0 text-zinc-500">Valor registrado:</span>
+            <span className="font-medium break-words text-zinc-900 tabular-nums dark:text-zinc-100">
               {formatCurrencyBRL(transaction.amount)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-zinc-500">Origem:</span>
-            <span className="font-medium">{transaction.source}</span>
+          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+            <span className="shrink-0 text-zinc-500">Origem:</span>
+            <span className="font-medium break-words">
+              {transaction.source}
+            </span>
           </div>
         </div>
       </div>
@@ -185,13 +187,14 @@ function TransactionEditForm({
             variant="outline"
             onClick={onClose}
             disabled={isSaving}
+            className="min-h-10 w-full sm:min-h-9 sm:w-auto"
           >
             Cancelar
           </Button>
           <Button
             type="submit"
             disabled={isSaving}
-            className="bg-emerald-600 text-white hover:bg-emerald-700"
+            className="min-h-10 w-full bg-emerald-600 text-white hover:bg-emerald-700 sm:min-h-9 sm:w-auto"
           >
             {isSaving ? (
               <>

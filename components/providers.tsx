@@ -3,6 +3,7 @@
 import * as React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { GoogleOAuthProvider } from "@react-oauth/google"
+import { MotionConfig } from "motion/react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/hooks/use-auth"
 
@@ -28,7 +29,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <GoogleOAuthProvider clientId={googleClientId}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <MotionConfig reducedMotion="user">
+            <AuthProvider>{children}</AuthProvider>
+          </MotionConfig>
         </ThemeProvider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
