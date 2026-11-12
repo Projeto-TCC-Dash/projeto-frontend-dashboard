@@ -1,45 +1,49 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import * as React from "react";
-import { Sidebar } from "./sidebar";
+import { describe, it, expect, vi } from "vitest"
+import { render, screen } from "@testing-library/react"
+import * as React from "react"
+import { Sidebar } from "./sidebar"
 
-let currentPathname = "/";
+let currentPathname = "/"
 vi.mock("next/navigation", () => ({
   usePathname: () => currentPathname,
-}));
+}))
 
 describe("Sidebar Component", () => {
   it("deve renderizar os itens de navegação incluindo 'Contas e Cartões'", () => {
-    currentPathname = "/";
-    render(<Sidebar />);
+    currentPathname = "/"
+    render(<Sidebar />)
 
-    expect(screen.getByText("FinAI Dashboard")).toBeDefined();
-    expect(screen.getByText("Dashboard")).toBeDefined();
-    expect(screen.getByText("Contas e Cartões")).toBeDefined();
-    expect(screen.getByText("Extratos & Transações")).toBeDefined();
-    expect(screen.getByText("Perfil e Metas")).toBeDefined();
-    expect(screen.getByText("Consultor IA")).toBeDefined();
+    expect(screen.getByText("FinAI Dashboard")).toBeDefined()
+    expect(screen.getByText("Dashboard")).toBeDefined()
+    expect(screen.getByText("Contas e Cartões")).toBeDefined()
+    expect(screen.getByText("Extratos & Transações")).toBeDefined()
+    expect(screen.getByText("Perfil e Metas")).toBeDefined()
+    expect(screen.getByText("Consultor IA")).toBeDefined()
 
-    const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i });
-    expect(accountsLink.getAttribute("href")).toBe("/accounts");
+    const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i })
+    expect(accountsLink.getAttribute("href")).toBe("/accounts")
 
-    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i });
-    expect(goalsLink.getAttribute("href")).toBe("/settings/metas");
-  });
+    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i })
+    expect(goalsLink.getAttribute("href")).toBe("/settings/metas")
+  })
 
   it("deve destacar visualmente o link de 'Contas e Cartões' quando a rota ativa for '/accounts'", () => {
-    currentPathname = "/accounts";
-    render(<Sidebar />);
+    currentPathname = "/accounts"
+    render(<Sidebar />)
 
-    const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i });
-    expect(accountsLink.className).toContain("bg-primary/10 text-primary font-semibold");
-  });
+    const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i })
+    expect(accountsLink.className).toContain("bg-primary/10")
+    expect(accountsLink.className).toContain("text-primary")
+    expect(accountsLink.className).toContain("font-semibold")
+  })
 
   it("deve destacar visualmente o link de 'Perfil e Metas' quando a rota ativa for '/settings/metas'", () => {
-    currentPathname = "/settings/metas";
-    render(<Sidebar />);
+    currentPathname = "/settings/metas"
+    render(<Sidebar />)
 
-    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i });
-    expect(goalsLink.className).toContain("bg-primary/10 text-primary font-semibold");
-  });
-});
+    const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i })
+    expect(goalsLink.className).toContain("bg-primary/10")
+    expect(goalsLink.className).toContain("text-primary")
+    expect(goalsLink.className).toContain("font-semibold")
+  })
+})

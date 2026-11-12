@@ -13,6 +13,7 @@ import { formatCurrencyBRL } from "@/lib/formatters"
 import { Badge } from "@/components/ui/badge"
 import { AccountCard } from "./account-card"
 import { cn } from "@/lib/utils"
+import { useSafeAutoAnimate } from "@/hooks/use-safe-auto-animate"
 import {
   ACCOUNT_TYPE_LABELS,
   type Account,
@@ -42,6 +43,7 @@ export function AccountSection({
 }: AccountSectionProps) {
   const Icon = SECTION_ICONS[type] || Wallet
   const label = ACCOUNT_TYPE_LABELS[type] || type
+  const [accountsGridRef] = useSafeAutoAnimate<HTMLDivElement>()
 
   const subtotal = React.useMemo(() => {
     return accounts.reduce((acc, account) => acc + (account.balance || 0), 0)
@@ -84,7 +86,10 @@ export function AccountSection({
 
       {/* Grid de Cards ou Estado Vazio da Seção */}
       {accounts.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 pt-1 md:grid-cols-2 lg:grid-cols-3">
+        <div
+          ref={accountsGridRef}
+          className="grid grid-cols-1 gap-4 pt-1 md:grid-cols-2 lg:grid-cols-3"
+        >
           {accounts.map((account) => (
             <AccountCard
               key={account.id}

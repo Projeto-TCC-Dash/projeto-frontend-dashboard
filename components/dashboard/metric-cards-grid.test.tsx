@@ -103,4 +103,15 @@ describe("MetricCardsGrid Component", () => {
       "R$ 1.250.480,90"
     )
   })
+
+  it("renders savings rate ProgressBar with proportional aria-valuenow", () => {
+    render(<MetricCardsGrid metrics={sampleMetrics} />)
+
+    const progressBar = screen.getByRole("progressbar", {
+      name: /Progresso da taxa de poupança/i,
+    })
+    expect(progressBar).toHaveAttribute("aria-valuenow", "50")
+    expect(progressBar).toHaveAttribute("aria-valuemin", "0")
+    expect(progressBar).toHaveAttribute("aria-valuemax", "100")
+  })
 })

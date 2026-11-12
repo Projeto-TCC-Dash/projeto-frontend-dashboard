@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { TransactionDeleteDialog } from "./transaction-delete-dialog"
 import { useDeleteTransaction } from "@/hooks/use-delete-transaction"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useSafeAutoAnimate } from "@/hooks/use-safe-auto-animate"
 
 export interface TransactionTableProps {
   transactions: Transaction[]
@@ -60,6 +61,8 @@ export function TransactionTable({
   const [txToDelete, setTxToDelete] = React.useState<Transaction | null>(null)
   const { deleteTransaction, isDeleting } = useDeleteTransaction()
   const isMobile = useMediaQuery("(max-width: 767px)")
+  const [mobileListRef] = useSafeAutoAnimate<HTMLDivElement>()
+  const [desktopTbodyRef] = useSafeAutoAnimate<HTMLTableSectionElement>()
 
   const handleDeleteConfirm = async (id: string) => {
     await deleteTransaction(id)
@@ -96,6 +99,7 @@ export function TransactionTable({
     <div className="max-w-full min-w-0 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
       {isMobile ? (
         <div
+          ref={mobileListRef}
           data-testid="transaction-mobile-cards"
           className="divide-y divide-zinc-200 dark:divide-zinc-800"
         >
@@ -243,7 +247,10 @@ export function TransactionTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody
+              ref={desktopTbodyRef}
+              className="divide-y divide-zinc-200 dark:divide-zinc-800"
+            >
               {transactions.map((tx) => {
                 const isIncome = tx.amount > 0
                 return (

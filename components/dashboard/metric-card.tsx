@@ -1,11 +1,21 @@
 import * as React from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import {
+  ProgressBar,
+  type ProgressBarProps,
+} from "@/components/ui/tremor/progress-bar"
+import { AnimatedNumberValue } from "@/components/ui/animated-number-value"
+import type { Format } from "@number-flow/react"
 import { cn } from "@/lib/utils"
 
 export interface MetricCardProps {
   title: string
   value: string
+  numericValue?: number
+  numberFormat?: Format
+  numberPrefix?: string
+  numberSuffix?: string
   description?: string
   icon?: React.ReactNode
   variant?: "default" | "positive" | "negative" | "warning"
@@ -21,17 +31,23 @@ export interface MetricCardProps {
   }
   isLoading?: boolean
   className?: string
+  progressBar?: ProgressBarProps
 }
 
 export function MetricCard({
   title,
   value,
+  numericValue,
+  numberFormat,
+  numberPrefix,
+  numberSuffix,
   description,
   icon,
   variant = "default",
   badge,
   isLoading = false,
   className,
+  progressBar,
 }: MetricCardProps) {
   if (isLoading) {
     return (
@@ -58,6 +74,13 @@ export function MetricCard({
     warning: "text-amber-600 dark:text-amber-400",
   }[variant]
 
+  const iconBadgeClass = {
+    default: "bg-muted/80 text-muted-foreground",
+    positive: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    negative: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  }[variant]
+
   return (
     <Card
       className={cn(
@@ -69,7 +92,17 @@ export function MetricCard({
         <CardTitle className="min-w-0 text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        {icon && <div className="shrink-0 text-muted-foreground">{icon}</div>}
+        {icon && (
+          <div
+            data-testid="metric-icon-badge"
+            className={cn(
+              "inline-flex size-8 shrink-0 items-center justify-center rounded-lg",
+              iconBadgeClass
+            )}
+          >
+            {icon}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="min-w-0 space-y-1.5">
         <div
@@ -79,8 +112,24 @@ export function MetricCard({
           )}
           data-testid="metric-value"
         >
-          {value}
+          {typeof numericValue === "number" ? (
+            <AnimatedNumberValue
+              value={numericValue}
+              fallbackText={value}
+              format={numberFormat}
+              prefix={numberPrefix}
+              suffix={numberSuffix}
+            />
+          ) : (
+            value
+          )}
         </div>
+        {progressBar ? (
+          <ProgressBar
+            {...progressBar}
+            className={cn("pt-1", progressBar.className)}
+          />
+        ) : null}
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
           {badge && (
             <Badge

@@ -3,6 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { motion } from "motion/react"
+import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion"
 import {
   Sparkles,
   LayoutDashboard,
@@ -29,6 +31,7 @@ const NAV_ITEMS = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const prefersReducedMotion = usePrefersReducedMotion()
   useChatDrawer()
   const headerRef = React.useRef<HTMLElement>(null)
   const [openPathname, setOpenPathname] = React.useState<string | null>(null)
@@ -111,12 +114,24 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                    "relative z-10 flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
                     isActive
-                      ? "bg-secondary font-semibold text-foreground"
+                      ? "font-semibold text-foreground"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   )}
                 >
+                  {isActive ? (
+                    <motion.span
+                      layoutId="navbar-active-pill"
+                      data-testid="navbar-active-pill"
+                      transition={
+                        prefersReducedMotion
+                          ? { duration: 0 }
+                          : { type: "spring", stiffness: 380, damping: 32 }
+                      }
+                      className="absolute inset-0 -z-10 rounded-md bg-secondary"
+                    />
+                  ) : null}
                   <Icon className="size-4" />
                   <span>{item.label}</span>
                 </Link>

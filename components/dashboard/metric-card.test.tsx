@@ -73,4 +73,27 @@ describe("MetricCard Component", () => {
     expect(screen.getByTestId("metric-card-skeleton")).toBeInTheDocument()
     expect(screen.queryByText("R$ 10.000,00")).not.toBeInTheDocument()
   })
+
+  it("renders tinted icon badge, animated numeric value, and optional ProgressBar", () => {
+    render(
+      <MetricCard
+        title="Taxa de Poupança"
+        value="45,0%"
+        numericValue={45}
+        numberFormat={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+        numberSuffix="%"
+        variant="positive"
+        icon={<span>%</span>}
+        progressBar={{ value: 45, max: 100, color: "emerald" }}
+      />
+    )
+
+    const badge = screen.getByTestId("metric-icon-badge")
+    expect(badge.className).toContain("bg-emerald-500/10")
+    expect(screen.getByTestId("number-flow")).toHaveTextContent("45,0%")
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "45"
+    )
+  })
 })

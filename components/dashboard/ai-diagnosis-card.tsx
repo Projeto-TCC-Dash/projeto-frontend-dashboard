@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { BorderBeam } from "@/components/ui/border-beam"
 import {
   FinancialAnalysis,
   FinancialProfile,
@@ -45,7 +46,14 @@ export interface AiDiagnosisCardProps {
   className?: string
   financialProfile?: FinancialProfile | null
   monthlyExpenses?: number
+  /** Iguala a altura ao slot do Bento Grid no desktop (`xl:`), fixando cabeçalho e rolando apenas o corpo. */
+  matchedDesktopHeight?: boolean
 }
+
+const MATCHED_CARD_CLASSES =
+  "xl:absolute xl:inset-0 xl:flex xl:flex-col xl:overflow-hidden"
+const MATCHED_HEADER_CLASSES = "xl:shrink-0"
+const MATCHED_BODY_CLASSES = "xl:flex-1 xl:min-h-0 xl:overflow-y-auto"
 
 export function AiDiagnosisCard({
   analysis,
@@ -59,6 +67,7 @@ export function AiDiagnosisCard({
   className,
   financialProfile,
   monthlyExpenses,
+  matchedDesktopHeight = false,
 }: AiDiagnosisCardProps) {
   // 1. Estado quando o usuário não possui chave de IA configurada (BYOK Fallback)
   if (!hasAiKey) {
@@ -66,11 +75,17 @@ export function AiDiagnosisCard({
       <Card
         className={cn(
           "min-w-0 overflow-hidden border-amber-200/60 bg-gradient-to-br from-amber-500/5 via-card to-card dark:border-amber-900/40",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
           className
         )}
         data-testid="ai-diagnosis-card-byok-required"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
           <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-2">
               <div className="shrink-0 rounded-lg bg-amber-500/10 p-1.5 text-amber-600 dark:text-amber-400">
@@ -95,7 +110,10 @@ export function AiDiagnosisCard({
             Configurar Chave de IA
           </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
           <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-amber-300/60 bg-amber-50/50 p-5 text-sm text-muted-foreground sm:flex-row dark:border-amber-900/60 dark:bg-amber-950/20">
             <div className="shrink-0 rounded-full bg-amber-500/10 p-2.5 text-amber-600 dark:text-amber-400">
               <Sparkles className="size-5" />
@@ -129,11 +147,17 @@ export function AiDiagnosisCard({
       <Card
         className={cn(
           "min-w-0 overflow-hidden border-rose-200/60 bg-rose-50/20 dark:border-rose-900/40 dark:bg-rose-950/10",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
           className
         )}
         data-testid="ai-diagnosis-card-error"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
           <div className="flex min-w-0 items-start gap-2.5 sm:items-center">
             <div className="shrink-0 rounded-lg bg-rose-500/10 p-1.5 text-rose-600 dark:text-rose-400">
               <AlertTriangle className="size-5" />
@@ -163,7 +187,10 @@ export function AiDiagnosisCard({
             </Button>
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
           <p className="text-xs break-words text-muted-foreground">
             {error.message ||
               "Tente atualizar o parecer ou aguarde alguns minutos."}
@@ -179,18 +206,30 @@ export function AiDiagnosisCard({
       <Card
         className={cn(
           "min-w-0 animate-pulse overflow-hidden border-border",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
           className
         )}
         data-testid="ai-diagnosis-card-loading"
       >
-        <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
           <div className="min-w-0 space-y-2">
             <div className="h-5 w-52 max-w-full rounded bg-muted" />
             <div className="h-4 w-72 max-w-full rounded bg-muted" />
           </div>
           <div className="h-9 w-36 max-w-full rounded bg-muted" />
         </CardHeader>
-        <CardContent className="space-y-4 pt-2">
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(
+            "space-y-4 pt-2",
+            matchedDesktopHeight && MATCHED_BODY_CLASSES
+          )}
+        >
           <div className="space-y-2">
             <div className="h-4 w-full rounded bg-muted" />
             <div className="h-4 w-5/6 rounded bg-muted" />
@@ -206,10 +245,19 @@ export function AiDiagnosisCard({
   if (!analysis) {
     return (
       <Card
-        className={cn("min-w-0 overflow-hidden border-border", className)}
+        className={cn(
+          "min-w-0 overflow-hidden border-border",
+          matchedDesktopHeight && MATCHED_CARD_CLASSES,
+          className
+        )}
         data-testid="ai-diagnosis-card-empty"
       >
-        <CardHeader className="flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader
+          className={cn(
+            "flex flex-col gap-4 pb-3 sm:flex-row sm:items-center sm:justify-between",
+            matchedDesktopHeight && MATCHED_HEADER_CLASSES
+          )}
+        >
           <div className="flex min-w-0 items-center gap-2">
             <Sparkles className="size-5 shrink-0 text-primary" />
             <CardTitle>Diagnóstico Mensal com IA</CardTitle>
@@ -226,7 +274,10 @@ export function AiDiagnosisCard({
             </Button>
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent
+          data-testid="ai-diagnosis-body"
+          className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
+        >
           <div className="rounded-xl border border-dashed border-border p-5 text-center text-sm text-muted-foreground sm:p-6">
             Nenhuma análise gerada para a competência selecionada. Clique em
             &quot;Gerar Análise&quot; para acionar o consultor.
@@ -247,12 +298,19 @@ export function AiDiagnosisCard({
   return (
     <Card
       className={cn(
-        "min-w-0 overflow-hidden border-border transition-all duration-200",
+        "relative min-w-0 overflow-hidden border-border transition-all duration-200",
+        matchedDesktopHeight && MATCHED_CARD_CLASSES,
         className
       )}
       data-testid="ai-diagnosis-card"
     >
-      <CardHeader className="flex flex-col gap-4 border-b border-border/40 pb-3 sm:flex-row sm:items-center sm:justify-between">
+      <BorderBeam state={isRefreshing ? "active" : "subtle"} />
+      <CardHeader
+        className={cn(
+          "flex flex-col gap-4 border-b border-border/40 pb-3 sm:flex-row sm:items-center sm:justify-between",
+          matchedDesktopHeight && MATCHED_HEADER_CLASSES
+        )}
+      >
         <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2">
@@ -305,7 +363,13 @@ export function AiDiagnosisCard({
         )}
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-5">
+      <CardContent
+        data-testid="ai-diagnosis-body"
+        className={cn(
+          "space-y-6 pt-5",
+          matchedDesktopHeight && MATCHED_BODY_CLASSES
+        )}
+      >
         {/* Diretriz Calibrada de Reserva de Emergência sob Medida */}
         <div
           className="space-y-2 rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 sm:p-5"

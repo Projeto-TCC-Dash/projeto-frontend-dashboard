@@ -182,4 +182,19 @@ describe("Navbar Component", () => {
 
     expect(document.getElementById("mobile-navigation-menu")).toBeNull()
   })
+
+  it("renders shared layoutId active pill on active desktop navigation route", () => {
+    currentPathname = "/"
+    const { rerender } = render(<Navbar />)
+
+    const activePill = screen.getByTestId("navbar-active-pill")
+    expect(activePill).toBeInTheDocument()
+    expect(activePill.parentElement).toHaveAttribute("href", "/")
+
+    currentPathname = "/accounts"
+    rerender(<Navbar />)
+
+    const movedPill = screen.getByTestId("navbar-active-pill")
+    expect(movedPill.parentElement).toHaveAttribute("href", "/accounts")
+  })
 })

@@ -56,6 +56,33 @@ vi.mock("@/hooks/use-financial-analysis", () => ({
   }),
 }))
 
+vi.mock("@/hooks/use-transactions", () => ({
+  useTransactions: () => ({
+    transactions: [
+      {
+        id: "tx-1",
+        amount: 10000,
+        date: "2026-10-05T10:00:00Z",
+        category: "Receita",
+        source: "OFX",
+      },
+      {
+        id: "tx-2",
+        amount: 2000,
+        date: "2026-10-08T10:00:00Z",
+        category: "Alimentação",
+        source: "CSV",
+      },
+    ],
+    isLoading: false,
+    isFetching: false,
+    isSuccess: true,
+    isError: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
+}))
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -88,5 +115,31 @@ describe("DashboardPage Integration", () => {
     expect(
       screen.getByText("Parabéns pela gestão equilibrada do orçamento.")
     ).toBeInTheDocument()
+
+    // Bento Grid 7/5 layout with stacked left analytics cards and matched-height right card
+    const bentoGrid = screen.getByTestId("dashboard-bento-grid")
+    expect(bentoGrid.className).toContain("grid-cols-1")
+    expect(bentoGrid.className).toContain("xl:grid-cols-12")
+    expect(bentoGrid.className).not.toContain("xl:items-start")
+
+    const analyticsSlot = screen.getByTestId("bento-analytics-slot")
+    expect(analyticsSlot.className).toContain("xl:col-span-7")
+    expect(analyticsSlot.className).toContain("flex-col")
+
+    const categoriesCard = screen.getByTestId("category-donut-chart")
+    const cashflowCard = screen.getByTestId("period-cashflow-card")
+    expect(analyticsSlot).toContainElement(categoriesCard)
+    expect(analyticsSlot).toContainElement(cashflowCard)
+    expect(screen.queryByRole("tab")).toBeNull()
+
+    const diagnosisSlot = screen.getByTestId("bento-diagnosis-slot")
+    expect(diagnosisSlot.className).toContain("xl:col-span-5")
+    expect(diagnosisSlot.className).toContain("xl:relative")
+    expect(screen.getByTestId("ai-diagnosis-card").className).toContain(
+      "xl:inset-0"
+    )
+    expect(screen.getByTestId("ai-diagnosis-body").className).toContain(
+      "xl:overflow-y-auto"
+    )
   })
 })
