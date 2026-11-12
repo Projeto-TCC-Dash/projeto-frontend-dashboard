@@ -42,29 +42,29 @@ export function ChatPanel({
   return (
     <div
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-xs",
+        "flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-xs",
         className
       )}
       data-testid="chat-panel"
     >
       {/* Cabeçalho do Painel */}
       {showHeader && (
-        <div className="flex items-center justify-between border-b border-border/70 bg-muted/30 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-xs">
+        <div className="flex min-w-0 items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-3 py-3 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-xs">
               <Sparkles className="size-3.5" />
             </div>
-            <div>
-              <h2 className="text-sm font-semibold tracking-tight text-foreground">
+            <div className="min-w-0">
+              <h2 className="truncate text-sm font-semibold tracking-tight text-foreground">
                 Consultor Financeiro IA
               </h2>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="truncate text-[11px] text-muted-foreground">
                 Streaming em tempo real via Gemini
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             {messages.length > 0 && (
               <button
                 type="button"
@@ -72,10 +72,10 @@ export function ChatPanel({
                 disabled={isStreaming}
                 aria-label="Nova consulta"
                 data-testid="clear-chat-button"
-                className="flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                className="flex size-10 cursor-pointer items-center justify-center gap-1 rounded-lg text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50 sm:size-auto sm:px-2.5 sm:py-1.5"
                 title="Limpar histórico e iniciar nova consulta"
               >
-                <Trash2 className="size-3.5" />
+                <Trash2 className="size-3.5 shrink-0" />
                 <span className="hidden sm:inline">Nova consulta</span>
               </button>
             )}
@@ -88,7 +88,7 @@ export function ChatPanel({
                 onClick={onClose}
                 aria-label="Fechar painel"
                 data-testid="panel-close-button"
-                className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:size-8"
               >
                 <X className="size-4" />
               </button>
@@ -100,7 +100,7 @@ export function ChatPanel({
       {/* Bloqueio Pedagógico BYOK (caso usuário não tenha chave configurada) */}
       {!hasKey && (
         <div
-          className="m-4 flex flex-col items-center justify-center rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5 p-6 text-center"
+          className="m-3 flex flex-col items-center justify-center rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5 p-4 text-center sm:m-4 sm:p-6"
           data-testid="byok-missing-banner"
         >
           <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
@@ -114,11 +114,11 @@ export function ChatPanel({
             orçamentários em tempo real, cadastre sua API Key gratuita do Google
             Gemini.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex w-full flex-col flex-wrap items-center justify-center gap-2 sm:w-auto sm:flex-row">
             <button
               type="button"
               onClick={() => setAiKeyModalOpen(true)}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
+              className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 sm:min-h-9 sm:w-auto"
               data-testid="configure-ai-key-button"
             >
               <KeyRound className="size-3.5" />
@@ -128,7 +128,7 @@ export function ChatPanel({
               href="https://aistudio.google.com/app/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:min-h-9 sm:w-auto"
             >
               <span>Obter chave gratuita</span>
               <ExternalLink className="size-3" />

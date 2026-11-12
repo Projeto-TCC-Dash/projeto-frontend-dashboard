@@ -82,7 +82,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full min-w-0">
       <CardHeader>
         <CardTitle>Criar Nova Conta</CardTitle>
         <CardDescription>
@@ -95,10 +95,10 @@ export function RegisterForm() {
           {errorMessage && (
             <div
               role="alert"
-              className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive"
+              className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm break-words text-destructive"
             >
-              <AlertCircle className="size-4 shrink-0" />
-              <span>{errorMessage}</span>
+              <AlertCircle className="mt-0.5 size-4 shrink-0" />
+              <span className="min-w-0 flex-1">{errorMessage}</span>
             </div>
           )}
 
@@ -172,7 +172,11 @@ export function RegisterForm() {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="min-h-10 w-full"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />

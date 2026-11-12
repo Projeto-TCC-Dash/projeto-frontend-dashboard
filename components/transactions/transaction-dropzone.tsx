@@ -96,9 +96,9 @@ export function TransactionDropzone({
   return (
     <div className="space-y-3">
       {/* Seletor de Conta Bancária de Origem */}
-      <div className="flex flex-col gap-1.5 rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-900/40">
-        <div className="flex items-center gap-2">
-          <Building2 className="size-4 text-zinc-500 dark:text-zinc-400" />
+      <div className="flex flex-col gap-2 rounded-xl border border-zinc-200/80 bg-zinc-50/60 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="flex min-w-0 items-center gap-2">
+          <Building2 className="size-4 shrink-0 text-zinc-500 dark:text-zinc-400" />
           <label
             htmlFor="upload-account"
             className="text-xs font-semibold text-zinc-700 dark:text-zinc-300"
@@ -112,7 +112,7 @@ export function TransactionDropzone({
           value={selectedAccountId}
           onChange={(e) => setSelectedAccountId(e.target.value)}
           disabled={isUploading}
-          className="h-9 w-full rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:w-72 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="h-10 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:h-9 sm:w-72 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         >
           <option value="">Sem conta vinculada / Padrão</option>
           {accounts.map((acc) => (
@@ -129,7 +129,7 @@ export function TransactionDropzone({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleClickZone}
-        className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 ${
+        className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-4 text-center transition-all duration-200 sm:p-6 ${
           isUploading
             ? "pointer-events-none border-zinc-300 bg-zinc-50/50 opacity-80 dark:border-zinc-800 dark:bg-zinc-900/20"
             : isDragging
@@ -176,7 +176,7 @@ export function TransactionDropzone({
               </span>
             </h4>
 
-            <div className="mt-1.5 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
+            <div className="mt-1.5 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
               <span className="inline-flex items-center gap-1 font-medium">
                 <FileText className="size-3.5" /> .OFX ou .CSV
               </span>

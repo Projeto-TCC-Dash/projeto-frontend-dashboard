@@ -82,7 +82,7 @@ export function ChatInput({
           onClick={onStop}
           aria-label="Parar resposta"
           data-testid="chat-stop-button"
-          className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-xs transition-all hover:bg-destructive/90 active:scale-95"
+          className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-xs transition-all hover:bg-destructive/90 active:scale-95 sm:size-8"
         >
           <Square className="size-3.5 fill-current" />
         </button>
@@ -93,7 +93,7 @@ export function ChatInput({
           aria-label="Enviar mensagem"
           data-testid="chat-send-button"
           className={cn(
-            "flex size-8 shrink-0 items-center justify-center rounded-xl shadow-xs transition-all",
+            "flex size-10 shrink-0 items-center justify-center rounded-xl shadow-xs transition-all sm:size-8",
             canSubmit
               ? "cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95"
               : "cursor-not-allowed bg-muted text-muted-foreground opacity-50"

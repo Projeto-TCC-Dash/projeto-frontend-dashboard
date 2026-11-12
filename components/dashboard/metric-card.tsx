@@ -36,16 +36,16 @@ export function MetricCard({
   if (isLoading) {
     return (
       <Card
-        className={cn("animate-pulse overflow-hidden", className)}
+        className={cn("min-w-0 animate-pulse overflow-hidden", className)}
         data-testid="metric-card-skeleton"
       >
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="h-4 w-28 rounded bg-muted" />
-          <div className="h-5 w-5 rounded-full bg-muted" />
+        <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+          <div className="h-4 w-28 max-w-full rounded bg-muted" />
+          <div className="h-5 w-5 shrink-0 rounded-full bg-muted" />
         </CardHeader>
         <CardContent>
-          <div className="my-1 h-8 w-36 rounded bg-muted" />
-          <div className="mt-2 h-3.5 w-24 rounded bg-muted" />
+          <div className="my-1 h-8 w-36 max-w-full rounded bg-muted" />
+          <div className="mt-2 h-3.5 w-24 max-w-full rounded bg-muted" />
         </CardContent>
       </Card>
     )
@@ -61,19 +61,22 @@ export function MetricCard({
   return (
     <Card
       className={cn(
-        "overflow-hidden transition-all duration-200 hover:shadow-md",
+        "min-w-0 overflow-hidden transition-all duration-200 hover:shadow-md",
         className
       )}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+        <CardTitle className="min-w-0 text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        {icon && <div className="text-muted-foreground">{icon}</div>}
+        {icon && <div className="shrink-0 text-muted-foreground">{icon}</div>}
       </CardHeader>
-      <CardContent className="space-y-1.5">
+      <CardContent className="min-w-0 space-y-1.5">
         <div
-          className={cn("text-2xl font-bold tracking-tight", valueColorClass)}
+          className={cn(
+            "text-xl font-bold tracking-tight break-words tabular-nums sm:text-2xl",
+            valueColorClass
+          )}
           data-testid="metric-value"
         >
           {value}
@@ -88,7 +91,9 @@ export function MetricCard({
             </Badge>
           )}
           {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <p className="min-w-0 text-xs break-words text-muted-foreground">
+              {description}
+            </p>
           )}
         </div>
       </CardContent>

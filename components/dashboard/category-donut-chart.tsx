@@ -118,15 +118,15 @@ export function CategoryDonutChart({
   if (isLoading) {
     return (
       <Card
-        className={cn("border-border", className)}
+        className={cn("min-w-0 border-border", className)}
         data-testid="category-donut-chart-loading"
       >
         <CardHeader>
-          <div className="h-5 w-44 animate-pulse rounded bg-muted" />
-          <div className="mt-1 h-4 w-64 animate-pulse rounded bg-muted" />
+          <div className="h-5 w-44 max-w-full animate-pulse rounded bg-muted" />
+          <div className="mt-1 h-4 w-64 max-w-full animate-pulse rounded bg-muted" />
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-8">
-          <div className="size-48 animate-pulse rounded-full border-8 border-muted border-t-muted/40" />
+          <div className="size-44 animate-pulse rounded-full border-8 border-muted border-t-muted/40 sm:size-48" />
         </CardContent>
       </Card>
     )
@@ -151,13 +151,13 @@ export function CategoryDonutChart({
 
   return (
     <Card
-      className={cn("border-border", className)}
+      className={cn("min-w-0 border-border", className)}
       data-testid="category-donut-chart"
     >
       <CardHeader className="flex flex-col pb-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2">
-            <PieChart className="size-5 text-primary" />
+            <PieChart className="size-5 shrink-0 text-primary" />
             <CardTitle>Distribuição por Categorias</CardTitle>
           </div>
           <CardDescription>
@@ -170,7 +170,7 @@ export function CategoryDonutChart({
       <CardContent className="pt-4">
         {activeCategories.length === 0 ? (
           <div
-            className="my-4 flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/20 p-8 text-center"
+            className="my-4 flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/20 p-5 text-center sm:p-8"
             data-testid="category-donut-chart-empty"
           >
             <div className="mb-3 rounded-full bg-muted p-3">
@@ -187,7 +187,7 @@ export function CategoryDonutChart({
               variant="outline"
               size="sm"
               onClick={() => router.push("/transactions")}
-              className="gap-1.5"
+              className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto"
             >
               Ir para Transações
               <ArrowUpRight className="size-3.5" />
@@ -196,12 +196,10 @@ export function CategoryDonutChart({
         ) : (
           <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-12">
             {/* Donut Chart SVG Container */}
-            <div className="relative flex flex-col items-center justify-center md:col-span-6">
+            <div className="relative flex min-w-0 flex-col items-center justify-center md:col-span-6">
               <svg
-                width={size}
-                height={size}
                 viewBox={`0 0 ${size} ${size}`}
-                className="overflow-visible drop-shadow-xs select-none"
+                className="h-auto w-full max-w-[220px] overflow-visible drop-shadow-xs select-none sm:max-w-[260px]"
                 role="img"
                 aria-label="Gráfico de rosca com distribuição de despesas por categoria"
               >
@@ -231,27 +229,27 @@ export function CategoryDonutChart({
 
               {/* Informação Central do Donut */}
               <div
-                className="pointer-events-none absolute flex max-w-[130px] flex-col items-center justify-center px-4 text-center"
+                className="pointer-events-none absolute flex max-w-[104px] flex-col items-center justify-center px-2 text-center sm:max-w-[130px] sm:px-4"
                 data-testid="donut-center-info"
               >
                 {activeSliceInfo ? (
                   <>
-                    <span className="max-w-[120px] truncate text-xs font-semibold text-foreground">
+                    <span className="max-w-full truncate text-[11px] font-semibold text-foreground sm:text-xs">
                       {activeSliceInfo.category}
                     </span>
-                    <span className="mt-0.5 font-mono text-sm font-bold text-primary">
+                    <span className="mt-0.5 font-mono text-xs font-bold break-words text-primary sm:text-sm">
                       {formatCurrencyBRL(activeSliceInfo.amount)}
                     </span>
-                    <span className="font-mono text-[11px] text-muted-foreground">
+                    <span className="font-mono text-[10px] text-muted-foreground sm:text-[11px]">
                       {formatPercentage(activeSliceInfo.percentage, 1)}
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
+                    <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase sm:text-[11px]">
                       Total Despesas
                     </span>
-                    <span className="mt-0.5 font-mono text-sm font-bold text-foreground">
+                    <span className="mt-0.5 font-mono text-xs font-bold break-words text-foreground sm:text-sm">
                       {formatCurrencyBRL(totalExpenses)}
                     </span>
                     <span className="mt-0.5 text-[10px] text-muted-foreground">
@@ -263,7 +261,7 @@ export function CategoryDonutChart({
             </div>
 
             {/* Legenda de Categorias com Navegação Drill-Down */}
-            <div className="md:col-span-6">
+            <div className="min-w-0 md:col-span-6">
               <CategoryChartLegend
                 categories={activeCategories}
                 activeCategory={hoveredCategory}

@@ -23,12 +23,12 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8 sm:py-12">
+    <div className="mx-auto w-full max-w-2xl min-w-0 space-y-6 py-4 sm:py-8 lg:py-12">
       <div className="space-y-2 text-center">
         <div className="mb-2 inline-flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <Sparkles className="size-6 text-primary" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
           Ativação da Inteligência Financeira (BYOK)
         </h1>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
@@ -40,9 +40,11 @@ export default function OnboardingPage() {
 
       <Card className="border-border shadow-md">
         <CardHeader>
-          <div className="flex items-center gap-2 text-primary">
-            <KeyRound className="size-5" />
-            <CardTitle>Cadastrar Chave do Google Gemini</CardTitle>
+          <div className="flex items-start gap-2 text-primary sm:items-center">
+            <KeyRound className="mt-0.5 size-5 shrink-0 sm:mt-0" />
+            <CardTitle className="leading-snug">
+              Cadastrar Chave do Google Gemini
+            </CardTitle>
           </div>
           <CardDescription>
             A chave é armazenada de forma segura e utilizada exclusivamente para

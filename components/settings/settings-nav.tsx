@@ -28,9 +28,14 @@ export function SettingsNav({ className }: { className?: string }) {
   const pathname = usePathname()
 
   return (
-    <div className={cn("mb-6 border-b border-border", className)}>
+    <div
+      className={cn(
+        "mb-6 max-w-full min-w-0 border-b border-border",
+        className
+      )}
+    >
       <nav
-        className="flex space-x-2 overflow-x-auto pb-px sm:space-x-4"
+        className="flex max-w-full space-x-2 overflow-x-auto pb-px sm:space-x-4"
         aria-label="Abas de Configurações"
       >
         {SETTINGS_TABS.map((tab) => {
@@ -42,13 +47,13 @@ export function SettingsNav({ className }: { className?: string }) {
               key={tab.href}
               href={tab.href}
               className={cn(
-                "flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
+                "flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors sm:min-h-0",
                 isActive
                   ? "border-primary font-semibold text-primary"
                   : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
               )}
             >
-              <Icon className="size-4" />
+              <Icon className="size-4 shrink-0" />
               <span>{tab.label}</span>
             </Link>
           )

@@ -16,11 +16,11 @@ export function UploadSummaryBanner({
 }: UploadSummaryBannerProps) {
   return (
     <div className="relative flex flex-col justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-sm sm:flex-row sm:items-center dark:border-emerald-900/60 dark:bg-emerald-950/30">
-      <div className="flex items-start gap-3 sm:items-center">
+      <div className="flex min-w-0 items-start gap-3 sm:items-center">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-white">
           <CheckCircle2 className="size-5" />
         </div>
-        <div>
+        <div className="min-w-0">
           <h4 className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
             Extrato importado com sucesso!
           </h4>
@@ -40,14 +40,14 @@ export function UploadSummaryBanner({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 self-end sm:self-auto">
+      <div className="flex items-center gap-2 self-end sm:shrink-0 sm:self-auto">
         <Button
           type="button"
           variant="ghost"
           size="icon"
           aria-label="Fechar resumo de importação"
           onClick={onDismiss}
-          className="size-8 text-emerald-800 hover:bg-emerald-100 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+          className="size-10 text-emerald-800 hover:bg-emerald-100 sm:size-8 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
         >
           <X className="size-4" />
         </Button>

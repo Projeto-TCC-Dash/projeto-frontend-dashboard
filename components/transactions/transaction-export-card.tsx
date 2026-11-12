@@ -115,10 +115,10 @@ export function TransactionExportCard({
   }
 
   return (
-    <Card className={cn("shadow-sm", className)}>
+    <Card className={cn("min-w-0 overflow-hidden shadow-sm", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Download className="size-5 text-primary" />
+          <Download className="size-5 shrink-0 text-primary" />
           <span>Filtros & Opções de Exportação</span>
         </CardTitle>
         <CardDescription>
@@ -155,9 +155,9 @@ export function TransactionExportCard({
             <span>Configurar Escopo de Dados</span>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
             {/* Filtro de Período */}
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label
                 htmlFor="period-type-select"
                 className="flex items-center gap-1.5 text-xs font-medium text-foreground"
@@ -172,7 +172,7 @@ export function TransactionExportCard({
                 onChange={(e) =>
                   setPeriodType(e.target.value as "month" | "range" | "all")
                 }
-                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+                className="h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none sm:h-9"
               >
                 <option value="month">Mês Específico</option>
                 <option value="range">Intervalo Customizado</option>
@@ -186,20 +186,23 @@ export function TransactionExportCard({
                     data-testid="month-input"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="h-9 text-xs"
+                    className="h-10 w-full min-w-0 text-xs sm:h-9"
                   />
                 </div>
               )}
 
               {periodType === "range" && (
-                <div className="grid grid-cols-2 gap-2 pt-1">
+                <div
+                  data-testid="export-date-range-grid"
+                  className="grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2"
+                >
                   <Input
                     type="date"
                     data-testid="start-date-input"
                     placeholder="Início"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="h-9 px-2 text-xs"
+                    className="h-10 w-full min-w-0 px-2 text-xs sm:h-9"
                   />
                   <Input
                     type="date"
@@ -207,14 +210,14 @@ export function TransactionExportCard({
                     placeholder="Fim"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="h-9 px-2 text-xs"
+                    className="h-10 w-full min-w-0 px-2 text-xs sm:h-9"
                   />
                 </div>
               )}
             </div>
 
             {/* Filtro de Conta Bancária */}
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label
                 htmlFor="account-filter-select"
                 className="block text-xs font-medium text-foreground"
@@ -227,7 +230,7 @@ export function TransactionExportCard({
                 value={selectedAccount}
                 onChange={(e) => setSelectedAccount(e.target.value)}
                 disabled={isLoadingAccounts}
-                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+                className="h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none sm:h-9"
               >
                 <option value="ALL">Todas as Contas</option>
                 {accounts.map((acc) => (
@@ -242,7 +245,7 @@ export function TransactionExportCard({
             </div>
 
             {/* Filtro de Categoria */}
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <label
                 htmlFor="category-filter-select"
                 className="block text-xs font-medium text-foreground"
@@ -254,7 +257,7 @@ export function TransactionExportCard({
                 data-testid="category-filter-select"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+                className="h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none sm:h-9"
               >
                 <option value="ALL">Todas as Categorias</option>
                 {CANONICAL_CATEGORIES.map((cat) => (
@@ -307,7 +310,7 @@ export function TransactionExportCard({
                   onClick={() => executeExport("csv")}
                   disabled={isExporting}
                   data-testid="export-csv-button"
-                  className="w-full gap-2 text-xs"
+                  className="min-h-10 w-full gap-2 text-xs sm:min-h-8"
                 >
                   {isExporting && activeFormat === "csv" ? (
                     <Loader2 className="size-3.5 animate-spin" />
@@ -349,7 +352,7 @@ export function TransactionExportCard({
                   onClick={() => executeExport("xlsx")}
                   disabled={isExporting}
                   data-testid="export-xlsx-button"
-                  className="w-full gap-2 text-xs"
+                  className="min-h-10 w-full gap-2 text-xs sm:min-h-8"
                 >
                   {isExporting && activeFormat === "xlsx" ? (
                     <Loader2 className="size-3.5 animate-spin" />
@@ -391,7 +394,7 @@ export function TransactionExportCard({
                   onClick={() => executeExport("pdf")}
                   disabled={isExporting}
                   data-testid="export-pdf-button"
-                  className="w-full gap-2 text-xs"
+                  className="min-h-10 w-full gap-2 text-xs sm:min-h-8"
                 >
                   {isExporting && activeFormat === "pdf" ? (
                     <Loader2 className="size-3.5 animate-spin" />

@@ -103,24 +103,27 @@ export function TransactionFilters({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="flex flex-wrap items-end gap-3">
+    <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm lg:flex-row lg:items-end lg:justify-between dark:border-zinc-800 dark:bg-zinc-950">
+      <div
+        data-testid="transaction-filters-grid"
+        className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-end"
+      >
         {/* Seletor de Mês */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <label
             htmlFor="filter-month"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
           >
             Mês de Competência
           </label>
-          <div className="flex items-center gap-1">
+          <div className="flex w-full min-w-0 items-center gap-1.5 sm:w-auto">
             <Button
               type="button"
               variant="outline"
               size="icon"
               aria-label="Mês anterior"
               onClick={handlePrevMonth}
-              className="h-9 w-9 shrink-0"
+              className="size-10 shrink-0 sm:size-9"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -130,7 +133,7 @@ export function TransactionFilters({
               value={month}
               onChange={handleMonthInput}
               aria-label="Mês de Competência"
-              className="h-9 rounded-md border border-zinc-300 bg-white px-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              className="h-10 min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:h-9 sm:flex-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
             <Button
               type="button"
@@ -138,7 +141,7 @@ export function TransactionFilters({
               size="icon"
               aria-label="Próximo mês"
               onClick={handleNextMonth}
-              className="h-9 w-9 shrink-0"
+              className="size-10 shrink-0 sm:size-9"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -146,7 +149,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Categoria */}
-        <div className="flex min-w-[150px] flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5 sm:min-w-[160px]">
           <label
             htmlFor="filter-category"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -158,7 +161,7 @@ export function TransactionFilters({
             value={category ?? ""}
             onChange={handleCategorySelect}
             aria-label="Categoria"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-10 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:h-9 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as categorias</option>
             {CANONICAL_CATEGORIES.map((cat) => (
@@ -170,7 +173,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Origem */}
-        <div className="flex min-w-[120px] flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5 sm:min-w-[140px]">
           <label
             htmlFor="filter-source"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -182,7 +185,7 @@ export function TransactionFilters({
             value={source ?? ""}
             onChange={handleSourceSelect}
             aria-label="Origem"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-10 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:h-9 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as origens</option>
             {TRANSACTION_SOURCES.map((src) => (
@@ -194,7 +197,7 @@ export function TransactionFilters({
         </div>
 
         {/* Dropdown de Conta Bancária */}
-        <div className="flex min-w-[150px] flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5 sm:max-w-xs sm:min-w-[170px]">
           <label
             htmlFor="filter-account"
             className="text-xs font-semibold text-zinc-600 dark:text-zinc-400"
@@ -206,7 +209,7 @@ export function TransactionFilters({
             value={accountId ?? ""}
             onChange={handleAccountSelect}
             aria-label="Conta Bancária"
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-10 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none sm:h-9 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="">Todas as contas</option>
             {accounts.map((acc) => (
@@ -225,7 +228,7 @@ export function TransactionFilters({
           variant="ghost"
           size="sm"
           onClick={handleClearFilters}
-          className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+          className="min-h-10 w-full shrink-0 text-xs text-zinc-500 hover:text-zinc-900 sm:min-h-8 sm:w-auto dark:hover:text-zinc-100"
         >
           <Filter className="mr-1.5 h-3.5 w-3.5" />
           Limpar filtros

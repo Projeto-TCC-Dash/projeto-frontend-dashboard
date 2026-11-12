@@ -75,4 +75,32 @@ describe("MetricCardsGrid Component", () => {
     const skeletons = screen.getAllByTestId("metric-card-skeleton")
     expect(skeletons).toHaveLength(5)
   })
+
+  it("uses progressive responsive grid breakpoints and preserves full large BRL values without truncation", () => {
+    const millionMetrics: FinancialMetrics = {
+      totalIncome: 1250480.9,
+      totalExpenses: 320100.5,
+      invoiceSettlements: 45000.25,
+      netBalance: 885380.15,
+      savingsRate: 70.8,
+      topCategories: [],
+    }
+
+    render(<MetricCardsGrid metrics={millionMetrics} />)
+
+    const grid = screen.getByTestId("metric-cards-grid")
+    expect(grid.className).toContain("grid-cols-1")
+    expect(grid.className).toContain("sm:grid-cols-2")
+    expect(grid.className).toContain("lg:grid-cols-3")
+    expect(grid.className).toContain("2xl:grid-cols-5")
+
+    const values = screen.getAllByTestId("metric-value")
+    expect(values).toHaveLength(5)
+    expect(values[0].className).toContain("tabular-nums")
+    expect(values[0].className).toContain("break-words")
+    expect(values[0].className).not.toContain("truncate")
+    expect(values[0].textContent?.replace(/\u00A0/g, " ")).toBe(
+      "R$ 1.250.480,90"
+    )
+  })
 })

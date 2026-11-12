@@ -231,7 +231,7 @@ export function UserProfileIdentityForm({
           )}
 
           {/* Seção Integrada de Foto de Perfil */}
-          <div className="flex flex-col items-center gap-5 rounded-xl border border-border/60 bg-muted/20 p-4 sm:flex-row">
+          <div className="flex flex-col items-center gap-4 rounded-xl border border-border/60 bg-muted/20 p-4 sm:flex-row sm:gap-5">
             <div className="group relative shrink-0">
               <div
                 data-testid="avatar-container"
@@ -262,13 +262,13 @@ export function UserProfileIdentityForm({
                 disabled={isPending}
                 data-testid="avatar-quick-upload-button"
                 aria-label="Alterar foto de perfil"
-                className="absolute right-0 bottom-0 flex size-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow transition-transform hover:bg-primary/90 active:scale-95 disabled:opacity-50"
+                className="absolute right-0 bottom-0 flex size-8 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow transition-transform hover:bg-primary/90 active:scale-95 disabled:opacity-50 sm:size-7"
               >
                 <Camera className="size-3.5" />
               </button>
             </div>
 
-            <div className="flex flex-1 flex-col items-center space-y-2 text-center sm:items-start sm:text-left">
+            <div className="flex min-w-0 flex-1 flex-col items-center space-y-2 text-center sm:items-start sm:text-left">
               <div>
                 <h4 className="text-sm font-semibold text-foreground">
                   Foto de Perfil
@@ -289,7 +289,7 @@ export function UserProfileIdentityForm({
                 )}
               </div>
 
-              <div className="flex items-center gap-2 pt-0.5">
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-0.5 sm:justify-start">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -306,7 +306,7 @@ export function UserProfileIdentityForm({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isPending}
                   data-testid="avatar-upload-button"
-                  className="h-8 gap-1.5 text-xs"
+                  className="min-h-10 gap-1.5 text-xs sm:h-8 sm:min-h-0"
                 >
                   <Camera className="size-3.5" />
                   <span>{activeImage ? "Alterar foto" : "Escolher foto"}</span>
@@ -320,7 +320,7 @@ export function UserProfileIdentityForm({
                     onClick={() => setDeleteDialogOpen(true)}
                     disabled={isPending}
                     data-testid="avatar-delete-button"
-                    className="h-8 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    className="min-h-10 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive sm:h-8 sm:min-h-0"
                   >
                     <Trash2 className="size-3.5" />
                     <span>Remover</span>
@@ -384,12 +384,12 @@ export function UserProfileIdentityForm({
             </div>
           </div>
 
-          <div className="flex justify-end border-t border-border/50 pt-2">
+          <div className="flex justify-end border-t border-border/50 pt-3">
             <Button
               type="submit"
               disabled={isPending || !isDirty}
               data-testid="save-identity-button"
-              className="gap-2 text-xs"
+              className="min-h-10 w-full gap-2 text-xs sm:min-h-9 sm:w-auto"
             >
               {isPending && <Loader2 className="size-3.5 animate-spin" />}
               <span>Salvar Alterações</span>
@@ -414,6 +414,7 @@ export function UserProfileIdentityForm({
               type="button"
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Cancelar
             </Button>
@@ -422,6 +423,7 @@ export function UserProfileIdentityForm({
               variant="destructive"
               onClick={handleConfirmRemovePhoto}
               data-testid="avatar-confirm-delete-button"
+              className="min-h-10 w-full sm:min-h-9 sm:w-auto"
             >
               Sim, remover foto
             </Button>

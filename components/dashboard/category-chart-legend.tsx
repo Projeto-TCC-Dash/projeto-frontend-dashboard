@@ -44,7 +44,10 @@ export function CategoryChartLegend({
 
   return (
     <div
-      className={cn("grid grid-cols-1 gap-2.5 sm:grid-cols-2", className)}
+      className={cn(
+        "grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5",
+        className
+      )}
       data-testid="category-chart-legend"
     >
       {categories.map((item) => {
@@ -59,7 +62,7 @@ export function CategoryChartLegend({
             onMouseEnter={() => onHoverCategory?.(item.category)}
             onMouseLeave={() => onHoverCategory?.(null)}
             className={cn(
-              "flex items-center justify-between rounded-lg border border-transparent p-2 text-left text-xs transition-all",
+              "flex min-h-11 w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-transparent p-2.5 text-left text-xs transition-all sm:min-h-0 sm:p-2",
               "cursor-pointer hover:border-border hover:bg-muted/50 focus:ring-1 focus:ring-primary focus:outline-none",
               isHovered && "border-border bg-muted/70 shadow-xs"
             )}
@@ -74,7 +77,7 @@ export function CategoryChartLegend({
                 {item.category}
               </span>
             </div>
-            <div className="flex shrink-0 items-center gap-2 text-right font-mono">
+            <div className="flex shrink-0 items-center gap-2 text-right font-mono tabular-nums">
               <span className="text-muted-foreground">
                 {formatPercentage(item.percentage, 1)}
               </span>

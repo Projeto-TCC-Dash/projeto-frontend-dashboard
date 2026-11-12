@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import * as React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -160,8 +160,80 @@ describe("TransactionTable component", () => {
     expect(screen.getByText(/Nenhuma transação encontrada/i)).toBeDefined()
   })
 
+  const originalMatchMedia = window.matchMedia
+
+  afterEach(() => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: originalMatchMedia,
+    })
+  })
+
   it("renders loading skeleton or spinner when isLoading is true", () => {
     renderWithProviders(<TransactionTable transactions={[]} isLoading={true} />)
     expect(screen.getByText(/Carregando transações/i)).toBeDefined()
+  })
+
+  it("renders responsive mobile cards with all 7 attributes and touch action targets when viewport < 768px", () => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(max-width: 767px)",
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    })
+
+    const onEdit = vi.fn()
+    const onDelete = vi.fn()
+    const txWithAccount: Transaction[] = [
+      {
+        ...mockTransactions[0],
+        accountId: "acc-1",
+        account: {
+          id: "acc-1",
+          name: "Nubank Conta Principal Muito Longa",
+          institution: "Nu",
+          color: "#8B5CF6",
+        },
+      },
+    ]
+
+    renderWithProviders(
+      <TransactionTable
+        transactions={txWithAccount}
+        isLoading={false}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    )
+
+    expect(screen.getByTestId("transaction-mobile-cards")).toBeInTheDocument()
+    expect(screen.queryByRole("table")).toBeNull()
+
+    // Todos os 7 atributos presentes no card mobile
+    expect(screen.getByText("15/10/2026")).toBeInTheDocument()
+    expect(screen.getByText("iFood Refeição")).toBeInTheDocument()
+    expect(screen.getByText("IFOOD *RESTAURANTE")).toBeInTheDocument()
+    expect(screen.getByText("Alimentação")).toBeInTheDocument()
+    expect(
+      screen.getByText("Nubank Conta Principal Muito Longa")
+    ).toBeInTheDocument()
+    expect(screen.getByText("OFX")).toBeInTheDocument()
+    expect(screen.getByText(/-R\$\s?45,50/)).toBeInTheDocument()
+
+    const editBtn = screen.getByRole("button", { name: /Editar transação/i })
+    const deleteBtn = screen.getByRole("button", { name: /Excluir transação/i })
+    expect(editBtn.className).toContain("size-10")
+    expect(deleteBtn.className).toContain("size-10")
+
+    fireEvent.click(editBtn)
+    expect(onEdit).toHaveBeenCalledWith(txWithAccount[0])
+
+    fireEvent.click(deleteBtn)
+    expect(onDelete).toHaveBeenCalledWith(txWithAccount[0])
   })
 })

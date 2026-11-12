@@ -35,7 +35,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
   return (
     <div
       className={cn(
-        "flex w-full gap-3 py-2",
+        "flex w-full min-w-0 gap-2.5 py-2 sm:gap-3",
         isUser ? "justify-end" : "justify-start",
         className
       )}
@@ -51,14 +51,14 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
       {/* Conteúdo da Mensagem */}
       <div
         className={cn(
-          "flex max-w-[85%] flex-col rounded-2xl px-4 py-3 text-sm shadow-xs transition-all sm:max-w-[75%]",
+          "flex max-w-[85%] min-w-0 flex-col rounded-2xl px-3.5 py-3 text-sm [overflow-wrap:anywhere] break-words shadow-xs transition-all sm:max-w-[75%] sm:px-4",
           isUser
             ? "rounded-tr-xs bg-primary text-primary-foreground"
             : "rounded-tl-xs border border-border/70 bg-card text-card-foreground"
         )}
       >
         {/* Cabeçalho do Papel */}
-        <div className="mb-1 flex items-center justify-between gap-2 text-xs opacity-75">
+        <div className="mb-1 flex flex-wrap items-center justify-between gap-2 text-xs opacity-75">
           <span className="font-semibold">
             {isUser ? "Você" : "Consultor Financeiro"}
           </span>
@@ -66,11 +66,13 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
         </div>
 
         {/* Corpo do Texto */}
-        <div className="leading-relaxed">
+        <div className="min-w-0 leading-relaxed [overflow-wrap:anywhere] break-words">
           {isUser ? (
-            <p className="whitespace-pre-wrap">{message.content}</p>
+            <p className="[overflow-wrap:anywhere] break-words whitespace-pre-wrap">
+              {message.content}
+            </p>
           ) : (
-            <div>
+            <div className="min-w-0 [overflow-wrap:anywhere] break-words">
               {message.content ? (
                 <MarkdownRenderer content={message.content} />
               ) : isStreaming ? (
@@ -109,9 +111,9 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
             className="mt-3 flex flex-col gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive"
             data-testid="message-error-box"
           >
-            <div className="flex items-start gap-1.5">
+            <div className="flex min-w-0 items-start gap-1.5">
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
-              <span>
+              <span className="min-w-0 flex-1 [overflow-wrap:anywhere] break-words">
                 {message.error || "Ocorreu uma falha na geração da resposta."}
               </span>
             </div>

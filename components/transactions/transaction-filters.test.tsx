@@ -149,4 +149,31 @@ describe("TransactionFilters component", () => {
       accountId: undefined,
     })
   })
+
+  it("stacks filters in single column below sm with full-width min-w-0 controls", () => {
+    render(
+      <TransactionFilters
+        month="2026-10"
+        accountId="acc-1"
+        onFilterChange={vi.fn()}
+      />
+    )
+
+    const grid = screen.getByTestId("transaction-filters-grid")
+    expect(grid.className).toContain("grid-cols-1")
+    expect(grid.className).toContain("sm:flex")
+    expect(grid.className).toContain("sm:flex-wrap")
+
+    const categorySelect = screen.getByLabelText(/Categoria/i)
+    const sourceSelect = screen.getByLabelText(/Origem/i)
+    const accountSelect = screen.getByLabelText(/Conta Bancária/i)
+    const monthInput = screen.getByDisplayValue("2026-10")
+
+    expect(categorySelect.className).toContain("w-full")
+    expect(categorySelect.className).toContain("min-w-0")
+    expect(sourceSelect.className).toContain("w-full")
+    expect(accountSelect.className).toContain("w-full")
+    expect(monthInput.className).toContain("min-w-0")
+    expect(monthInput.className).toContain("flex-1")
+  })
 })

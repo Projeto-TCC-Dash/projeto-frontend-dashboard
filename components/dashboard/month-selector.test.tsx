@@ -67,4 +67,24 @@ describe("MonthSelector Component", () => {
     expect(prevButton).toBeDisabled()
     expect(nextButton).toBeDisabled()
   })
+
+  it("uses flexible width and touch-friendly button sizing for narrow viewports", () => {
+    render(<MonthSelector currentMonth="2026-10" onMonthChange={vi.fn()} />)
+
+    const group = screen.getByRole("group", {
+      name: /seletor de competência mensal/i,
+    })
+    expect(group.className).toContain("w-full")
+    expect(group.className).toContain("sm:w-auto")
+
+    const monthTextWrapper = screen.getByText("Outubro de 2026").parentElement
+    expect(monthTextWrapper?.className).toContain("min-w-0")
+    expect(monthTextWrapper?.className).toContain("flex-1")
+    expect(monthTextWrapper?.className).toContain("sm:min-w-[170px]")
+
+    const prevButton = screen.getByRole("button", { name: /mês anterior/i })
+    const nextButton = screen.getByRole("button", { name: /próximo mês/i })
+    expect(prevButton.className).toContain("size-9")
+    expect(nextButton.className).toContain("size-9")
+  })
 })

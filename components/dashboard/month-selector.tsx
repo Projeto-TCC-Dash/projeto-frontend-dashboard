@@ -36,7 +36,7 @@ export function MonthSelector({
       role="group"
       aria-label="Seletor de competência mensal"
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 p-1 shadow-sm backdrop-blur",
+        "inline-flex w-full items-center justify-between gap-1.5 rounded-xl border border-border bg-card/60 p-1 shadow-sm backdrop-blur sm:w-auto",
         className
       )}
     >
@@ -47,14 +47,14 @@ export function MonthSelector({
         disabled={disabled}
         onClick={handlePreviousMonth}
         aria-label="Mês anterior"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-9 shrink-0 text-muted-foreground hover:text-foreground sm:size-8"
       >
         <ChevronLeft className="size-4" />
       </Button>
 
-      <div className="flex min-w-[170px] items-center justify-center gap-2 px-3 text-sm font-semibold text-foreground select-none">
+      <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-2 text-xs font-semibold text-foreground select-none sm:min-w-[170px] sm:flex-none sm:px-3 sm:text-sm">
         <Calendar className="size-4 shrink-0 text-primary" aria-hidden="true" />
-        <span>{formattedMonth}</span>
+        <span className="truncate">{formattedMonth}</span>
       </div>
 
       <Button
@@ -64,7 +64,7 @@ export function MonthSelector({
         disabled={disabled}
         onClick={handleNextMonth}
         aria-label="Próximo mês"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-9 shrink-0 text-muted-foreground hover:text-foreground sm:size-8"
       >
         <ChevronRight className="size-4" />
       </Button>

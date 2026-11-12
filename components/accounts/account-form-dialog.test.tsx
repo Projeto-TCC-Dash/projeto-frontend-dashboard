@@ -81,4 +81,28 @@ describe("AccountFormDialog Component", () => {
       )
     })
   })
+
+  it("deve aplicar classes responsivas de viewport e alvos táteis ao modal", () => {
+    render(
+      <AccountFormDialog isOpen={true} onClose={vi.fn()} onSubmit={vi.fn()} />
+    )
+
+    const dialogOverlay = screen.getByRole("dialog")
+    const panel = dialogOverlay.firstElementChild as HTMLElement
+    expect(panel).toHaveClass(
+      "max-h-[90dvh]",
+      "overflow-y-auto",
+      "p-4",
+      "sm:p-6"
+    )
+
+    const closeBtn = screen.getByRole("button", { name: "Fechar" })
+    expect(closeBtn).toHaveClass("size-10", "sm:size-8")
+
+    const cancelBtn = screen.getByRole("button", { name: "Cancelar" })
+    expect(cancelBtn.parentElement).toHaveClass(
+      "flex-col-reverse",
+      "sm:flex-row"
+    )
+  })
 })

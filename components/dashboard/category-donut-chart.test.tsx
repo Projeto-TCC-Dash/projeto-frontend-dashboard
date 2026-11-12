@@ -98,4 +98,18 @@ describe("CategoryDonutChart Component", () => {
     expect(invoiceSlice).toBeInTheDocument()
     expect(invoiceSlice).toHaveAttribute("fill", "#64748b")
   })
+
+  it("scales SVG fluidly for narrow viewports and gives legend items comfortable touch targets", () => {
+    render(<CategoryDonutChart categories={sampleCategories} month="2026-10" />)
+
+    const svg = screen.getByRole("img", {
+      name: /gráfico de rosca com distribuição de despesas por categoria/i,
+    })
+    expect(svg).toHaveAttribute("viewBox", "0 0 260 260")
+    expect(svg).toHaveClass("w-full", "max-w-[220px]", "sm:max-w-[260px]")
+
+    const legendBtn = screen.getByRole("button", { name: /moradia/i })
+    expect(legendBtn.className).toContain("min-h-11")
+    expect(legendBtn.className).toContain("sm:min-h-0")
+  })
 })

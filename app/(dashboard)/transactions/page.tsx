@@ -109,15 +109,15 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {/* Cabeçalho da Página */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
               <ReceiptText className="size-4" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Gestão de Transações
             </h1>
           </div>
@@ -128,7 +128,7 @@ export default function TransactionsPage() {
         </div>
 
         {/* Botão de Categorização Automática */}
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0">
           <CategorizeButton
             hasAiKey={hasAiKey}
             isCategorizing={isCategorizing}
@@ -154,14 +154,14 @@ export default function TransactionsPage() {
 
       {/* Banner de Resumo Pós-Categorização por IA */}
       {categorizeSummary && (
-        <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground">
-          <div className="flex items-center gap-3">
-            <Sparkles className="size-5 text-primary" />
-            <div>
+        <div className="flex flex-col justify-between gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground sm:flex-row sm:items-center">
+          <div className="flex min-w-0 items-start gap-3 sm:items-center">
+            <Sparkles className="mt-0.5 size-5 shrink-0 text-primary sm:mt-0" />
+            <div className="min-w-0">
               <p className="font-semibold">
                 Categorização Inteligente Concluída!
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-0.5 text-xs break-words text-muted-foreground">
                 {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
                 comerciais analisados e{" "}
                 <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
@@ -172,7 +172,7 @@ export default function TransactionsPage() {
           <button
             type="button"
             onClick={() => setCategorizeSummary(null)}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="min-h-9 self-end px-2 text-xs font-medium text-muted-foreground hover:text-foreground sm:shrink-0 sm:self-center"
           >
             Fechar
           </button>
@@ -181,17 +181,17 @@ export default function TransactionsPage() {
 
       {/* Alerta de Erro no Upload */}
       {uploadError && (
-        <div className="flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
           <AlertCircle className="size-4 shrink-0" />
-          <span>{uploadError}</span>
+          <span className="min-w-0 break-words">{uploadError}</span>
         </div>
       )}
 
       {/* Alerta de Erro na Categorização */}
       {categorizeError && (
-        <div className="flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
           <AlertCircle className="size-4 shrink-0" />
-          <span>{categorizeError}</span>
+          <span className="min-w-0 break-words">{categorizeError}</span>
         </div>
       )}
 

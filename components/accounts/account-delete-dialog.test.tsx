@@ -112,4 +112,33 @@ describe("AccountDeleteDialog Component", () => {
     // O diálogo continua aberto
     expect(screen.getByText("Excluir Conta Financeira")).toBeDefined()
   })
+
+  it("deve aplicar contenção vertical, paddings responsivos e botão fechar tátil", () => {
+    render(
+      <AccountDeleteDialog
+        isOpen={true}
+        account={mockAccount}
+        onClose={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+
+    const dialogOverlay = screen.getByRole("dialog")
+    const panel = dialogOverlay.firstElementChild as HTMLElement
+    expect(panel).toHaveClass(
+      "max-h-[90dvh]",
+      "overflow-y-auto",
+      "p-4",
+      "sm:p-6"
+    )
+
+    const closeBtn = screen.getByRole("button", { name: "Fechar" })
+    expect(closeBtn).toHaveClass("size-10", "sm:size-8")
+
+    const cancelBtn = screen.getByRole("button", { name: "Cancelar" })
+    expect(cancelBtn.parentElement).toHaveClass(
+      "flex-col-reverse",
+      "sm:flex-row"
+    )
+  })
 })
