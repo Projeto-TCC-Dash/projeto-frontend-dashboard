@@ -10,6 +10,7 @@ import {
 import { useUploadTransactions } from "@/hooks/use-upload-transactions"
 import { useUpdateTransaction } from "@/hooks/use-update-transaction"
 import { useCategorizeTransactions } from "@/hooks/use-categorize-transactions"
+import { useAccounts } from "@/hooks/use-accounts"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { TransactionTable } from "@/components/transactions/transaction-table"
 import { TransactionDropzone } from "@/components/transactions/transaction-dropzone"
@@ -47,6 +48,7 @@ export default function TransactionsPage() {
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false)
 
   const { transactions, isLoading, error } = useTransactions(filters)
+  const { accounts } = useAccounts()
   const { upload, isUploading } = useUploadTransactions()
   const { updateTransaction, isUpdating } = useUpdateTransaction()
   const { categorize, isCategorizing, hasAiKey } = useCategorizeTransactions()
@@ -214,6 +216,7 @@ export default function TransactionsPage() {
       {/* Tabela de Transações */}
       <TransactionTable
         transactions={transactions}
+        accounts={accounts}
         isLoading={isLoading}
         onEdit={handleOpenEdit}
       />
