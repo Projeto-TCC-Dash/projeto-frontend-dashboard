@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   Wallet,
   Plus,
@@ -9,6 +10,7 @@ import {
   TrendingDown,
   Building2,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react"
 import {
   useAccounts,
@@ -38,6 +40,7 @@ import {
 import { cn } from "@/lib/utils"
 import {
   ACCOUNT_TYPES,
+  APP_ROUTES,
   type Account,
   type CreateAccountDTO,
 } from "@/src/types/api"
@@ -164,13 +167,25 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        <Button
-          onClick={handleOpenCreate}
-          className="min-h-10 w-full shrink-0 gap-2 sm:min-h-9 sm:w-auto"
-        >
-          <Plus className="size-4" />
-          <span>Nova Conta</span>
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <Link
+            href={APP_ROUTES.INVESTMENTS}
+            data-testid="accounts-investments-shortcut"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground sm:min-h-9"
+          >
+            <TrendingUp className="size-4 text-primary" />
+            <span>Ver Carteira de Investimentos</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
+
+          <Button
+            onClick={handleOpenCreate}
+            className="min-h-10 w-full shrink-0 gap-2 sm:min-h-9 sm:w-auto"
+          >
+            <Plus className="size-4" />
+            <span>Nova Conta</span>
+          </Button>
+        </div>
       </div>
 
       {feedbackMessage && (

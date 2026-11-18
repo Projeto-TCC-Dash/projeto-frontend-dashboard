@@ -16,9 +16,13 @@ import { TrendingUp, BarChart3 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { formatCurrencyBRL } from "@/lib/formatters"
+import { formatCurrencyBRL, formatPercentage } from "@/lib/formatters"
 import { formatCompactCurrencyBRL } from "@/lib/chart-utils"
 import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion"
+import type {
+  FixedCostTrendStatus,
+  MultiMonthAnalysisResponse,
+} from "@/src/types/api"
 import type {
   MultiMonthEvolutionPoint,
   MultiMonthHorizon,
@@ -28,10 +32,20 @@ export interface MultiMonthEvolutionChartProps {
   data: readonly MultiMonthEvolutionPoint[]
   horizon: MultiMonthHorizon
   onHorizonChange: (horizon: MultiMonthHorizon) => void
+  serverAnalysis?: MultiMonthAnalysisResponse | null
   emergencyFundTarget?: number
   isLoading?: boolean
   height?: number
   className?: string
+}
+
+const TREND_BADGE_MAP: Record<
+  FixedCostTrendStatus,
+  { label: string; variant: "secondary" | "warning" | "success" }
+> = {
+  STABLE: { label: "Custos Estáveis", variant: "secondary" },
+  GROWING: { label: "Custos em Alta", variant: "warning" },
+  DECLINING: { label: "Custos em Queda", variant: "success" },
 }
 
 interface EvolutionTooltipProps {
@@ -134,6 +148,7 @@ export function MultiMonthEvolutionChart({
   data,
   horizon,
   onHorizonChange,
+  serverAnalysis,
   emergencyFundTarget,
   isLoading = false,
   height = 320,
@@ -145,6 +160,7 @@ export function MultiMonthEvolutionChart({
   const cumulativeFinal = latestPoint?.cumulativeBalance ?? 0
 
   const horizonOptions: { label: string; value: MultiMonthHorizon }[] = [
+    { label: "3 Meses", value: "3M" },
     { label: "6 Meses", value: "6M" },
     { label: "12 Meses", value: "12M" },
     { label: "Tudo", value: "ALL" },
@@ -207,6 +223,46 @@ export function MultiMonthEvolutionChart({
       </CardHeader>
 
       <CardContent>
+        {serverAnalysis ? (
+          <div
+            data-testid="multi-month-server-metrics"
+            className="mb-4 grid grid-cols-1 gap-2.5 rounded-xl border border-border/70 bg-muted/20 p-3 sm:grid-cols-3"
+          >
+            <div>
+              <p className="text-[11px] text-muted-foreground">
+                Taxa Média de Poupança
+              </p>
+              <p className="text-sm font-bold tabular-nums text-foreground">
+                {formatPercentage(serverAnalysis.averageSavingsRate)}
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground">
+                Média Mensal de Despesas
+              </p>
+              <p className="text-sm font-bold tabular-nums text-foreground">
+                {formatCurrencyBRL(serverAnalysis.averageMonthlyExpenses)}
+              </p>
+            </div>
+            <div className="flex flex-col items-start justify-center gap-1">
+              <p className="text-[11px] text-muted-foreground">
+                Tendência de Custos Fixos
+              </p>
+              <Badge
+                data-testid="fixed-cost-trend-badge"
+                variant={
+                  TREND_BADGE_MAP[serverAnalysis.fixedCostTrend.status].variant
+                }
+              >
+                {TREND_BADGE_MAP[serverAnalysis.fixedCostTrend.status].label}
+                {serverAnalysis.fixedCostTrend.alertCategory
+                  ? ` (${serverAnalysis.fixedCostTrend.alertCategory})`
+                  : ""}
+              </Badge>
+            </div>
+          </div>
+        ) : null}
+
         {isLoading ? (
           <div
             data-testid="multi-month-chart-loading"

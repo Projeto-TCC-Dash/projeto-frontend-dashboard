@@ -52,16 +52,50 @@ describe("MultiMonthEvolutionChart", () => {
       screen.getByText("Evolução Financeira Consolidada")
     ).toBeInTheDocument()
 
+    const btn3M = screen.getByTestId("horizon-btn-3M")
     const btn6M = screen.getByTestId("horizon-btn-6M")
     const btn12M = screen.getByTestId("horizon-btn-12M")
     const btnAll = screen.getByTestId("horizon-btn-ALL")
 
+    expect(btn3M).toHaveAttribute("aria-pressed", "false")
     expect(btn6M).toHaveAttribute("aria-pressed", "true")
     expect(btn12M).toHaveAttribute("aria-pressed", "false")
     expect(btnAll).toHaveAttribute("aria-pressed", "false")
 
+    fireEvent.click(btn3M)
+    expect(handleHorizonChange).toHaveBeenCalledWith("3M")
+
     fireEvent.click(btn12M)
     expect(handleHorizonChange).toHaveBeenCalledWith("12M")
+  })
+
+  it("displays server-side savings rate, expense average and fixed cost trend badge", () => {
+    render(
+      <MultiMonthEvolutionChart
+        data={sampleData}
+        horizon="6M"
+        onHorizonChange={vi.fn()}
+        serverAnalysis={{
+          rangeMonths: 6,
+          averageSavingsRate: 22.5,
+          averageMonthlyExpenses: 4350,
+          averageMonthlyIncome: 7500,
+          fixedCostTrend: {
+            status: "GROWING",
+            percentageChange: 11.2,
+            alertCategory: "Moradia",
+          },
+          monthlyHistory: [],
+        }}
+      />
+    )
+
+    expect(screen.getByTestId("multi-month-server-metrics")).toBeInTheDocument()
+    expect(screen.getByText(/22,5%/)).toBeInTheDocument()
+    expect(screen.getByText(/4\.350,00/)).toBeInTheDocument()
+    expect(screen.getByTestId("fixed-cost-trend-badge")).toHaveTextContent(
+      /Custos em Alta \(Moradia\)/i
+    )
   })
 
   it("displays growth badge with cumulative balance highlight", () => {

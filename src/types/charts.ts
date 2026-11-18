@@ -54,7 +54,7 @@ export interface CumulativeDailyCashflowPoint {
   [key: string]: string | number
 }
 
-export type MultiMonthHorizon = "6M" | "12M" | "ALL"
+export type MultiMonthHorizon = "3M" | "6M" | "12M" | "ALL"
 
 export interface MultiMonthEvolutionPoint {
   month: string

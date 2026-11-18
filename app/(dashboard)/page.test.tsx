@@ -58,6 +58,53 @@ vi.mock("@/hooks/use-financial-analysis", () => ({
   useFinancialAnalysis: () => mockAnalysisHookReturn,
 }))
 
+vi.mock("@/hooks/use-budgets", () => ({
+  useBudget: () => ({
+    budget: {
+      month: "2026-10",
+      totalLimitAmount: 6500,
+      totalSpentAmount: 4200,
+      totalRemainingAmount: 2300,
+      globalPercentConsumed: 64.6,
+      globalStatus: "REGULAR",
+      categories: [
+        {
+          category: "Alimentação",
+          limitAmount: 2500,
+          spentAmount: 1850,
+          remainingAmount: 650,
+          percentConsumed: 74,
+          status: "WARNING",
+        },
+      ],
+    },
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  }),
+  useUpsertBudget: () => ({
+    upsertBudget: vi.fn(),
+    isSaving: false,
+  }),
+}))
+
+vi.mock("@/hooks/use-multi-month-analysis", () => ({
+  useMultiMonthAnalysis: () => ({
+    analysis: {
+      rangeMonths: 6,
+      averageSavingsRate: 28.4,
+      averageMonthlyExpenses: 4250,
+      averageMonthlyIncome: 9500,
+      fixedCostTrend: {
+        status: "STABLE",
+        percentageChange: 1.5,
+      },
+      monthlyHistory: [],
+    },
+    isLoading: false,
+  }),
+}))
+
 vi.mock("@/hooks/use-transactions", () => ({
   useTransactions: () => ({
     transactions: [

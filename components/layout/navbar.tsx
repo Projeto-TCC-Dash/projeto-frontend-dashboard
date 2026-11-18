@@ -9,6 +9,8 @@ import {
   Sparkles,
   LayoutDashboard,
   Wallet,
+  TrendingUp,
+  Scale,
   ReceiptText,
   BotMessageSquare,
   UserCheck,
@@ -24,7 +26,9 @@ import { cn } from "@/lib/utils"
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Contas", icon: Wallet },
+  { href: "/investments", label: "Investimentos", icon: TrendingUp },
   { href: "/transactions", label: "Extratos", icon: ReceiptText },
+  { href: "/fiscal", label: "Fiscal", icon: Scale },
   { href: "/settings/metas", label: "Metas", icon: UserCheck },
   { href: "/chat", label: "Consultor", icon: BotMessageSquare },
 ]

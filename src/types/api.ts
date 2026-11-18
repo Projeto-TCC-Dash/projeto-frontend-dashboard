@@ -65,6 +65,8 @@ export interface AuthSession {
 export const APP_ROUTES = {
   DASHBOARD: "/",
   ACCOUNTS: "/accounts",
+  INVESTMENTS: "/investments",
+  FISCAL: "/fiscal",
   TRANSACTIONS: "/transactions",
   METAS: "/settings/metas",
   PROFILE: "/settings/profile",
@@ -243,6 +245,7 @@ export interface Transaction {
   source: TransactionSource
   accountId?: string
   account?: TransactionAccountSummary
+  fiscal?: TransactionFiscalMetadata
 }
 
 export interface UploadTransactionsResponse {
@@ -447,4 +450,189 @@ export interface UpsertInvestmentHoldingDTO {
   amount: number
   notes?: string
 }
+
+// ==========================================
+// MÓDULO FISCAL (IRPF, PJ/MEI, OCR & DOSSIÊ)
+// ==========================================
+export const TAX_CATEGORIES = [
+  "HEALTH",
+  "EDUCATION",
+  "PENSION_PGBL",
+  "ALIMONY",
+  "BUSINESS_EXPENSE_BOOK",
+  "OTHER_DEDUCTIBLE",
+] as const
+
+export type TaxCategory = (typeof TAX_CATEGORIES)[number]
+
+export const TAX_CATEGORY_LABELS: Record<TaxCategory, string> = {
+  HEALTH: "Saúde",
+  EDUCATION: "Educação / Instrução",
+  PENSION_PGBL: "Previdência Complementar (PGBL)",
+  ALIMONY: "Pensão Alimentícia Judicial",
+  BUSINESS_EXPENSE_BOOK: "Livro-Caixa Profissional",
+  OTHER_DEDUCTIBLE: "Outras Despesas Dedutíveis",
+}
+
+export const FISCAL_VERIFICATION_STATUSES = [
+  "PENDING",
+  "CONFIRMED",
+  "EXEMPT",
+] as const
+
+export type FiscalVerificationStatus =
+  (typeof FISCAL_VERIFICATION_STATUSES)[number]
+
+export const FISCAL_STATUS_LABELS: Record<FiscalVerificationStatus, string> = {
+  PENDING: "Pendente de Comprovante",
+  CONFIRMED: "Comprovado",
+  EXEMPT: "Isento de Comprovação",
+}
+
+export interface TransactionFiscalMetadata {
+  isTaxDeductible: boolean
+  taxCategory?: TaxCategory
+  providerDocument?: string
+  providerName?: string
+  deductibleAmount?: number
+  status: FiscalVerificationStatus
+  notes?: string
+}
+
+export interface UpdateTransactionFiscalDTO {
+  isTaxDeductible: boolean
+  taxCategory?: TaxCategory
+  providerDocument?: string
+  providerName?: string
+  deductibleAmount?: number
+  status?: FiscalVerificationStatus
+  notes?: string
+}
+
+export interface UpdateTransactionFiscalResponse {
+  id: string
+  amount: number
+  cleanDescription: string
+  fiscal: TransactionFiscalMetadata
+}
+
+export interface FiscalCategoryBreakdown {
+  taxCategory: TaxCategory
+  totalAmount: number
+  confirmedAmount: number
+  pendingAmount: number
+  count: number
+}
+
+export interface FiscalPjSummary {
+  applicable: boolean
+  grossRevenueYearToDate: number
+  annualLimit: number
+  ceilingPercentage: number
+  proLaboreTotal: number
+  dividendsTotal: number
+}
+
+export interface FiscalAnnualSummary {
+  year: string
+  totalDeductibleExpenses: number
+  confirmedDeductibleExpenses: number
+  pendingDocumentationExpenses: number
+  byCategory: FiscalCategoryBreakdown[]
+  pjSummary: FiscalPjSummary
+}
+
+export interface FiscalOcrExtractedData {
+  providerDocument?: string
+  providerName?: string
+  totalAmount?: number
+  issueDate?: string
+  description?: string
+}
+
+export interface FiscalOcrSuggestedMatch {
+  transactionId: string
+  date: string
+  amount: number
+  cleanDescription: string
+  confidence: "HIGH" | "MEDIUM" | "LOW"
+}
+
+export interface FiscalOcrResponse {
+  proofDocumentId: string
+  originalFilename: string
+  extractedData: FiscalOcrExtractedData
+  suggestedMatches: FiscalOcrSuggestedMatch[]
+}
+
+export type FiscalDossierFormat = "pdf" | "xlsx"
+
+// ==========================================
+// ORÇAMENTOS MENSAIS (Budgets)
+// ==========================================
+export const BUDGET_CONSUMPTION_STATUSES = [
+  "REGULAR",
+  "WARNING",
+  "EXCEEDED",
+] as const
+
+export type BudgetConsumptionStatus =
+  (typeof BUDGET_CONSUMPTION_STATUSES)[number]
+
+export interface CategoryBudgetLimit {
+  category: Category
+  limitAmount: number
+}
+
+export interface SetBudgetPlanDTO {
+  totalLimitAmount: number
+  categoryBudgets: CategoryBudgetLimit[]
+}
+
+export interface BudgetConsumptionItem {
+  category: Category
+  limitAmount: number
+  spentAmount: number
+  remainingAmount: number
+  percentConsumed: number
+  status: BudgetConsumptionStatus
+}
+
+export interface BudgetOverview {
+  month: string
+  totalLimitAmount: number
+  totalSpentAmount: number
+  totalRemainingAmount: number
+  globalPercentConsumed: number
+  globalStatus: BudgetConsumptionStatus
+  categories: BudgetConsumptionItem[]
+}
+
+// ==========================================
+// ANÁLISE MULTI-MÊS (/api/analysis/multi-month)
+// ==========================================
+export type MultiMonthRange = "3" | "6" | "12"
+export type FixedCostTrendStatus = "STABLE" | "GROWING" | "DECLINING"
+
+export interface MultiMonthSummaryPoint {
+  month: string
+  totalIncome: number
+  totalExpenses: number
+  netBalance: number
+  savingsRate: number
+}
+
+export interface MultiMonthAnalysisResponse {
+  rangeMonths: number
+  averageSavingsRate: number
+  averageMonthlyExpenses: number
+  averageMonthlyIncome: number
+  fixedCostTrend: {
+    status: FixedCostTrendStatus
+    percentageChange: number
+    alertCategory?: string
+  }
+  monthlyHistory: MultiMonthSummaryPoint[]
+}
+
 

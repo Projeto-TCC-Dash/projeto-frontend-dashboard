@@ -122,11 +122,15 @@ describe("AccountsPage", () => {
     expect(screen.getByText("Nubank")).toBeDefined()
     expect(screen.getByText("Cartão XP")).toBeDefined()
 
-    // Allocation bar, InvestmentTimeSeriesChart empty state and InvestmentPortfolioCard
+    // Allocation bar, InvestmentTimeSeriesChart empty state, shortcut and InvestmentPortfolioCard
     expect(screen.getByTestId("account-allocation-bar")).toBeDefined()
     expect(screen.getByTestId("investment-chart-empty")).toBeDefined()
     expect(screen.getByTestId("investment-portfolio-card")).toBeDefined()
     expect(screen.getByText("Carteira equilibrada.")).toBeDefined()
+    expect(screen.getByTestId("accounts-investments-shortcut")).toHaveAttribute(
+      "href",
+      "/investments"
+    )
   })
 
   it("deve abrir o modal de nova conta ao clicar em 'Nova Conta'", () => {

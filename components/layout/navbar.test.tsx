@@ -101,8 +101,14 @@ describe("Navbar Component", () => {
       mobileMenu?.querySelector('a[href="/accounts"]')?.textContent
     ).toContain("Contas")
     expect(
+      mobileMenu?.querySelector('a[href="/investments"]')?.textContent
+    ).toContain("Investimentos")
+    expect(
       mobileMenu?.querySelector('a[href="/transactions"]')?.textContent
     ).toContain("Extratos")
+    expect(
+      mobileMenu?.querySelector('a[href="/fiscal"]')?.textContent
+    ).toContain("Fiscal")
     expect(
       mobileMenu?.querySelector('a[href="/settings/metas"]')?.textContent
     ).toContain("Metas")

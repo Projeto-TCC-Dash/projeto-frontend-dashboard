@@ -270,7 +270,10 @@ export function buildMultiMonthEvolutionSeries(
   const latestMonth = referenceMonth || allMonthsWithData[allMonthsWithData.length - 1]
 
   let startMonth = earliestMonth
-  if (horizon === "6M") {
+  if (horizon === "3M") {
+    const cutoff = subtractMonths(latestMonth, 2)
+    startMonth = cutoff > earliestMonth ? cutoff : earliestMonth
+  } else if (horizon === "6M") {
     const cutoff = subtractMonths(latestMonth, 5)
     startMonth = cutoff > earliestMonth ? cutoff : earliestMonth
   } else if (horizon === "12M") {

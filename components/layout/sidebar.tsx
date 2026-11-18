@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Wallet,
+  TrendingUp,
   ReceiptText,
+  Scale,
   Target,
   BotMessageSquare,
   Sparkles,
@@ -16,7 +18,9 @@ import { cn } from "@/lib/utils"
 export const SIDEBAR_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Contas e Cartões", icon: Wallet },
+  { href: "/investments", label: "Investimentos", icon: TrendingUp },
   { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
+  { href: "/fiscal", label: "Planejamento Fiscal", icon: Scale },
   { href: "/settings/metas", label: "Perfil e Metas", icon: Target },
   { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },
 ]

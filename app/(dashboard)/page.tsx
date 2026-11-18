@@ -13,9 +13,13 @@ import { MetricCardsGrid } from "@/components/dashboard/metric-cards-grid"
 import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart"
 import { PeriodCashflowCard } from "@/components/dashboard/period-cashflow-card"
 import { AiDiagnosisCard } from "@/components/dashboard/ai-diagnosis-card"
+import { MonthlyBudgetCard } from "@/components/dashboard/monthly-budget-card"
 import { MultiMonthEvolutionChart } from "@/components/dashboard/multi-month-evolution-chart"
 import { AiKeyModal } from "@/components/ai-key/ai-key-modal"
+import { useBudget, useUpsertBudget } from "@/hooks/use-budgets"
+import { useMultiMonthAnalysis } from "@/hooks/use-multi-month-analysis"
 import { useTransactions } from "@/hooks/use-transactions"
+import type { MultiMonthRange } from "@/src/types/api"
 import {
   buildMultiMonthEvolutionSeries,
   calculateEmergencyFundTarget,
@@ -43,6 +47,18 @@ export default function DashboardPage() {
     useFinancialAnalysis(selectedMonth, {
       enabled: Boolean(selectedMonth) && (user?.hasAiKey ?? true),
     })
+  const {
+    budget,
+    isLoading: isBudgetLoading,
+    isError: isBudgetError,
+    refetch: refetchBudget,
+  } = useBudget(selectedMonth)
+  const { upsertBudget, isSaving: isBudgetSaving } = useUpsertBudget()
+
+  const multiMonthRange: MultiMonthRange =
+    horizon === "3M" ? "3" : horizon === "6M" ? "6" : "12"
+  const { analysis: multiMonthServerAnalysis } =
+    useMultiMonthAnalysis(multiMonthRange)
   const {
     transactions: monthTransactions,
     isLoading: isMonthTransactionsLoading,
@@ -188,6 +204,29 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
+      {/* Orçamentos do Mês (Tetos Globais e por Categoria) */}
+      <motion.div
+        data-testid="monthly-budget-slot"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: prefersReducedMotion ? 0 : 0.22,
+          delay: 0.16,
+        }}
+      >
+        <MonthlyBudgetCard
+          month={selectedMonth}
+          budget={budget}
+          isLoading={isBudgetLoading}
+          isError={isBudgetError}
+          onRetry={() => void refetchBudget()}
+          onSaveBudget={(data) =>
+            upsertBudget({ month: selectedMonth, data })
+          }
+          isSaving={isBudgetSaving}
+        />
+      </motion.div>
+
       {/* Gráfico Histórico Consolidado Multi-Mês (Trajetória e Subida Acumulada) */}
       <motion.div
         data-testid="multi-month-evolution-slot"
@@ -202,6 +241,7 @@ export default function DashboardPage() {
           data={multiMonthSeries}
           horizon={horizon}
           onHorizonChange={setHorizon}
+          serverAnalysis={multiMonthServerAnalysis}
           emergencyFundTarget={emergencyFundTarget}
           isLoading={isAllTransactionsLoading}
         />
