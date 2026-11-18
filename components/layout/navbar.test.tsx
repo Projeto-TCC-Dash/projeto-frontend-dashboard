@@ -203,4 +203,15 @@ describe("Navbar Component", () => {
     const movedPill = screen.getByTestId("navbar-active-pill")
     expect(movedPill.parentElement).toHaveAttribute("href", "/accounts")
   })
+
+  it("renders FinAI Dashboard brand and desktop navigation links as clean text without decorative icons", () => {
+    const { container } = render(<Navbar />)
+
+    const brandLink = screen.getByRole("link", { name: "FinAI Dashboard" })
+    expect(brandLink.querySelector("svg")).toBeNull()
+
+    const desktopNav = container.querySelector("header nav")
+    expect(desktopNav).not.toBeNull()
+    expect(desktopNav?.querySelectorAll("svg").length).toBe(0)
+  })
 })

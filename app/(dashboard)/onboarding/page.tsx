@@ -10,7 +10,7 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { AiKeyForm } from "@/components/ai-key/ai-key-form"
-import { Sparkles, KeyRound, ShieldCheck } from "lucide-react"
+import { KeyRound, ShieldCheck } from "lucide-react"
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -25,9 +25,6 @@ export default function OnboardingPage() {
   return (
     <div className="mx-auto w-full max-w-2xl min-w-0 space-y-6 py-4 sm:py-8 lg:py-12">
       <div className="space-y-2 text-center">
-        <div className="mb-2 inline-flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <Sparkles className="size-6 text-primary" />
-        </div>
         <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
           Ativação da Inteligência Financeira (BYOK)
         </h1>
@@ -64,8 +61,7 @@ export default function OnboardingPage() {
             extratos nunca são utilizados para treinamento de modelos públicos.
           </span>
         </div>
-        <div className="flex items-start gap-2.5 rounded-lg border border-border/50 bg-muted/40 p-3.5">
-          <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" />
+        <div className="rounded-lg border border-border/50 bg-muted/40 p-3.5">
           <span>
             <strong>Cota Gratuita do Gemini</strong>: O Google AI Studio oferece
             cota gratuita generosa para modelos como Gemini 1.5 e 2.0 Flash.

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Sparkles, User, AlertCircle, RefreshCw, Square } from "lucide-react"
+import { User, AlertCircle, RefreshCw, Square } from "lucide-react"
 import { ChatMessage } from "@/src/types/api"
 import { MarkdownRenderer } from "@/lib/markdown-renderer"
 import { cn } from "@/lib/utils"
@@ -41,10 +41,10 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
       )}
       data-testid={`chat-message-${message.role}`}
     >
-      {/* Ícone do Assistente */}
+      {/* Avatar do Assistente */}
       {!isUser && (
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary shadow-xs select-none">
-          <Sparkles className="size-4" />
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-[11px] font-bold text-primary shadow-xs select-none">
+          IA
         </div>
       )}
 

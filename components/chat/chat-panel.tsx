@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Sparkles, Trash2, KeyRound, ExternalLink, X } from "lucide-react"
+import { Trash2, KeyRound, ExternalLink, X } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { useChatStream } from "@/hooks/use-chat-stream"
 import { ChatMessageList } from "./chat-message-list"
@@ -50,18 +50,13 @@ export function ChatPanel({
       {/* Cabeçalho do Painel */}
       {showHeader && (
         <div className="flex min-w-0 items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-3 py-3 sm:px-4">
-          <div className="flex min-w-0 items-center gap-2">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-xs">
-              <Sparkles className="size-3.5" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="truncate text-sm font-semibold tracking-tight text-foreground">
-                Consultor Financeiro IA
-              </h2>
-              <p className="truncate text-[11px] text-muted-foreground">
-                Streaming em tempo real via Gemini
-              </p>
-            </div>
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-semibold tracking-tight text-foreground">
+              Consultor Financeiro IA
+            </h2>
+            <p className="truncate text-[11px] text-muted-foreground">
+              Streaming em tempo real via Gemini
+            </p>
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5">

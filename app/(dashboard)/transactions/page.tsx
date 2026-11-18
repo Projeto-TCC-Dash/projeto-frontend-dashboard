@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ReceiptText, AlertCircle, Sparkles } from "lucide-react"
+import { ReceiptText, AlertCircle } from "lucide-react"
 import { getCurrentYearMonth } from "@/lib/formatters"
 import {
   useTransactions,
@@ -157,19 +157,16 @@ export default function TransactionsPage() {
       {/* Banner de Resumo Pós-Categorização por IA */}
       {categorizeSummary && (
         <div className="flex flex-col justify-between gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground sm:flex-row sm:items-center">
-          <div className="flex min-w-0 items-start gap-3 sm:items-center">
-            <Sparkles className="mt-0.5 size-5 shrink-0 text-primary sm:mt-0" />
-            <div className="min-w-0">
-              <p className="font-semibold">
-                Categorização Inteligente Concluída!
-              </p>
-              <p className="mt-0.5 text-xs break-words text-muted-foreground">
-                {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
-                comerciais analisados e{" "}
-                <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
-                transações reclassificadas em toda a sua conta.
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="font-semibold">
+              Categorização Inteligente Concluída!
+            </p>
+            <p className="mt-0.5 text-xs break-words text-muted-foreground">
+              {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
+              comerciais analisados e{" "}
+              <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
+              transações reclassificadas em toda a sua conta.
+            </p>
           </div>
           <button
             type="button"

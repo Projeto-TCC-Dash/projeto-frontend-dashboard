@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   FileUp,
-  Sparkles,
   Key,
   Loader2,
   CheckCircle2,
@@ -118,12 +117,9 @@ export function FiscalOcrDropzone({
       <Card data-testid="fiscal-ocr-dropzone">
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="size-4 text-primary" />
-              <CardTitle className="text-base font-semibold">
-                Leitura Inteligente de Recibos (OCR)
-              </CardTitle>
-            </div>
+            <CardTitle className="text-base font-semibold">
+              Leitura Inteligente de Recibos (OCR)
+            </CardTitle>
             <Badge variant="secondary" className="text-[11px]">
               PDF, PNG, JPG até 10MB
             </Badge>
