@@ -16,6 +16,11 @@ import {
   useUpdateAccount,
   useDeleteAccount,
 } from "@/hooks/use-accounts"
+import {
+  useInvestmentPortfolio,
+  useUpsertInvestmentHolding,
+} from "@/hooks/use-investments"
+import { useTransactions } from "@/hooks/use-transactions"
 import { formatCurrencyBRL } from "@/lib/formatters"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -24,8 +29,12 @@ import { AccountSection } from "@/components/accounts/account-section"
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog"
 import { AccountDeleteDialog } from "@/components/accounts/account-delete-dialog"
 import { AccountAllocationBar } from "@/components/accounts/account-allocation-bar"
+import { InvestmentPortfolioCard } from "@/components/accounts/investment-portfolio-card"
 import { InvestmentTimeSeriesChart } from "@/components/charts/investment-time-series-chart"
-import { buildAccountAllocationSegments } from "@/lib/dashboard-charts"
+import {
+  buildAccountAllocationSegments,
+  buildPatrimonyTimeSeries,
+} from "@/lib/dashboard-charts"
 import { cn } from "@/lib/utils"
 import {
   ACCOUNT_TYPES,
@@ -38,6 +47,10 @@ export default function AccountsPage() {
   const { createAccount, isPending: isCreating } = useCreateAccount()
   const { updateAccount, isPending: isUpdating } = useUpdateAccount()
   const { deleteAccount, isPending: isDeleting } = useDeleteAccount()
+  const { portfolio, isLoading: isPortfolioLoading } = useInvestmentPortfolio()
+  const { upsertHolding, isPending: isUpsertingHolding } =
+    useUpsertInvestmentHolding()
+  const { transactions: allTransactions } = useTransactions({})
 
   const [selectedAccountForEdit, setSelectedAccountForEdit] =
     React.useState<Account | null>(null)
@@ -53,6 +66,11 @@ export default function AccountsPage() {
   const allocationSegments = React.useMemo(
     () => buildAccountAllocationSegments(accounts),
     [accounts]
+  )
+
+  const patrimonySeries = React.useMemo(
+    () => buildPatrimonyTimeSeries(allTransactions, accounts),
+    [allTransactions, accounts]
   )
 
   // Limpa feedback após 4 segundos
@@ -226,8 +244,23 @@ export default function AccountsPage() {
           title="Evolução Patrimonial"
           subtitle="Histórico consolidado dos saldos de contas e ativos ao longo do tempo"
           seriesType="area"
-          data={[]}
+          data={patrimonySeries}
           height={260}
+        />
+      )}
+
+      {/* Carteira de Investimentos & Insights de Alocação */}
+      {accounts.length > 0 && (
+        <InvestmentPortfolioCard
+          portfolio={portfolio}
+          accounts={accounts}
+          isLoading={isPortfolioLoading}
+          onUpsertHolding={async (dto) => {
+            const res = await upsertHolding(dto)
+            setFeedbackMessage("Posição de investimento atualizada com sucesso!")
+            return res
+          }}
+          isSubmitting={isUpsertingHolding}
         />
       )}
 

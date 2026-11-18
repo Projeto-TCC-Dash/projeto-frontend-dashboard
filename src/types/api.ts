@@ -399,3 +399,52 @@ export interface DeleteAccountParams {
   id: string
   cascade?: boolean
 }
+
+// ==========================================
+// CARTEIRA DE INVESTIMENTOS & ALOCAÇÃO (Backend /api/investments/holdings)
+// ==========================================
+export const ASSET_MACRO_CLASSES = [
+  "FIXED_INCOME",
+  "EQUITIES",
+  "REAL_ESTATE",
+  "INTERNATIONAL",
+  "CRYPTO",
+  "CASH_LIQUIDITY",
+] as const
+
+export type AssetMacroClass = (typeof ASSET_MACRO_CLASSES)[number]
+
+export const ASSET_MACRO_CLASS_LABELS: Record<AssetMacroClass, string> = {
+  FIXED_INCOME: "Renda Fixa",
+  EQUITIES: "Ações Brasil",
+  REAL_ESTATE: "Fundos Imobiliários",
+  INTERNATIONAL: "Internacional",
+  CRYPTO: "Criptoativos",
+  CASH_LIQUIDITY: "Caixa & Liquidez",
+}
+
+export interface InvestmentHoldingItem {
+  macroClass: AssetMacroClass
+  amount: number
+  percentage: number
+}
+
+export interface InvestmentAllocationDiagnosis {
+  adherentToRiskProfile: boolean
+  recommendations: string[]
+}
+
+export interface InvestmentPortfolioSummary {
+  totalInvested: number
+  riskProfile?: RiskProfile | string
+  holdings: InvestmentHoldingItem[]
+  allocationDiagnosis: InvestmentAllocationDiagnosis
+}
+
+export interface UpsertInvestmentHoldingDTO {
+  accountId: string
+  macroClass: AssetMacroClass
+  amount: number
+  notes?: string
+}
+

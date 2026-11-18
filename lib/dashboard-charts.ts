@@ -12,6 +12,7 @@ import type {
   CashflowPoint,
   CategoryChartDatum,
   CumulativeDailyCashflowPoint,
+  InvestmentSingleValuePoint,
   MultiMonthEvolutionPoint,
   MultiMonthHorizon,
   TremorColor,
@@ -483,6 +484,50 @@ export function calculateFinancialMetricsFromTransactions(
     topCategories,
   }
 }
+
+export function buildPatrimonyTimeSeries(
+  transactions: readonly Transaction[],
+  accounts: readonly Account[] = []
+): InvestmentSingleValuePoint[] {
+  if (transactions.length === 0) return []
+
+  const initialNetWorth = accounts.reduce(
+    (sum, acc) => sum + (acc.initialBalance ?? 0),
+    0
+  )
+
+  const dailyDelta = new Map<string, number>()
+
+  for (const tx of transactions) {
+    if (!tx.date) continue
+    const isoDate = tx.date.slice(0, 10)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) continue
+
+    const signedAmount =
+      tx.category === "Receita"
+        ? Math.abs(tx.amount)
+        : tx.amount < 0
+          ? tx.amount
+          : -Math.abs(tx.amount)
+
+    dailyDelta.set(isoDate, roundCents((dailyDelta.get(isoDate) ?? 0) + signedAmount))
+  }
+
+  const sortedDates = Array.from(dailyDelta.keys()).sort((a, b) =>
+    a.localeCompare(b)
+  )
+
+  let runningBalance = initialNetWorth
+
+  return sortedDates.map((date) => {
+    runningBalance = roundCents(runningBalance + (dailyDelta.get(date) ?? 0))
+    return {
+      time: date,
+      value: runningBalance,
+    }
+  })
+}
+
 
 
 

@@ -6,6 +6,7 @@ import {
   buildCategoryDrillDownHref,
   buildCumulativeDailyCashflowSeries,
   buildMultiMonthEvolutionSeries,
+  buildPatrimonyTimeSeries,
   buildPeriodCashflowSeries,
   calculateFinancialMetricsFromTransactions,
   calculateMoMTrend,
@@ -497,6 +498,56 @@ describe("lib/dashboard-charts", () => {
         savingsRate: 0,
         topCategories: [],
       })
+    })
+  })
+
+  describe("buildPatrimonyTimeSeries", () => {
+    it("builds ascending unique-date cumulative patrimony series starting from accounts initialBalance", () => {
+      const accounts = [
+        {
+          id: "a1",
+          name: "Conta",
+          type: "CHECKING" as const,
+          balance: 7000,
+          initialBalance: 2000,
+          color: "#3b82f6",
+          createdAt: "",
+          updatedAt: "",
+        },
+      ]
+
+      const transactions: Transaction[] = [
+        {
+          id: "t2",
+          externalId: "e2",
+          rawDescription: "MERCADO",
+          cleanDescription: "Mercado",
+          amount: -1000,
+          date: "2026-11-10T10:00:00Z",
+          category: "Alimentação",
+          source: "SEED",
+        },
+        {
+          id: "t1",
+          externalId: "e1",
+          rawDescription: "SALARIO",
+          cleanDescription: "Salário",
+          amount: 6000,
+          date: "2026-11-05T10:00:00Z",
+          category: "Receita",
+          source: "SEED",
+        },
+      ]
+
+      const series = buildPatrimonyTimeSeries(transactions, accounts)
+      expect(series).toEqual([
+        { time: "2026-11-05", value: 8000 },
+        { time: "2026-11-10", value: 7000 },
+      ])
+    })
+
+    it("returns empty array when transactions are empty", () => {
+      expect(buildPatrimonyTimeSeries([], [])).toEqual([])
     })
   })
 })
