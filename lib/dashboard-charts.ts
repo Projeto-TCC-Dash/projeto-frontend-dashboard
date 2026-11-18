@@ -271,10 +271,10 @@ export function buildMultiMonthEvolutionSeries(
   let startMonth = earliestMonth
   if (horizon === "6M") {
     const cutoff = subtractMonths(latestMonth, 5)
-    startMonth = cutoff < earliestMonth ? cutoff : cutoff
+    startMonth = cutoff > earliestMonth ? cutoff : earliestMonth
   } else if (horizon === "12M") {
     const cutoff = subtractMonths(latestMonth, 11)
-    startMonth = cutoff < earliestMonth ? cutoff : cutoff
+    startMonth = cutoff > earliestMonth ? cutoff : earliestMonth
   }
 
   // Se startMonth for posterior a latestMonth, normaliza
@@ -425,5 +425,64 @@ export function calculateEmergencyFundTarget(
 
   return roundCents(base * months)
 }
+
+export function calculateFinancialMetricsFromTransactions(
+  transactions: readonly Transaction[]
+): FinancialMetrics {
+  let totalIncome = 0
+  let totalExpenses = 0
+  let invoiceSettlements = 0
+  const catExpenses = new Map<string, number>()
+
+  for (const tx of transactions) {
+    const absVal = Math.abs(tx.amount)
+    const cat = tx.category || "Outros"
+
+    if (cat === "Receita") {
+      totalIncome += absVal
+    } else if (cat === "Pagamento de Fatura") {
+      invoiceSettlements += absVal
+    } else {
+      totalExpenses += absVal
+      catExpenses.set(cat, (catExpenses.get(cat) ?? 0) + absVal)
+    }
+  }
+
+  const roundedIncome = roundCents(totalIncome)
+  const roundedExpenses = roundCents(totalExpenses)
+  const roundedInvoices = roundCents(invoiceSettlements)
+  const netBalance = roundCents(roundedIncome - roundedExpenses)
+
+  const savingsRate =
+    roundedIncome > 0
+      ? Math.max(
+          0,
+          Math.round(((roundedIncome - roundedExpenses) / roundedIncome) * 1000) /
+            10
+        )
+      : 0
+
+  const topCategories = Array.from(catExpenses.entries())
+    .map(([category, amount]) => {
+      const roundedAmount = roundCents(amount)
+      const percentage =
+        roundedExpenses > 0
+          ? Math.round((roundedAmount / roundedExpenses) * 1000) / 10
+          : 0
+      return { category, amount: roundedAmount, percentage }
+    })
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5)
+
+  return {
+    totalIncome: roundedIncome,
+    totalExpenses: roundedExpenses,
+    invoiceSettlements: roundedInvoices,
+    netBalance,
+    savingsRate,
+    topCategories,
+  }
+}
+
 
 

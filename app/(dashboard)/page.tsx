@@ -19,6 +19,7 @@ import { useTransactions } from "@/hooks/use-transactions"
 import {
   buildMultiMonthEvolutionSeries,
   calculateEmergencyFundTarget,
+  calculateFinancialMetricsFromTransactions,
   subtractMonths,
 } from "@/lib/dashboard-charts"
 import type { MultiMonthHorizon } from "@/src/types/charts"
@@ -39,22 +40,38 @@ export default function DashboardPage() {
   )
 
   const { metrics, analysis, isLoading, isRefreshing, error, refreshAnalysis } =
-    useFinancialAnalysis(selectedMonth)
+    useFinancialAnalysis(selectedMonth, {
+      enabled: Boolean(selectedMonth) && (user?.hasAiKey ?? true),
+    })
+  const {
+    transactions: monthTransactions,
+    isLoading: isMonthTransactionsLoading,
+  } = useTransactions({ month: selectedMonth })
   const { transactions: allTransactions, isLoading: isAllTransactionsLoading } =
     useTransactions({})
   const prefersReducedMotion = usePrefersReducedMotion()
+
+  const fallbackMetrics = React.useMemo(
+    () => calculateFinancialMetricsFromTransactions(monthTransactions),
+    [monthTransactions]
+  )
+
+  const effectiveMetrics =
+    metrics ?? (!isMonthTransactionsLoading ? fallbackMetrics : null)
+  const isMetricsLoading =
+    !effectiveMetrics && (isLoading || isMonthTransactionsLoading)
 
   const emergencyFundTarget = React.useMemo(
     () =>
       calculateEmergencyFundTarget(
         userProfile?.financialProfile?.incomeType,
         userProfile?.financialProfile?.declaredMonthlyIncome,
-        metrics?.totalExpenses
+        effectiveMetrics?.totalExpenses
       ),
     [
       userProfile?.financialProfile?.incomeType,
       userProfile?.financialProfile?.declaredMonthlyIncome,
-      metrics?.totalExpenses,
+      effectiveMetrics?.totalExpenses,
     ]
   )
 
@@ -102,7 +119,7 @@ export default function DashboardPage() {
       <DashboardHeader
         currentMonth={selectedMonth}
         onMonthChange={setSelectedMonth}
-        isLoading={isLoading || isRefreshing}
+        isLoading={isMetricsLoading || isRefreshing}
         hasAiKey={user?.hasAiKey ?? true}
       />
 
@@ -111,10 +128,10 @@ export default function DashboardPage() {
 
       {/* Grid de Resumo Financeiro (KPIs Consolidados) */}
       <MetricCardsGrid
-        metrics={metrics}
+        metrics={effectiveMetrics}
         previousMetrics={previousMetrics}
         historicalTrends={historicalTrends}
-        isLoading={isLoading}
+        isLoading={isMetricsLoading}
       />
 
       <div
@@ -133,14 +150,14 @@ export default function DashboardPage() {
         >
           {/* Cards analíticos empilhados (Distribuição por Categorias + Fluxo do Período) */}
           <CategoryDonutChart
-            categories={metrics?.topCategories ?? []}
+            categories={effectiveMetrics?.topCategories ?? []}
             month={selectedMonth}
-            isLoading={isLoading}
+            isLoading={isMetricsLoading}
           />
           <PeriodCashflowCard
-            metrics={metrics}
+            metrics={effectiveMetrics}
             month={selectedMonth}
-            isLoading={isLoading}
+            isLoading={isMonthTransactionsLoading}
           />
         </motion.div>
 
@@ -165,7 +182,7 @@ export default function DashboardPage() {
             onRefresh={() => void refreshAnalysis()}
             onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
             financialProfile={userProfile?.financialProfile}
-            monthlyExpenses={metrics?.totalExpenses}
+            monthlyExpenses={effectiveMetrics?.totalExpenses}
             matchedDesktopHeight
           />
         </motion.div>

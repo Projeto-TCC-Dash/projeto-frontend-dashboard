@@ -35,7 +35,7 @@ export function MetricCardsGrid({
 }: MetricCardsGridProps) {
   const prefersReducedMotion = usePrefersReducedMotion()
 
-  if (isLoading || !metrics) {
+  if (isLoading) {
     return (
       <div
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
@@ -50,15 +50,27 @@ export function MetricCardsGrid({
     )
   }
 
-  const invoiceSettlements = metrics.invoiceSettlements ?? 0
+  const safeMetrics: FinancialMetrics = metrics ?? {
+    totalIncome: 0,
+    totalExpenses: 0,
+    invoiceSettlements: 0,
+    netBalance: 0,
+    savingsRate: 0,
+    topCategories: [],
+  }
+
+  const invoiceSettlements = safeMetrics.invoiceSettlements ?? 0
   // Saldo Líquido atualizado descontando despesas primárias e liquidação de faturas (sem duplicidade contábil)
   const netBalance =
     Math.round(
-      (metrics.totalIncome - metrics.totalExpenses - invoiceSettlements) * 100
+      (safeMetrics.totalIncome -
+        safeMetrics.totalExpenses -
+        invoiceSettlements) *
+        100
     ) / 100
   const savings = calculateSavingsRate(
-    metrics.totalIncome,
-    metrics.totalExpenses
+    safeMetrics.totalIncome,
+    safeMetrics.totalExpenses
   )
 
   const prevInvoiceSettlements = previousMetrics?.invoiceSettlements ?? 0
@@ -72,13 +84,13 @@ export function MetricCardsGrid({
     : undefined
 
   const incomeTrend = calculateMoMTrend(
-    metrics.totalIncome,
+    safeMetrics.totalIncome,
     previousMetrics?.totalIncome,
     false
   )
 
   const expensesTrend = calculateMoMTrend(
-    metrics.totalExpenses,
+    safeMetrics.totalExpenses,
     previousMetrics?.totalExpenses,
     true
   )
@@ -114,8 +126,8 @@ export function MetricCardsGrid({
         <MetricCard
           className="h-full"
           title="Receitas Totais"
-          value={formatCurrencyBRL(metrics.totalIncome)}
-          numericValue={metrics.totalIncome}
+          value={formatCurrencyBRL(safeMetrics.totalIncome)}
+          numericValue={safeMetrics.totalIncome}
           numberFormat={{ style: "currency", currency: "BRL" }}
           variant="positive"
           icon={<ArrowUpRight className="size-4 text-emerald-500" />}
@@ -130,8 +142,8 @@ export function MetricCardsGrid({
         <MetricCard
           className="h-full"
           title="Despesas Primárias"
-          value={formatCurrencyBRL(metrics.totalExpenses)}
-          numericValue={metrics.totalExpenses}
+          value={formatCurrencyBRL(safeMetrics.totalExpenses)}
+          numericValue={safeMetrics.totalExpenses}
           numberFormat={{ style: "currency", currency: "BRL" }}
           variant="negative"
           icon={<ArrowDownRight className="size-4 text-rose-500" />}

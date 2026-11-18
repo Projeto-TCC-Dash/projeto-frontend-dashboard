@@ -48,7 +48,6 @@ interface EvolutionTooltipProps {
 
 function MultiMonthEvolutionTooltip({
   active,
-  label,
   payload,
 }: EvolutionTooltipProps) {
   if (!active || !payload || payload.length === 0) return null

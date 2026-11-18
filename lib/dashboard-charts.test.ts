@@ -7,6 +7,7 @@ import {
   buildCumulativeDailyCashflowSeries,
   buildMultiMonthEvolutionSeries,
   buildPeriodCashflowSeries,
+  calculateFinancialMetricsFromTransactions,
   calculateMoMTrend,
   hasInvoiceSettlementsInCashflow,
 } from "@/lib/dashboard-charts"
@@ -427,6 +428,75 @@ describe("lib/dashboard-charts", () => {
 
       expect(checking?.percentage).toBe(30)
       expect(investment?.percentage).toBe(70)
+    })
+  })
+
+  describe("calculateFinancialMetricsFromTransactions", () => {
+    it("computes totals, invoice settlements, savings rate and top 5 categories matching backend rules", () => {
+      const transactions: Transaction[] = [
+        {
+          id: "1",
+          externalId: "e1",
+          rawDescription: "SALARIO",
+          cleanDescription: "Salário",
+          amount: 10000,
+          date: "2026-11-05T10:00:00Z",
+          category: "Receita",
+          source: "SEED",
+        },
+        {
+          id: "2",
+          externalId: "e2",
+          rawDescription: "ALUGUEL",
+          cleanDescription: "Aluguel",
+          amount: -2500,
+          date: "2026-11-06T10:00:00Z",
+          category: "Moradia",
+          source: "SEED",
+        },
+        {
+          id: "3",
+          externalId: "e3",
+          rawDescription: "SUSHI",
+          cleanDescription: "Restaurante",
+          amount: -500,
+          date: "2026-11-07T10:00:00Z",
+          category: "Alimentação",
+          source: "SEED",
+        },
+        {
+          id: "4",
+          externalId: "e4",
+          rawDescription: "FATURA",
+          cleanDescription: "Pagamento de Fatura",
+          amount: -1500,
+          date: "2026-11-08T10:00:00Z",
+          category: "Pagamento de Fatura",
+          source: "SEED",
+        },
+      ]
+
+      const result = calculateFinancialMetricsFromTransactions(transactions)
+      expect(result.totalIncome).toBe(10000)
+      expect(result.totalExpenses).toBe(3000)
+      expect(result.invoiceSettlements).toBe(1500)
+      expect(result.netBalance).toBe(7000)
+      expect(result.savingsRate).toBe(70)
+      expect(result.topCategories).toEqual([
+        { category: "Moradia", amount: 2500, percentage: 83.3 },
+        { category: "Alimentação", amount: 500, percentage: 16.7 },
+      ])
+    })
+
+    it("returns zeroed metrics for empty transaction list", () => {
+      expect(calculateFinancialMetricsFromTransactions([])).toEqual({
+        totalIncome: 0,
+        totalExpenses: 0,
+        invoiceSettlements: 0,
+        netBalance: 0,
+        savingsRate: 0,
+        topCategories: [],
+      })
     })
   })
 })
