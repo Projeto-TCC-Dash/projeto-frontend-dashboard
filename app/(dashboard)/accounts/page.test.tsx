@@ -81,6 +81,10 @@ describe("AccountsPage", () => {
     expect(screen.getByText(/1\.500,00/)).toBeDefined()
     expect(screen.getByText("Nubank")).toBeDefined()
     expect(screen.getByText("Cartão XP")).toBeDefined()
+
+    // Allocation bar and InvestmentTimeSeriesChart empty state
+    expect(screen.getByTestId("account-allocation-bar")).toBeDefined()
+    expect(screen.getByTestId("investment-chart-empty")).toBeDefined()
   })
 
   it("deve abrir o modal de nova conta ao clicar em 'Nova Conta'", () => {

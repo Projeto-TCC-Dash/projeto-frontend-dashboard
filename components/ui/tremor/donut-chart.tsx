@@ -18,6 +18,7 @@ export interface DonutChartProps {
   showTooltip?: boolean
   isAnimated?: boolean
   height?: number
+  cornerRadius?: number
   className?: string
   ariaLabel?: string
 }
@@ -68,6 +69,7 @@ export function DonutChart({
   showTooltip = true,
   isAnimated = true,
   height = 240,
+  cornerRadius = 6,
   className,
   ariaLabel = "Gráfico de rosca com distribuição por categorias",
 }: DonutChartProps) {
@@ -98,6 +100,7 @@ export function DonutChart({
             cy="50%"
             innerRadius="64%"
             outerRadius="90%"
+            cornerRadius={cornerRadius}
             paddingAngle={chartData.length > 1 ? 2 : 0}
             strokeWidth={1.5}
             isAnimationActive={isAnimated && !prefersReducedMotion}
@@ -121,8 +124,9 @@ export function DonutChart({
                   key={key}
                   fill={entry.color}
                   stroke={isSelected ? "var(--background)" : "var(--card)"}
+                  strokeWidth={isSelected ? 2.5 : 1.5}
                   fillOpacity={isDimmed ? 0.35 : 1}
-                  className="cursor-pointer transition-opacity duration-150 outline-none"
+                  className="cursor-pointer transition-all duration-150 outline-none"
                 />
               )
             })}

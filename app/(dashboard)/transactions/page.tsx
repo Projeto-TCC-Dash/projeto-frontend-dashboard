@@ -197,7 +197,7 @@ export default function TransactionsPage() {
 
       {/* Barra de Filtros Dinâmicos */}
       <TransactionFilters
-        month={filters.month}
+        month={filters.month ?? getCurrentYearMonth()}
         category={filters.category}
         source={filters.source}
         accountId={filters.accountId}

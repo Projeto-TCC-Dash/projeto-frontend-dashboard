@@ -96,4 +96,28 @@ describe("MetricCard Component", () => {
       "45"
     )
   })
+
+  it("renders MoM trend badge and mini sparkline chart when provided", () => {
+    render(
+      <MetricCard
+        title="Receitas Totais"
+        value="R$ 12.000,00"
+        variant="positive"
+        trend={{
+          rate: 15.5,
+          direction: "up",
+          isPositive: true,
+          label: "+15,5% vs mês ant.",
+        }}
+        sparklineData={[8000, 9500, 10000, 12000]}
+      />
+    )
+
+    const trendBadge = screen.getByTestId("metric-trend-badge")
+    expect(trendBadge).toBeInTheDocument()
+    expect(trendBadge.textContent).toContain("+15,5% vs mês ant.")
+    expect(trendBadge.className).toContain("text-emerald-600")
+
+    expect(screen.getByTestId("metric-sparkline")).toBeInTheDocument()
+  })
 })

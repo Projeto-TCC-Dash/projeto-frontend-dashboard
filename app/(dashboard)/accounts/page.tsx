@@ -23,6 +23,9 @@ import { Badge } from "@/components/ui/badge"
 import { AccountSection } from "@/components/accounts/account-section"
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog"
 import { AccountDeleteDialog } from "@/components/accounts/account-delete-dialog"
+import { AccountAllocationBar } from "@/components/accounts/account-allocation-bar"
+import { InvestmentTimeSeriesChart } from "@/components/charts/investment-time-series-chart"
+import { buildAccountAllocationSegments } from "@/lib/dashboard-charts"
 import { cn } from "@/lib/utils"
 import {
   ACCOUNT_TYPES,
@@ -46,6 +49,11 @@ export default function AccountsPage() {
   )
 
   const isNetWorthNegative = netWorth < 0
+
+  const allocationSegments = React.useMemo(
+    () => buildAccountAllocationSegments(accounts),
+    [accounts]
+  )
 
   // Limpa feedback após 4 segundos
   React.useEffect(() => {
@@ -204,7 +212,24 @@ export default function AccountsPage() {
             )}
           </div>
         </div>
+
+        {/* Barra Proporcional de Alocação de Ativos */}
+        <AccountAllocationBar
+          segments={allocationSegments}
+          totalBalance={netWorth}
+        />
       </Card>
+
+      {/* Gráfico de Séries Temporais de Investimentos e Evolução Patrimonial */}
+      {accounts.length > 0 && (
+        <InvestmentTimeSeriesChart
+          title="Evolução Patrimonial"
+          subtitle="Histórico consolidado dos saldos de contas e ativos ao longo do tempo"
+          seriesType="area"
+          data={[]}
+          height={260}
+        />
+      )}
 
       {/* Seções Temáticas Verticais */}
       {accounts.length === 0 ? (

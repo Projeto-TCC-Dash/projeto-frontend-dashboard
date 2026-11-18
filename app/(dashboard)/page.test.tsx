@@ -141,5 +141,16 @@ describe("DashboardPage Integration", () => {
     expect(screen.getByTestId("ai-diagnosis-body").className).toContain(
       "xl:overflow-y-auto"
     )
+
+    // Multi-month evolution chart slot
+    expect(
+      screen.getByTestId("multi-month-evolution-slot")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByTestId("multi-month-evolution-chart")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("Evolução Financeira Consolidada")
+    ).toBeInTheDocument()
   })
 })

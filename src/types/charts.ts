@@ -1,4 +1,4 @@
-import type { Category } from "@/src/types/api"
+import type { AccountType, Category } from "@/src/types/api"
 
 export type TremorColor =
   | "emerald"
@@ -39,6 +39,50 @@ export interface CashflowPoint {
   despesas: number
   faturas: number
   [key: string]: string | number
+}
+
+export type PeriodCashflowViewMode = "daily" | "cumulative"
+
+export interface CumulativeDailyCashflowPoint {
+  label: string
+  isoDate: string
+  receitas: number
+  despesas: number
+  faturas: number
+  dailyNet: number
+  cumulativeBalance: number
+  [key: string]: string | number
+}
+
+export type MultiMonthHorizon = "6M" | "12M" | "ALL"
+
+export interface MultiMonthEvolutionPoint {
+  month: string
+  label: string
+  receitas: number
+  despesas: number
+  faturas: number
+  netBalance: number
+  cumulativeBalance: number
+  [key: string]: string | number
+}
+
+export type TrendDirection = "up" | "down" | "neutral"
+
+export interface TrendMetric {
+  rate: number
+  direction: TrendDirection
+  isPositive: boolean
+  label: string
+}
+
+export interface AccountAllocationSegment {
+  type: AccountType
+  label: string
+  balance: number
+  percentage: number
+  color: string
+  tremorColor: TremorColor
 }
 
 export interface ChartTooltipPayloadItem<
@@ -82,3 +126,4 @@ export interface InvestmentTimeSeriesChartProps {
 }
 
 export type BorderBeamState = "hidden" | "subtle" | "active"
+
