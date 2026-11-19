@@ -5,7 +5,17 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "motion/react"
 import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion"
-import { Menu, X } from "lucide-react"
+import {
+  LayoutDashboard,
+  Wallet,
+  TrendingUp,
+  Scale,
+  ReceiptText,
+  BotMessageSquare,
+  UserCheck,
+  Menu,
+  X,
+} from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import { UserNav } from "./user-nav"
 import { AiKeyStatusBadge } from "@/components/ai-key/ai-key-status-badge"
@@ -13,13 +23,13 @@ import { useChatDrawer } from "@/components/chat/chat-drawer-context"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/accounts", label: "Contas" },
-  { href: "/investments", label: "Investimentos" },
-  { href: "/transactions", label: "Extratos" },
-  { href: "/fiscal", label: "Fiscal" },
-  { href: "/settings/metas", label: "Metas" },
-  { href: "/chat", label: "Consultor" },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/accounts", label: "Contas", icon: Wallet },
+  { href: "/investments", label: "Investimentos", icon: TrendingUp },
+  { href: "/transactions", label: "Extratos", icon: ReceiptText },
+  { href: "/fiscal", label: "Fiscal", icon: Scale },
+  { href: "/settings/metas", label: "Metas", icon: UserCheck },
+  { href: "/chat", label: "Consultor", icon: BotMessageSquare },
 ]
 
 export function Navbar() {
@@ -83,9 +93,9 @@ export function Navbar() {
       ref={headerRef}
       className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
     >
-      <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center justify-between gap-4 px-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full items-center justify-between gap-3 px-3 sm:px-5 lg:px-8">
         {/* Lado Esquerdo: Marca (somente texto) e Navegação Desktop */}
-        <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6 xl:gap-8">
+        <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5 xl:gap-7">
           <Link
             href="/"
             className="shrink-0 whitespace-nowrap font-bold tracking-tight text-foreground"
@@ -95,15 +105,16 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden min-w-0 items-center gap-0.5 overflow-x-auto text-sm font-medium lg:flex xl:gap-1">
+          <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto text-sm font-medium lg:flex xl:gap-1">
             {NAV_ITEMS.map((item) => {
+              const Icon = item.icon
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative z-10 shrink-0 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[13px] transition-colors xl:px-3 xl:text-sm",
+                    "relative z-10 flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1.5 text-xs transition-colors xl:gap-2 xl:px-2.5 xl:text-sm",
                     isActive
                       ? "font-semibold text-foreground"
                       : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -121,6 +132,7 @@ export function Navbar() {
                       className="absolute inset-0 -z-10 rounded-md bg-secondary"
                     />
                   ) : null}
+                  <Icon className="size-3.5 shrink-0 xl:size-4" />
                   <span>{item.label}</span>
                 </Link>
               )
@@ -163,6 +175,7 @@ export function Navbar() {
           className="space-y-1 border-b border-border bg-background px-3 py-3 sm:px-6 lg:hidden"
         >
           {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
             const isActive = pathname === item.href
             return (
               <Link
@@ -170,12 +183,13 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setOpenPathname(null)}
                 className={cn(
-                  "flex min-h-11 items-center rounded-md px-3 py-2 text-sm transition-colors",
+                  "flex min-h-11 items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
                   isActive
                     ? "bg-secondary font-medium text-foreground"
                     : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                 )}
               >
+                <Icon className="size-4 shrink-0" />
                 <span>{item.label}</span>
               </Link>
             )

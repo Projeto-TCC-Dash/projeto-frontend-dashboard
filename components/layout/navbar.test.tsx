@@ -204,14 +204,18 @@ describe("Navbar Component", () => {
     expect(movedPill.parentElement).toHaveAttribute("href", "/accounts")
   })
 
-  it("renders FinAI Dashboard brand and desktop navigation links as clean text without decorative icons", () => {
+  it("renders FinAI Dashboard brand without sparkle icon while keeping page icons and full-width bar", () => {
     const { container } = render(<Navbar />)
 
     const brandLink = screen.getByRole("link", { name: "FinAI Dashboard" })
     expect(brandLink.querySelector("svg")).toBeNull()
 
+    const headerInner = container.querySelector("header > div")
+    expect(headerInner?.className).toContain("w-full")
+    expect(headerInner?.className).not.toContain("max-w-7xl")
+
     const desktopNav = container.querySelector("header nav")
     expect(desktopNav).not.toBeNull()
-    expect(desktopNav?.querySelectorAll("svg").length).toBe(0)
+    expect(desktopNav?.querySelectorAll("svg").length).toBe(7)
   })
 })
