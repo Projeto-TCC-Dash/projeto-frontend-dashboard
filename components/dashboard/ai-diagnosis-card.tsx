@@ -27,6 +27,7 @@ import {
   FINANCIAL_GOAL_LABELS,
 } from "@/src/types/api"
 import { MarkdownRenderer } from "@/lib/markdown-renderer"
+import { classifyAiError } from "@/lib/ai-error-helper"
 import {
   formatDateBR,
   computeEmergencyReserveGuideline,
@@ -132,12 +133,7 @@ export function AiDiagnosisCard({
 
   // 2. Estado de Erro na Chamada da IA
   if (error) {
-    const isRateLimit =
-      error.message.includes("429") ||
-      error.message.toLowerCase().includes("muitas requisições")
-    const isServiceUnavailable =
-      error.message.includes("503") ||
-      error.message.toLowerCase().includes("sobrecarregado")
+    const classified = classifyAiError(error)
 
     return (
       <Card
@@ -155,41 +151,47 @@ export function AiDiagnosisCard({
           )}
         >
           <div className="flex min-w-0 items-start gap-2.5 sm:items-center">
-            <div className="shrink-0 rounded-lg bg-rose-500/10 p-1.5 text-rose-600 dark:text-rose-400">
+            <div className="shrink-0 rounded-lg bg-rose-500/10 p-1.5 text-rose-700 dark:text-rose-400">
               <AlertTriangle className="size-5" />
             </div>
             <div className="min-w-0">
               <CardTitle className="text-base sm:text-lg">
                 Diagnóstico Temporariamente Indisponível
               </CardTitle>
-              <CardDescription>
-                {isRateLimit
-                  ? "Limite de chamadas atingido temporariamente."
-                  : isServiceUnavailable
-                    ? "Serviço de IA upstream sob alta demanda no momento."
-                    : "Não foi possível carregar a análise deste mês."}
-              </CardDescription>
+              <CardDescription>{classified.title}</CardDescription>
             </div>
           </div>
-          {onRetry && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRetry}
-              className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto sm:shrink-0"
-            >
-              <RefreshCw className="size-3.5" />
-              Tentar novamente
-            </Button>
-          )}
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row">
+            {classified.actionType === "open_key_modal" && onOpenAiKeyModal && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenAiKeyModal}
+                className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto"
+              >
+                <Key className="size-3.5" />
+                Atualizar Chave IA
+              </Button>
+            )}
+            {onRetry && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onRetry}
+                className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto"
+              >
+                <RefreshCw className="size-3.5" />
+                Tentar novamente
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent
           data-testid="ai-diagnosis-body"
           className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
         >
           <p className="text-xs break-words text-muted-foreground">
-            {error.message ||
-              "Tente atualizar o parecer ou aguarde alguns minutos."}
+            {classified.description}
           </p>
         </CardContent>
       </Card>
