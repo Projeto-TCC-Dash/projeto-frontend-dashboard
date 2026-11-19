@@ -62,7 +62,64 @@ describe("components/chat/quick-suggestion-chips", () => {
 
     expect(screen.getByText("Gastos em Alimentação")).toBeInTheDocument()
     expect(screen.getByText("Alocar Excedente")).toBeInTheDocument()
+    expect(screen.getByText("Deduções IRPF & MEI")).toBeInTheDocument()
     expect(screen.getByText("Gastos Atípicos")).toBeInTheDocument()
+  })
+
+  it("prioritizes budget alert and portfolio rebalancing chips when cached context requires attention", () => {
+    const queryClient = createTestQueryClient()
+    queryClient.setQueryData(["analysis", "2026-10"], {
+      cached: true,
+      month: "2026-10",
+      diagnosis: "Diagnóstico",
+      recommendations: [],
+      metrics: {
+        totalIncome: 8000,
+        totalExpenses: 5000,
+        netBalance: 3000,
+        savingsRate: 37.5,
+        topCategories: [],
+      },
+      generatedAt: "2026-10-19T00:00:00Z",
+      expiresAt: "2026-10-20T00:00:00Z",
+    } satisfies FinancialAnalysis)
+    queryClient.setQueryData(["budgets", "2026-10"], {
+      month: "2026-10",
+      totalLimitAmount: 6000,
+      totalSpentAmount: 5500,
+      totalRemainingAmount: 500,
+      globalPercentConsumed: 91.7,
+      globalStatus: "WARNING",
+      categories: [
+        {
+          category: "Lazer",
+          limitAmount: 500,
+          spentAmount: 600,
+          remainingAmount: -100,
+          percentConsumed: 120,
+          status: "EXCEEDED",
+        },
+      ],
+    })
+    queryClient.setQueryData(["investments", "portfolio"], {
+      totalInvested: 50000,
+      riskProfile: "CONSERVATIVE",
+      holdings: [],
+      allocationDiagnosis: {
+        adherentToRiskProfile: false,
+        recommendations: ["Exposição elevada em renda variável"],
+      },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <QuickSuggestionChips onSelect={vi.fn()} currentMonth="2026-10" />
+      </QueryClientProvider>
+    )
+
+    expect(screen.getByText("Orçamento: Lazer")).toBeInTheDocument()
+    expect(screen.getByText("Rebalancear Carteira")).toBeInTheDocument()
+    expect(screen.getByText("Deduções IRPF & MEI")).toBeInTheDocument()
   })
 
   it("deve disparar onSelect com o prompt correspondente ao clicar em um chip", () => {

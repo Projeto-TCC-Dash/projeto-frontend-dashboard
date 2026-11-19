@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   Wallet,
   Plus,
@@ -9,6 +10,7 @@ import {
   TrendingDown,
   Building2,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react"
 import {
   useAccounts,
@@ -16,6 +18,11 @@ import {
   useUpdateAccount,
   useDeleteAccount,
 } from "@/hooks/use-accounts"
+import {
+  useInvestmentPortfolio,
+  useUpsertInvestmentHolding,
+} from "@/hooks/use-investments"
+import { useTransactions } from "@/hooks/use-transactions"
 import { formatCurrencyBRL } from "@/lib/formatters"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -23,9 +30,17 @@ import { Badge } from "@/components/ui/badge"
 import { AccountSection } from "@/components/accounts/account-section"
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog"
 import { AccountDeleteDialog } from "@/components/accounts/account-delete-dialog"
+import { AccountAllocationBar } from "@/components/accounts/account-allocation-bar"
+import { InvestmentPortfolioCard } from "@/components/accounts/investment-portfolio-card"
+import { InvestmentTimeSeriesChart } from "@/components/charts/investment-time-series-chart"
+import {
+  buildAccountAllocationSegments,
+  buildPatrimonyTimeSeries,
+} from "@/lib/dashboard-charts"
 import { cn } from "@/lib/utils"
 import {
   ACCOUNT_TYPES,
+  APP_ROUTES,
   type Account,
   type CreateAccountDTO,
 } from "@/src/types/api"
@@ -35,6 +50,10 @@ export default function AccountsPage() {
   const { createAccount, isPending: isCreating } = useCreateAccount()
   const { updateAccount, isPending: isUpdating } = useUpdateAccount()
   const { deleteAccount, isPending: isDeleting } = useDeleteAccount()
+  const { portfolio, isLoading: isPortfolioLoading } = useInvestmentPortfolio()
+  const { upsertHolding, isPending: isUpsertingHolding } =
+    useUpsertInvestmentHolding()
+  const { transactions: allTransactions } = useTransactions({})
 
   const [selectedAccountForEdit, setSelectedAccountForEdit] =
     React.useState<Account | null>(null)
@@ -46,6 +65,16 @@ export default function AccountsPage() {
   )
 
   const isNetWorthNegative = netWorth < 0
+
+  const allocationSegments = React.useMemo(
+    () => buildAccountAllocationSegments(accounts),
+    [accounts]
+  )
+
+  const patrimonySeries = React.useMemo(
+    () => buildPatrimonyTimeSeries(allTransactions, accounts),
+    [allTransactions, accounts]
+  )
 
   // Limpa feedback após 4 segundos
   React.useEffect(() => {
@@ -138,13 +167,25 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        <Button
-          onClick={handleOpenCreate}
-          className="min-h-10 w-full shrink-0 gap-2 sm:min-h-9 sm:w-auto"
-        >
-          <Plus className="size-4" />
-          <span>Nova Conta</span>
-        </Button>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <Link
+            href={APP_ROUTES.INVESTMENTS}
+            data-testid="accounts-investments-shortcut"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground sm:min-h-9"
+          >
+            <TrendingUp className="size-4 text-primary" />
+            <span>Ver Carteira de Investimentos</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
+
+          <Button
+            onClick={handleOpenCreate}
+            className="min-h-10 w-full shrink-0 gap-2 sm:min-h-9 sm:w-auto"
+          >
+            <Plus className="size-4" />
+            <span>Nova Conta</span>
+          </Button>
+        </div>
       </div>
 
       {feedbackMessage && (
@@ -204,7 +245,39 @@ export default function AccountsPage() {
             )}
           </div>
         </div>
+
+        {/* Barra Proporcional de Alocação de Ativos */}
+        <AccountAllocationBar
+          segments={allocationSegments}
+          totalBalance={netWorth}
+        />
       </Card>
+
+      {/* Gráfico de Séries Temporais de Investimentos e Evolução Patrimonial */}
+      {accounts.length > 0 && (
+        <InvestmentTimeSeriesChart
+          title="Evolução Patrimonial"
+          subtitle="Histórico consolidado dos saldos de contas e ativos ao longo do tempo"
+          seriesType="area"
+          data={patrimonySeries}
+          height={260}
+        />
+      )}
+
+      {/* Carteira de Investimentos & Insights de Alocação */}
+      {accounts.length > 0 && (
+        <InvestmentPortfolioCard
+          portfolio={portfolio}
+          accounts={accounts}
+          isLoading={isPortfolioLoading}
+          onUpsertHolding={async (dto) => {
+            const res = await upsertHolding(dto)
+            setFeedbackMessage("Posição de investimento atualizada com sucesso!")
+            return res
+          }}
+          isSubmitting={isUpsertingHolding}
+        />
+      )}
 
       {/* Seções Temáticas Verticais */}
       {accounts.length === 0 ? (

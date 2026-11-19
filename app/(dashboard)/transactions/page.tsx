@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ReceiptText, AlertCircle, Sparkles } from "lucide-react"
+import { ReceiptText, AlertCircle } from "lucide-react"
 import { getCurrentYearMonth } from "@/lib/formatters"
 import {
   useTransactions,
@@ -10,6 +10,7 @@ import {
 import { useUploadTransactions } from "@/hooks/use-upload-transactions"
 import { useUpdateTransaction } from "@/hooks/use-update-transaction"
 import { useCategorizeTransactions } from "@/hooks/use-categorize-transactions"
+import { useAccounts } from "@/hooks/use-accounts"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { TransactionTable } from "@/components/transactions/transaction-table"
 import { TransactionDropzone } from "@/components/transactions/transaction-dropzone"
@@ -47,6 +48,7 @@ export default function TransactionsPage() {
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false)
 
   const { transactions, isLoading, error } = useTransactions(filters)
+  const { accounts } = useAccounts()
   const { upload, isUploading } = useUploadTransactions()
   const { updateTransaction, isUpdating } = useUpdateTransaction()
   const { categorize, isCategorizing, hasAiKey } = useCategorizeTransactions()
@@ -155,19 +157,16 @@ export default function TransactionsPage() {
       {/* Banner de Resumo Pós-Categorização por IA */}
       {categorizeSummary && (
         <div className="flex flex-col justify-between gap-3 rounded-xl border border-primary/30 bg-primary/10 p-4 text-sm text-foreground sm:flex-row sm:items-center">
-          <div className="flex min-w-0 items-start gap-3 sm:items-center">
-            <Sparkles className="mt-0.5 size-5 shrink-0 text-primary sm:mt-0" />
-            <div className="min-w-0">
-              <p className="font-semibold">
-                Categorização Inteligente Concluída!
-              </p>
-              <p className="mt-0.5 text-xs break-words text-muted-foreground">
-                {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
-                comerciais analisados e{" "}
-                <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
-                transações reclassificadas em toda a sua conta.
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="font-semibold">
+              Categorização Inteligente Concluída!
+            </p>
+            <p className="mt-0.5 text-xs break-words text-muted-foreground">
+              {categorizeSummary.uniqueMerchantsAnalyzed} estabelecimentos
+              comerciais analisados e{" "}
+              <strong>{categorizeSummary.transactionsUpdated}</strong>{" "}
+              transações reclassificadas em toda a sua conta.
+            </p>
           </div>
           <button
             type="button"
@@ -197,7 +196,7 @@ export default function TransactionsPage() {
 
       {/* Barra de Filtros Dinâmicos */}
       <TransactionFilters
-        month={filters.month}
+        month={filters.month ?? getCurrentYearMonth()}
         category={filters.category}
         source={filters.source}
         accountId={filters.accountId}
@@ -214,6 +213,7 @@ export default function TransactionsPage() {
       {/* Tabela de Transações */}
       <TransactionTable
         transactions={transactions}
+        accounts={accounts}
         isLoading={isLoading}
         onEdit={handleOpenEdit}
       />

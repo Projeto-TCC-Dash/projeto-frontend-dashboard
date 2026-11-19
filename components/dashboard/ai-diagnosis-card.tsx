@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  Sparkles,
   RefreshCw,
   Key,
   AlertTriangle,
@@ -114,10 +113,7 @@ export function AiDiagnosisCard({
           data-testid="ai-diagnosis-body"
           className={cn(matchedDesktopHeight && MATCHED_BODY_CLASSES)}
         >
-          <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-amber-300/60 bg-amber-50/50 p-5 text-sm text-muted-foreground sm:flex-row dark:border-amber-900/60 dark:bg-amber-950/20">
-            <div className="shrink-0 rounded-full bg-amber-500/10 p-2.5 text-amber-600 dark:text-amber-400">
-              <Sparkles className="size-5" />
-            </div>
+          <div className="rounded-xl border border-dashed border-amber-300/60 bg-amber-50/50 p-5 text-sm text-muted-foreground dark:border-amber-900/60 dark:bg-amber-950/20">
             <div className="space-y-1 text-center sm:text-left">
               <p className="font-medium text-foreground">
                 Sua chave de API do Google AI Studio é gratuita e pessoal.
@@ -258,8 +254,7 @@ export function AiDiagnosisCard({
             matchedDesktopHeight && MATCHED_HEADER_CLASSES
           )}
         >
-          <div className="flex min-w-0 items-center gap-2">
-            <Sparkles className="size-5 shrink-0 text-primary" />
+          <div className="min-w-0">
             <CardTitle>Diagnóstico Mensal com IA</CardTitle>
           </div>
           {onRefresh && (
@@ -267,9 +262,8 @@ export function AiDiagnosisCard({
               size="sm"
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="min-h-10 w-full gap-1.5 sm:min-h-8 sm:w-auto sm:shrink-0"
+              className="min-h-10 w-full sm:min-h-8 sm:w-auto sm:shrink-0"
             >
-              <Sparkles className="size-4" />
               Gerar Análise
             </Button>
           )}
@@ -313,12 +307,9 @@ export function AiDiagnosisCard({
       >
         <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center gap-2">
-              <Sparkles className="size-5 shrink-0 text-primary" />
-              <CardTitle className="text-base sm:text-lg">
-                Parecer do Consultor Financeiro
-              </CardTitle>
-            </div>
+            <CardTitle className="text-base sm:text-lg">
+              Parecer do Consultor Financeiro
+            </CardTitle>
             {analysis.cached ? (
               <Badge
                 variant="secondary"
@@ -329,8 +320,7 @@ export function AiDiagnosisCard({
                 Cache ativo 24h
               </Badge>
             ) : (
-              <Badge variant="success" className="gap-1 font-mono text-[11px]">
-                <Sparkles className="size-3" />
+              <Badge variant="success" className="font-mono text-[11px]">
                 Análise recém-gerada
               </Badge>
             )}

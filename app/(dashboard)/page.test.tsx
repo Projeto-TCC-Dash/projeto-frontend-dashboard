@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import * as React from "react"
 import DashboardPage from "./page"
@@ -32,6 +32,15 @@ const mockUserProfile: UserProfileResponse = {
   },
 }
 
+let mockAnalysisHookReturn = {
+  analysis: mockAnalysis as FinancialAnalysis | null,
+  metrics: mockAnalysis.metrics as FinancialAnalysis["metrics"] | null,
+  isLoading: false,
+  isRefreshing: false,
+  error: null as Error | null,
+  refreshAnalysis: vi.fn(),
+}
+
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
     user: { id: "user-1", email: "teste@exemplo.com", hasAiKey: true },
@@ -46,13 +55,53 @@ vi.mock("@/hooks/use-user-profile", () => ({
 }))
 
 vi.mock("@/hooks/use-financial-analysis", () => ({
-  useFinancialAnalysis: () => ({
-    analysis: mockAnalysis,
-    metrics: mockAnalysis.metrics,
+  useFinancialAnalysis: () => mockAnalysisHookReturn,
+}))
+
+vi.mock("@/hooks/use-budgets", () => ({
+  useBudget: () => ({
+    budget: {
+      month: "2026-10",
+      totalLimitAmount: 6500,
+      totalSpentAmount: 4200,
+      totalRemainingAmount: 2300,
+      globalPercentConsumed: 64.6,
+      globalStatus: "REGULAR",
+      categories: [
+        {
+          category: "Alimentação",
+          limitAmount: 2500,
+          spentAmount: 1850,
+          remainingAmount: 650,
+          percentConsumed: 74,
+          status: "WARNING",
+        },
+      ],
+    },
     isLoading: false,
-    isRefreshing: false,
-    error: null,
-    refreshAnalysis: vi.fn(),
+    isError: false,
+    refetch: vi.fn(),
+  }),
+  useUpsertBudget: () => ({
+    upsertBudget: vi.fn(),
+    isSaving: false,
+  }),
+}))
+
+vi.mock("@/hooks/use-multi-month-analysis", () => ({
+  useMultiMonthAnalysis: () => ({
+    analysis: {
+      rangeMonths: 6,
+      averageSavingsRate: 28.4,
+      averageMonthlyExpenses: 4250,
+      averageMonthlyIncome: 9500,
+      fixedCostTrend: {
+        status: "STABLE",
+        percentageChange: 1.5,
+      },
+      monthlyHistory: [],
+    },
+    isLoading: false,
   }),
 }))
 
@@ -90,6 +139,17 @@ vi.mock("next/navigation", () => ({
 }))
 
 describe("DashboardPage Integration", () => {
+  beforeEach(() => {
+    mockAnalysisHookReturn = {
+      analysis: mockAnalysis,
+      metrics: mockAnalysis.metrics,
+      isLoading: false,
+      isRefreshing: false,
+      error: null,
+      refreshAnalysis: vi.fn(),
+    }
+  })
+
   it("renders header, kpi cards with invoice settlements, donut chart and ai diagnosis card with calibrated guideline", () => {
     render(<DashboardPage />)
 
@@ -141,5 +201,45 @@ describe("DashboardPage Integration", () => {
     expect(screen.getByTestId("ai-diagnosis-body").className).toContain(
       "xl:overflow-y-auto"
     )
+
+    // Multi-month evolution chart slot
+    expect(
+      screen.getByTestId("multi-month-evolution-slot")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByTestId("multi-month-evolution-chart")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("Evolução Financeira Consolidada")
+    ).toBeInTheDocument()
+  })
+
+  it("renders KPIs, donut chart and cashflow immediately from transactions even while AI analysis is pending", () => {
+    mockAnalysisHookReturn = {
+      analysis: null,
+      metrics: null,
+      isLoading: true,
+      isRefreshing: false,
+      error: null,
+      refreshAnalysis: vi.fn(),
+    }
+
+    render(<DashboardPage />)
+
+    // KPIs should NOT be stuck in skeleton; should reflect mock transactions (10000 income, 2000 Alimentação)
+    expect(screen.queryByTestId("metric-cards-grid-loading")).toBeNull()
+    expect(screen.getByText("Receitas Totais")).toBeInTheDocument()
+    expect(screen.getByText("R$ 10.000,00")).toBeInTheDocument()
+    expect(screen.getAllByText("R$ 2.000,00").length).toBeGreaterThanOrEqual(1)
+
+    // Donut and cashflow should render immediately
+    expect(screen.getByTestId("category-donut-chart")).toBeInTheDocument()
+    expect(screen.getByTestId("period-cashflow-card")).toBeInTheDocument()
+    expect(screen.queryByTestId("cashflow-chart-loading")).toBeNull()
+
+    // Multi-month evolution should render immediately
+    expect(
+      screen.getByTestId("multi-month-evolution-chart")
+    ).toBeInTheDocument()
   })
 })

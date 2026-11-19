@@ -29,7 +29,6 @@ import {
   Check,
   Info,
   Loader2,
-  Sparkles,
   Target,
   Shield,
   Briefcase,
@@ -112,18 +111,15 @@ export function FinancialProfileForm({
   return (
     <form onSubmit={handleSubmit} className="min-w-0 space-y-6 sm:space-y-8">
       {/* Banner de Voluntariedade e LGPD */}
-      <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-        <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-        <div>
-          <p className="font-medium text-primary">
-            Preenchimento 100% Voluntário
-          </p>
-          <p className="mt-0.5 text-muted-foreground">
-            Estes dados são protegidos e servem exclusivamente para calibrar a
-            inteligência do Gemini, personalizando a meta de reserva de
-            emergência e conselhos para a sua realidade.
-          </p>
-        </div>
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
+        <p className="font-medium text-primary">
+          Preenchimento 100% Voluntário
+        </p>
+        <p className="mt-0.5 text-muted-foreground">
+          Estes dados são protegidos e servem exclusivamente para calibrar a
+          inteligência do Gemini, personalizando a meta de reserva de
+          emergência e conselhos para a sua realidade.
+        </p>
       </div>
 
       {successMessage && (

@@ -63,12 +63,12 @@ export function UserNav() {
           </div>
         )}
 
-        <div className="hidden max-w-[140px] flex-col text-left sm:flex sm:max-w-[180px]">
+        <div className="hidden max-w-[110px] flex-col text-left sm:flex xl:max-w-[160px]">
           <span className="truncate text-xs font-medium text-foreground">
             {displayName}
           </span>
           {userProfile?.name && (
-            <span className="hidden truncate text-[10px] text-muted-foreground sm:inline">
+            <span className="hidden truncate text-[10px] text-muted-foreground 2xl:inline">
               {user.email}
             </span>
           )}

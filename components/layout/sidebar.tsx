@@ -6,17 +6,20 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Wallet,
+  TrendingUp,
   ReceiptText,
+  Scale,
   Target,
   BotMessageSquare,
-  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export const SIDEBAR_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Contas e Cartões", icon: Wallet },
+  { href: "/investments", label: "Investimentos", icon: TrendingUp },
   { href: "/transactions", label: "Extratos & Transações", icon: ReceiptText },
+  { href: "/fiscal", label: "Planejamento Fiscal", icon: Scale },
   { href: "/settings/metas", label: "Perfil e Metas", icon: Target },
   { href: "/chat", label: "Consultor IA", icon: BotMessageSquare },
 ]
@@ -26,11 +29,8 @@ export function Sidebar() {
 
   return (
     <aside className="flex w-64 flex-col space-y-4 border-r border-border bg-card p-4">
-      <div className="flex items-center gap-2 px-2 py-3">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-          <Sparkles className="size-4" />
-        </div>
-        <span className="font-semibold tracking-tight text-foreground">
+      <div className="px-2 py-3">
+        <span className="text-base font-bold tracking-tight text-foreground">
           FinAI Dashboard
         </span>
       </div>
@@ -50,7 +50,7 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
               )}
             >
-              <Icon className="size-4" />
+              <Icon className="size-4 shrink-0" />
               <span>{item.label}</span>
             </Link>
           )

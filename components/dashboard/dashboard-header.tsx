@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, ArrowRight, AlertTriangle } from "lucide-react"
+import { ArrowRight, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { MonthSelector } from "./month-selector"
@@ -38,8 +38,7 @@ export function DashboardHeader({
               Painel Financeiro Inteligente
             </h1>
             {hasAiKey ? (
-              <Badge variant="success" className="gap-1 font-medium">
-                <Sparkles className="size-3" />
+              <Badge variant="success" className="font-medium">
                 IA Ativa
               </Badge>
             ) : (

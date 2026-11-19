@@ -12,20 +12,30 @@ import {
 import { FinancialMetrics } from "@/src/types/api"
 import { MetricCard } from "./metric-card"
 import { formatCurrencyBRL, calculateSavingsRate } from "@/lib/formatters"
+import { calculateMoMTrend } from "@/lib/dashboard-charts"
 import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion"
 
 export interface MetricCardsGridProps {
   metrics: FinancialMetrics | null
+  previousMetrics?: FinancialMetrics | null
+  historicalTrends?: {
+    incomeSeries?: number[]
+    expensesSeries?: number[]
+    invoiceSeries?: number[]
+    netBalanceSeries?: number[]
+  }
   isLoading?: boolean
 }
 
 export function MetricCardsGrid({
   metrics,
+  previousMetrics,
+  historicalTrends,
   isLoading = false,
 }: MetricCardsGridProps) {
   const prefersReducedMotion = usePrefersReducedMotion()
 
-  if (isLoading || !metrics) {
+  if (isLoading) {
     return (
       <div
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
@@ -40,15 +50,61 @@ export function MetricCardsGrid({
     )
   }
 
-  const invoiceSettlements = metrics.invoiceSettlements ?? 0
+  const safeMetrics: FinancialMetrics = metrics ?? {
+    totalIncome: 0,
+    totalExpenses: 0,
+    invoiceSettlements: 0,
+    netBalance: 0,
+    savingsRate: 0,
+    topCategories: [],
+  }
+
+  const invoiceSettlements = safeMetrics.invoiceSettlements ?? 0
   // Saldo Líquido atualizado descontando despesas primárias e liquidação de faturas (sem duplicidade contábil)
   const netBalance =
     Math.round(
-      (metrics.totalIncome - metrics.totalExpenses - invoiceSettlements) * 100
+      (safeMetrics.totalIncome -
+        safeMetrics.totalExpenses -
+        invoiceSettlements) *
+        100
     ) / 100
   const savings = calculateSavingsRate(
-    metrics.totalIncome,
-    metrics.totalExpenses
+    safeMetrics.totalIncome,
+    safeMetrics.totalExpenses
+  )
+
+  const prevInvoiceSettlements = previousMetrics?.invoiceSettlements ?? 0
+  const prevNetBalance = previousMetrics
+    ? Math.round(
+        (previousMetrics.totalIncome -
+          previousMetrics.totalExpenses -
+          prevInvoiceSettlements) *
+          100
+      ) / 100
+    : undefined
+
+  const incomeTrend = calculateMoMTrend(
+    safeMetrics.totalIncome,
+    previousMetrics?.totalIncome,
+    false
+  )
+
+  const expensesTrend = calculateMoMTrend(
+    safeMetrics.totalExpenses,
+    previousMetrics?.totalExpenses,
+    true
+  )
+
+  const invoiceTrend = calculateMoMTrend(
+    invoiceSettlements,
+    previousMetrics?.invoiceSettlements,
+    true
+  )
+
+  const netTrend = calculateMoMTrend(
+    netBalance,
+    prevNetBalance,
+    false
   )
 
   const cardMotion = (index: number) =>
@@ -70,12 +126,14 @@ export function MetricCardsGrid({
         <MetricCard
           className="h-full"
           title="Receitas Totais"
-          value={formatCurrencyBRL(metrics.totalIncome)}
-          numericValue={metrics.totalIncome}
+          value={formatCurrencyBRL(safeMetrics.totalIncome)}
+          numericValue={safeMetrics.totalIncome}
           numberFormat={{ style: "currency", currency: "BRL" }}
           variant="positive"
           icon={<ArrowUpRight className="size-4 text-emerald-500" />}
           description="Entradas consolidadas"
+          trend={incomeTrend}
+          sparklineData={historicalTrends?.incomeSeries}
         />
       </motion.div>
 
@@ -84,12 +142,14 @@ export function MetricCardsGrid({
         <MetricCard
           className="h-full"
           title="Despesas Primárias"
-          value={formatCurrencyBRL(metrics.totalExpenses)}
-          numericValue={metrics.totalExpenses}
+          value={formatCurrencyBRL(safeMetrics.totalExpenses)}
+          numericValue={safeMetrics.totalExpenses}
           numberFormat={{ style: "currency", currency: "BRL" }}
           variant="negative"
           icon={<ArrowDownRight className="size-4 text-rose-500" />}
           description="Consumo real do mês"
+          trend={expensesTrend}
+          sparklineData={historicalTrends?.expensesSeries}
         />
       </motion.div>
 
@@ -104,6 +164,8 @@ export function MetricCardsGrid({
           variant="default"
           icon={<CreditCard className="size-4 text-slate-500" />}
           description="Liquidação de cartão"
+          trend={invoiceTrend}
+          sparklineData={historicalTrends?.invoiceSeries}
         />
       </motion.div>
 
@@ -125,6 +187,8 @@ export function MetricCardsGrid({
           }
           icon={<Wallet className="size-4 text-primary" />}
           description={netBalance >= 0 ? "Superávit do mês" : "Déficit do mês"}
+          trend={netTrend}
+          sparklineData={historicalTrends?.netBalanceSeries}
         />
       </motion.div>
 

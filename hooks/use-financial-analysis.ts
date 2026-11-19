@@ -33,7 +33,9 @@ export function useFinancialAnalysis(
         : (failureCount, error) => {
             if (
               error instanceof ApiClientError &&
-              (error.status === 401 || error.status === 403)
+              (error.status === 400 ||
+                error.status === 401 ||
+                error.status === 403)
             ) {
               return false
             }
