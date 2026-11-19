@@ -54,12 +54,12 @@ describe("ProfileOnboardingBanner Component", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("deve navegar para /settings/profile ao clicar em Configurar Perfil", () => {
+  it("deve navegar para /settings/metas ao clicar em Configurar Perfil", () => {
     render(<ProfileOnboardingBanner hasProfile={false} />)
 
     const configBtn = screen.getByRole("button", { name: /Configurar Perfil/i })
     fireEvent.click(configBtn)
 
-    expect(mockPush).toHaveBeenCalledWith("/settings/profile")
+    expect(mockPush).toHaveBeenCalledWith("/settings/metas")
   })
 })

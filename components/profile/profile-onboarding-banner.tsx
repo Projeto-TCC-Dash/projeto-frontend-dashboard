@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { APP_ROUTES } from "@/src/types/api"
 import { ArrowRight } from "lucide-react"
 
 export interface ProfileOnboardingBannerProps {
@@ -38,7 +39,7 @@ export function ProfileOnboardingBanner({
   }
 
   const handleConfigure = () => {
-    router.push("/settings/profile")
+    router.push(APP_ROUTES.METAS)
   }
 
   return (
