@@ -21,20 +21,27 @@ export function UploadSummaryBanner({
           <CheckCircle2 className="size-5" />
         </div>
         <div className="min-w-0">
-          <h4 className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
+          <h2 className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
             Extrato importado com sucesso!
-          </h4>
+          </h2>
           <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300">
             <span>
-              <strong>{summary.totalExtracted}</strong> movimentações extraídas
+              <strong>{summary.totalExtracted}</strong>{" "}
+              {summary.totalExtracted === 1
+                ? "movimentação extraída"
+                : "movimentações extraídas"}
             </span>
             <span>•</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-              +{summary.imported} novas adicionadas
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+              +{summary.imported}{" "}
+              {summary.imported === 1 ? "nova adicionada" : "novas adicionadas"}
             </span>
             <span>•</span>
-            <span className="text-zinc-500 dark:text-zinc-400">
-              {summary.duplicatesIgnored} duplicadas ignoradas
+            <span className="text-zinc-600 dark:text-zinc-400">
+              {summary.duplicatesIgnored}{" "}
+              {summary.duplicatesIgnored === 1
+                ? "duplicada ignorada"
+                : "duplicadas ignoradas"}
             </span>
           </div>
         </div>
