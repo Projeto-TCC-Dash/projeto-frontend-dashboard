@@ -1,14 +1,18 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   Download,
   FileSpreadsheet,
   Loader2,
   Scale,
   AlertCircle,
+  ArrowRight,
+  Wallet,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { FiscalLegalNotice } from "@/components/fiscal/fiscal-legal-notice"
 import { FiscalSummaryCards } from "@/components/fiscal/fiscal-summary-cards"
 import { FiscalPjPanel } from "@/components/fiscal/fiscal-pj-panel"
@@ -24,13 +28,14 @@ import {
   useUpdateTransactionFiscal,
   useUploadFiscalOcr,
 } from "@/hooks/use-fiscal"
-import type {
-  FiscalOcrResponse,
-  FiscalOcrSuggestedMatch,
-  TaxCategory,
-  Transaction,
-  TransactionFiscalMetadata,
-  UpdateTransactionFiscalDTO,
+import {
+  APP_ROUTES,
+  type FiscalOcrResponse,
+  type FiscalOcrSuggestedMatch,
+  type TaxCategory,
+  type Transaction,
+  type TransactionFiscalMetadata,
+  type UpdateTransactionFiscalDTO,
 } from "@/src/types/api"
 
 export default function FiscalPage() {
@@ -72,6 +77,25 @@ export default function FiscalPage() {
       return { ...tx, fiscal: override }
     })
   }, [transactions, fiscalOverrides])
+
+  const isPjApplicable = Boolean(summary?.pjSummary?.applicable)
+  const hasPjRevenue = (summary?.pjSummary?.grossRevenueYearToDate ?? 0) > 0
+  const hasTransactionRevenue = React.useMemo(
+    () =>
+      mergedTransactions.some(
+        (tx) => tx.category === "Receita" && Math.abs(tx.amount) > 0
+      ),
+    [mergedTransactions]
+  )
+  const hasDeductibleExpenses = (summary?.totalDeductibleExpenses ?? 0) > 0
+  const isFiscalUnavailable =
+    !isSummaryLoading &&
+    !isTxLoading &&
+    !isSummaryError &&
+    !isPjApplicable &&
+    !hasPjRevenue &&
+    !hasTransactionRevenue &&
+    !hasDeductibleExpenses
 
   const handleSaveFiscal = async (
     transactionId: string,
@@ -119,54 +143,56 @@ export default function FiscalPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            aria-label="Selecionar ano fiscal"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            {yearOptions.map((y) => (
-              <option key={y} value={y}>
-                Exercício {y}
-              </option>
-            ))}
-          </select>
+        {!isFiscalUnavailable && (
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              aria-label="Selecionar ano fiscal"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  Exercício {y}
+                </option>
+              ))}
+            </select>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isExporting}
-            onClick={() => exportDossier({ year: selectedYear, format: "pdf" })}
-            data-testid="export-dossier-pdf"
-          >
-            {isExporting && exportFormat === "pdf" ? (
-              <Loader2 className="mr-1.5 size-4 animate-spin" />
-            ) : (
-              <Download className="mr-1.5 size-4" />
-            )}
-            Dossiê PDF
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isExporting}
+              onClick={() => exportDossier({ year: selectedYear, format: "pdf" })}
+              data-testid="export-dossier-pdf"
+            >
+              {isExporting && exportFormat === "pdf" ? (
+                <Loader2 className="mr-1.5 size-4 animate-spin" />
+              ) : (
+                <Download className="mr-1.5 size-4" />
+              )}
+              Dossiê PDF
+            </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={isExporting}
-            onClick={() =>
-              exportDossier({ year: selectedYear, format: "xlsx" })
-            }
-            data-testid="export-dossier-xlsx"
-          >
-            {isExporting && exportFormat === "xlsx" ? (
-              <Loader2 className="mr-1.5 size-4 animate-spin" />
-            ) : (
-              <FileSpreadsheet className="mr-1.5 size-4" />
-            )}
-            Planilha Excel
-          </Button>
-        </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isExporting}
+              onClick={() =>
+                exportDossier({ year: selectedYear, format: "xlsx" })
+              }
+              data-testid="export-dossier-xlsx"
+            >
+              {isExporting && exportFormat === "xlsx" ? (
+                <Loader2 className="mr-1.5 size-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="mr-1.5 size-4" />
+              )}
+              Planilha Excel
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Aviso Legal Obrigatório (FR-014) */}
@@ -202,43 +228,81 @@ export default function FiscalPage() {
         </div>
       )}
 
-      {/* Consolidado IRPF Anual */}
-      <FiscalSummaryCards summary={summary} isLoading={isSummaryLoading} />
+      {isFiscalUnavailable ? (
+        <Card
+          data-testid="fiscal-unavailable-card"
+          className="border-dashed p-6 text-center sm:p-10"
+        >
+          <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-muted/60 text-muted-foreground">
+            <Scale className="size-6" />
+          </div>
+          <h2 className="text-base font-semibold text-foreground">
+            Planejamento fiscal não aplicável no momento
+          </h2>
+          <p className="mx-auto mt-1.5 max-w-lg text-sm text-muted-foreground">
+            Você ainda não possui faturamento registrado e o enquadramento fiscal
+            não se aplica ao seu perfil atual. Quando houver receitas
+            cadastradas ou atuação como PJ/Autônomo no perfil financeiro, os
+            painéis e exportações fiscais serão exibidos aqui.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={APP_ROUTES.METAS}
+              className={buttonVariants({ variant: "default", size: "lg" })}
+            >
+              Atualizar Perfil Financeiro
+              <ArrowRight className="size-4" />
+            </Link>
+            <Link
+              href={APP_ROUTES.TRANSACTIONS}
+              className={buttonVariants({ variant: "outline", size: "lg" })}
+            >
+              <Wallet className="size-4" />
+              Registrar Receitas
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <>
+          {/* Consolidado IRPF Anual */}
+          <FiscalSummaryCards summary={summary} isLoading={isSummaryLoading} />
 
-      {/* Painel Condicional PJ / MEI */}
-      <FiscalPjPanel pjSummary={summary?.pjSummary} />
+          {/* Painel Condicional PJ / MEI */}
+          <FiscalPjPanel pjSummary={summary?.pjSummary} />
 
-      {/* OCR Inteligente de Comprovantes */}
-      <FiscalOcrDropzone
-        hasAiKey={Boolean(user?.hasAiKey)}
-        onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
-        onUploadReceipt={uploadOcr}
-        onLinkMatch={handleLinkOcrMatch}
-        isUploading={isUploading}
-        isLinking={isUpdating}
-      />
+          {/* OCR Inteligente de Comprovantes */}
+          <FiscalOcrDropzone
+            hasAiKey={Boolean(user?.hasAiKey)}
+            onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
+            onUploadReceipt={uploadOcr}
+            onLinkMatch={handleLinkOcrMatch}
+            isUploading={isUploading}
+            isLinking={isUpdating}
+          />
 
-      {/* Lista de Despesas Elegíveis do Exercício */}
-      <FiscalExpensesList
-        transactions={mergedTransactions}
-        year={selectedYear}
-        isLoading={isTxLoading}
-        onEditTransaction={setEditingTx}
-      />
+          {/* Lista de Despesas Elegíveis do Exercício */}
+          <FiscalExpensesList
+            transactions={mergedTransactions}
+            year={selectedYear}
+            isLoading={isTxLoading}
+            onEditTransaction={setEditingTx}
+          />
 
-      {/* Modal de Classificação Manual */}
-      <FiscalEditDialog
-        open={Boolean(editingTx)}
-        onOpenChange={(open) => {
-          if (!open) setEditingTx(null)
-        }}
-        transaction={editingTx}
-        onSubmit={handleSaveFiscal}
-        isSubmitting={isUpdating}
-      />
+          {/* Modal de Classificação Manual */}
+          <FiscalEditDialog
+            open={Boolean(editingTx)}
+            onOpenChange={(open) => {
+              if (!open) setEditingTx(null)
+            }}
+            transaction={editingTx}
+            onSubmit={handleSaveFiscal}
+            isSubmitting={isUpdating}
+          />
 
-      {/* Modal BYOK Gemini */}
-      <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />
+          {/* Modal BYOK Gemini */}
+          <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />
+        </>
+      )}
     </div>
   )
 }
