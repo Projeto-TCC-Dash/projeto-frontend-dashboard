@@ -27,6 +27,7 @@ export interface TransactionEditDialogProps {
   onClose: () => void
   onSave: (data: UpdateTransactionDTO) => void
   isSaving?: boolean
+  error?: string | null
 }
 
 interface TransactionEditFormProps {
@@ -34,6 +35,7 @@ interface TransactionEditFormProps {
   onClose: () => void
   onSave: (data: UpdateTransactionDTO) => void
   isSaving: boolean
+  error?: string | null
 }
 
 function TransactionEditForm({
@@ -41,6 +43,7 @@ function TransactionEditForm({
   onClose,
   onSave,
   isSaving,
+  error,
 }: TransactionEditFormProps) {
   const [cleanDescription, setCleanDescription] = React.useState(
     transaction.cleanDescription || transaction.rawDescription
@@ -175,9 +178,12 @@ function TransactionEditForm({
           </select>
         </div>
 
-        {validationError && (
-          <p className="text-xs text-rose-600 dark:text-rose-400">
-            {validationError}
+        {(validationError || error) && (
+          <p
+            role="alert"
+            className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400"
+          >
+            {validationError ?? error}
           </p>
         )}
 
@@ -217,6 +223,7 @@ export function TransactionEditDialog({
   onClose,
   onSave,
   isSaving = false,
+  error = null,
 }: TransactionEditDialogProps) {
   if (!transaction) return null
 
@@ -236,6 +243,7 @@ export function TransactionEditDialog({
           onClose={onClose}
           onSave={onSave}
           isSaving={isSaving}
+          error={error}
         />
       </DialogContent>
     </Dialog>

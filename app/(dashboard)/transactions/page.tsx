@@ -45,6 +45,7 @@ export default function TransactionsPage() {
   )
   const [editingTransaction, setEditingTransaction] =
     React.useState<Transaction | null>(null)
+  const [editError, setEditError] = React.useState<string | null>(null)
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false)
 
   const { transactions, isLoading, error } = useTransactions(filters)
@@ -89,15 +90,18 @@ export default function TransactionsPage() {
   }
 
   const handleOpenEdit = (tx: Transaction) => {
+    setEditError(null)
     setEditingTransaction(tx)
   }
 
   const handleCloseEdit = () => {
+    setEditError(null)
     setEditingTransaction(null)
   }
 
   const handleSaveEdit = async (data: UpdateTransactionDTO) => {
     if (!editingTransaction) return
+    setEditError(null)
 
     try {
       await updateTransaction({
@@ -106,7 +110,11 @@ export default function TransactionsPage() {
       })
       setEditingTransaction(null)
     } catch (err) {
-      console.error("Falha ao salvar edição:", err)
+      setEditError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível salvar as alterações. Tente novamente."
+      )
     }
   }
 
@@ -225,6 +233,7 @@ export default function TransactionsPage() {
         onClose={handleCloseEdit}
         onSave={handleSaveEdit}
         isSaving={isUpdating}
+        error={editError}
       />
 
       {/* Modal de Configuração de Chave de IA (BYOK) */}

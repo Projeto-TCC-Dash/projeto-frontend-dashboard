@@ -191,7 +191,7 @@ export function TransactionTable({
                   {tx.rawDescription &&
                     tx.rawDescription !== tx.cleanDescription && (
                       <span
-                        className="text-[11px] [overflow-wrap:anywhere] break-words text-zinc-400 dark:text-zinc-500"
+                        className="text-[11px] [overflow-wrap:anywhere] break-words text-zinc-600 dark:text-zinc-400"
                         title={tx.rawDescription}
                       >
                         {tx.rawDescription}
@@ -301,7 +301,7 @@ export function TransactionTable({
                         {tx.rawDescription &&
                           tx.rawDescription !== tx.cleanDescription && (
                             <span
-                              className="max-w-xs truncate text-[11px] text-zinc-400 dark:text-zinc-500"
+                              className="max-w-xs truncate text-[11px] text-zinc-600 dark:text-zinc-400"
                               title={tx.rawDescription}
                             >
                               {tx.rawDescription}

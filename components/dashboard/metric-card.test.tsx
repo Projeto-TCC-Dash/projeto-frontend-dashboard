@@ -116,7 +116,7 @@ describe("MetricCard Component", () => {
     const trendBadge = screen.getByTestId("metric-trend-badge")
     expect(trendBadge).toBeInTheDocument()
     expect(trendBadge.textContent).toContain("+15,5% vs mês ant.")
-    expect(trendBadge.className).toContain("text-emerald-600")
+    expect(trendBadge.className).toContain("text-emerald-700")
 
     expect(screen.getByTestId("metric-sparkline")).toBeInTheDocument()
   })

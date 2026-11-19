@@ -75,7 +75,7 @@ export function Navbar() {
       return
     }
 
-    const mediaQuery = window.matchMedia("(min-width: 1024px)")
+    const mediaQuery = window.matchMedia("(min-width: 1280px)")
     const handleViewportChange = () => {
       if (mediaQuery.matches) {
         setOpenPathname(null)
@@ -105,7 +105,7 @@ export function Navbar() {
         </Link>
 
         {/* Links de navegação alinhados à borda de max-w-7xl do corpo em telas amplas (2xl+) */}
-        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto text-sm font-medium lg:flex xl:gap-1 2xl:pointer-events-none 2xl:absolute 2xl:inset-y-0 2xl:inset-x-0 2xl:mx-auto 2xl:max-w-7xl 2xl:flex-none 2xl:overflow-visible 2xl:px-8">
+        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 text-sm font-medium xl:flex xl:gap-1 2xl:pointer-events-none 2xl:absolute 2xl:inset-y-0 2xl:inset-x-0 2xl:mx-auto 2xl:max-w-7xl 2xl:flex-none 2xl:overflow-visible 2xl:px-8">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -151,7 +151,7 @@ export function Navbar() {
             onClick={() =>
               setOpenPathname((prev) => (prev === pathname ? null : pathname))
             }
-            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground lg:hidden"
+            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground xl:hidden"
             aria-label={
               mobileMenuOpen ? "Fechar menu móvel" : "Abrir menu móvel"
             }

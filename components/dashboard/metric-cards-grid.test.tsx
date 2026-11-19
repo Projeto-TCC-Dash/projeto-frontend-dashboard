@@ -92,7 +92,7 @@ describe("MetricCardsGrid Component", () => {
     expect(grid.className).toContain("grid-cols-1")
     expect(grid.className).toContain("sm:grid-cols-2")
     expect(grid.className).toContain("lg:grid-cols-3")
-    expect(grid.className).toContain("2xl:grid-cols-5")
+    expect(grid.className).toContain("xl:grid-cols-5")
 
     const values = screen.getAllByTestId("metric-value")
     expect(values).toHaveLength(5)

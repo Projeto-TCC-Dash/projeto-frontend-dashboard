@@ -171,7 +171,7 @@ export function TransactionDropzone({
 
             <h4 className="mt-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               Arraste seu extrato bancário ou{" "}
-              <span className="text-emerald-600 underline underline-offset-2 dark:text-emerald-400">
+              <span className="text-emerald-700 underline underline-offset-2 dark:text-emerald-400">
                 clique para selecionar
               </span>
             </h4>
