@@ -1,9 +1,14 @@
 import * as React from "react"
+import type { Metadata } from "next"
 import { AuthGuard } from "@/components/auth/auth-guard"
 import { Navbar } from "@/components/layout/navbar"
 import { ChatDrawerProvider } from "@/components/chat/chat-drawer-context"
 import { ChatDrawer } from "@/components/chat/chat-drawer"
 import { ChatFloatingButton } from "@/components/chat/chat-floating-button"
+
+export const metadata: Metadata = {
+  title: "Painel",
+}
 
 export default function DashboardLayout({
   children,
@@ -15,7 +20,7 @@ export default function DashboardLayout({
       <ChatDrawerProvider>
         <div className="flex min-h-screen flex-col bg-background text-foreground">
           <Navbar />
-          <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pb-8 lg:px-8">
+          <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pb-20 lg:px-8">
             {children}
           </main>
           <ChatDrawer />

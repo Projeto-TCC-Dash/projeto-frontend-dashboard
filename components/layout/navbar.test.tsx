@@ -63,17 +63,17 @@ describe("Navbar Component", () => {
     })
   })
 
-  it("uses lg breakpoint for full horizontal navigation and touch-sized hamburger button", () => {
+  it("uses xl breakpoint for full horizontal navigation and touch-sized hamburger button", () => {
     const { container } = render(<Navbar />)
 
     const desktopNav = container.querySelector("header nav")
     expect(desktopNav).not.toBeNull()
     expect(desktopNav?.className).toContain("hidden")
-    expect(desktopNav?.className).toContain("lg:flex")
+    expect(desktopNav?.className).toContain("xl:flex")
     expect(desktopNav?.className).not.toContain("md:flex")
 
     const toggleBtn = screen.getByRole("button", { name: /Abrir menu móvel/i })
-    expect(toggleBtn.className).toContain("lg:hidden")
+    expect(toggleBtn.className).toContain("xl:hidden")
     expect(toggleBtn.className).toContain("size-10")
     expect(toggleBtn).toHaveAttribute("aria-expanded", "false")
     expect(toggleBtn).toHaveAttribute("aria-controls", "mobile-navigation-menu")

@@ -58,7 +58,7 @@ export function GoogleLoginButton({
             shape="rectangular"
             text="signin_with"
             size="large"
-            width="100%"
+            width="320"
           />
         </div>
       )}

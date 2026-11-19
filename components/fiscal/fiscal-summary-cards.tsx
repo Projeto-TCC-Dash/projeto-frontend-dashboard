@@ -142,7 +142,7 @@ export function FiscalSummaryCards({
                     </span>
                     <div className="flex items-center gap-3 tabular-nums">
                       {item.pendingAmount > 0 ? (
-                        <span className="text-amber-600 dark:text-amber-400">
+                        <span className="text-amber-700 dark:text-amber-400">
                           Pendente: {formatCurrencyBRL(item.pendingAmount)}
                         </span>
                       ) : null}

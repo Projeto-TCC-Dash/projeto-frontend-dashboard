@@ -83,7 +83,7 @@ export function BarList({
                 {valueFormatter(item.value)}
               </span>
               {typeof item.percentage === "number" ? (
-                <span className="min-w-[3.25rem] text-right text-xs text-muted-foreground">
+                <span className="min-w-[3.25rem] text-right text-xs font-medium text-foreground/80">
                   {formatPercentage(item.percentage)}
                 </span>
               ) : null}
