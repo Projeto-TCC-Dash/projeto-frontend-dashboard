@@ -21,7 +21,7 @@ import {
   useUpsertInvestmentHolding,
 } from "@/hooks/use-investments"
 import { useTransactions } from "@/hooks/use-transactions"
-import { buildPatrimonyTimeSeries } from "@/lib/dashboard-charts"
+import { buildInvestmentPatrimonyTimeSeries } from "@/lib/dashboard-charts"
 import { formatCurrencyBRL } from "@/lib/formatters"
 import { APP_ROUTES } from "@/src/types/api"
 
@@ -48,7 +48,7 @@ export default function InvestmentsPage() {
   }, [feedbackMessage])
 
   const patrimonySeries = React.useMemo(
-    () => buildPatrimonyTimeSeries(allTransactions, accounts),
+    () => buildInvestmentPatrimonyTimeSeries(allTransactions, accounts),
     [allTransactions, accounts]
   )
 
@@ -197,13 +197,15 @@ export default function InvestmentsPage() {
         </div>
       )}
 
-      {/* Gráfico de Evolução Patrimonial */}
+      {/* Gráfico de Evolução das Contas de Investimento */}
       <InvestmentTimeSeriesChart
-        title="Evolução Patrimonial"
-        subtitle="Histórico consolidado dos saldos e patrimônio ao longo do tempo"
+        title="Evolução das Contas de Investimento"
+        subtitle="Histórico consolidado apenas das contas do tipo investimento ao longo do tempo"
         seriesType="area"
         data={patrimonySeries}
         height={260}
+        emptyTitle="Sem movimentações em contas de investimento"
+        emptyDescription="Cadastre uma conta de investimentos e vincule aportes ou movimentações para acompanhar a evolução ao longo do tempo."
       />
     </div>
   )

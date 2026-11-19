@@ -5,6 +5,7 @@ import {
   buildCategoryChartData,
   buildCategoryDrillDownHref,
   buildCumulativeDailyCashflowSeries,
+  buildInvestmentPatrimonyTimeSeries,
   buildMultiMonthEvolutionSeries,
   buildPatrimonyTimeSeries,
   buildPeriodCashflowSeries,
@@ -548,6 +549,134 @@ describe("lib/dashboard-charts", () => {
 
     it("returns empty array when transactions are empty", () => {
       expect(buildPatrimonyTimeSeries([], [])).toEqual([])
+    })
+
+    it("preserves positive amounts for non-Receita categories instead of inverting inflows to negative", () => {
+      const transactions: Transaction[] = [
+        {
+          id: "t1",
+          externalId: "e1",
+          rawDescription: "PIX RECEBIDO",
+          cleanDescription: "Pix Recebido",
+          amount: 1500,
+          date: "2026-11-01T10:00:00Z",
+          category: "Não Categorizado",
+          source: "OFX",
+        },
+        {
+          id: "t2",
+          externalId: "e2",
+          rawDescription: "COMPRA",
+          cleanDescription: "Compra",
+          amount: -465.1,
+          date: "2026-11-02T10:00:00Z",
+          category: "Outros",
+          source: "OFX",
+        },
+      ]
+
+      expect(buildPatrimonyTimeSeries(transactions, [])).toEqual([
+        { time: "2026-11-01", value: 1500 },
+        { time: "2026-11-02", value: 1034.9 },
+      ])
+    })
+  })
+
+  describe("buildInvestmentPatrimonyTimeSeries", () => {
+    it("filters to INVESTMENT accounts and their linked transactions only", () => {
+      const accounts = [
+        {
+          id: "acc-chk",
+          name: "Conta Corrente",
+          type: "CHECKING" as const,
+          balance: 34.9,
+          initialBalance: 1000,
+          color: "#3b82f6",
+          createdAt: "",
+          updatedAt: "",
+        },
+        {
+          id: "acc-inv",
+          name: "Corretora XP",
+          type: "INVESTMENT" as const,
+          balance: 15000,
+          initialBalance: 10000,
+          color: "#10b981",
+          createdAt: "",
+          updatedAt: "",
+        },
+      ]
+
+      const transactions: Transaction[] = [
+        {
+          id: "t-chk",
+          externalId: "e-chk",
+          rawDescription: "MERCADO",
+          cleanDescription: "Mercado",
+          amount: -965.1,
+          date: "2026-11-02T10:00:00Z",
+          category: "Alimentação",
+          source: "OFX",
+          accountId: "acc-chk",
+        },
+        {
+          id: "t-inv-1",
+          externalId: "e-inv-1",
+          rawDescription: "APORTE CDB",
+          cleanDescription: "Aporte CDB",
+          amount: 5000,
+          date: "2026-11-05T10:00:00Z",
+          category: "Investimentos",
+          source: "OFX",
+          accountId: "acc-inv",
+        },
+        {
+          id: "t-unlinked",
+          externalId: "e-unlinked",
+          rawDescription: "SEM CONTA",
+          cleanDescription: "Sem Conta",
+          amount: -200,
+          date: "2026-11-06T10:00:00Z",
+          category: "Outros",
+          source: "CSV",
+        },
+      ]
+
+      expect(buildInvestmentPatrimonyTimeSeries(transactions, accounts)).toEqual(
+        [{ time: "2026-11-05", value: 15000 }]
+      )
+    })
+
+    it("returns empty array when user has no INVESTMENT accounts", () => {
+      const accounts = [
+        {
+          id: "acc-chk",
+          name: "Conta Corrente",
+          type: "CHECKING" as const,
+          balance: 1000,
+          initialBalance: 500,
+          color: "#3b82f6",
+          createdAt: "",
+          updatedAt: "",
+        },
+      ]
+      const transactions: Transaction[] = [
+        {
+          id: "t1",
+          externalId: "e1",
+          rawDescription: "SALARIO",
+          cleanDescription: "Salário",
+          amount: 500,
+          date: "2026-11-01T10:00:00Z",
+          category: "Receita",
+          source: "SEED",
+          accountId: "acc-chk",
+        },
+      ]
+
+      expect(buildInvestmentPatrimonyTimeSeries(transactions, accounts)).toEqual(
+        []
+      )
     })
   })
 })

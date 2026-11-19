@@ -502,16 +502,12 @@ export function buildPatrimonyTimeSeries(
   const dailyDelta = new Map<string, number>()
 
   for (const tx of transactions) {
-    if (!tx.date) continue
+    if (!tx.date || !Number.isFinite(tx.amount)) continue
     const isoDate = tx.date.slice(0, 10)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) continue
 
     const signedAmount =
-      tx.category === "Receita"
-        ? Math.abs(tx.amount)
-        : tx.amount < 0
-          ? tx.amount
-          : -Math.abs(tx.amount)
+      tx.category === "Receita" ? Math.abs(tx.amount) : tx.amount
 
     dailyDelta.set(isoDate, roundCents((dailyDelta.get(isoDate) ?? 0) + signedAmount))
   }
@@ -529,6 +525,24 @@ export function buildPatrimonyTimeSeries(
       value: runningBalance,
     }
   })
+}
+
+export function buildInvestmentPatrimonyTimeSeries(
+  transactions: readonly Transaction[],
+  accounts: readonly Account[] = []
+): InvestmentSingleValuePoint[] {
+  const investmentAccounts = accounts.filter(
+    (acc) => acc.type === "INVESTMENT"
+  )
+  if (investmentAccounts.length === 0) return []
+
+  const investmentAccountIds = new Set(investmentAccounts.map((acc) => acc.id))
+  const investmentTransactions = transactions.filter((tx) => {
+    const accountId = tx.accountId ?? tx.account?.id
+    return Boolean(accountId && investmentAccountIds.has(accountId))
+  })
+
+  return buildPatrimonyTimeSeries(investmentTransactions, investmentAccounts)
 }
 
 

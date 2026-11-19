@@ -253,11 +253,11 @@ export default function AccountsPage() {
         />
       </Card>
 
-      {/* Gráfico de Séries Temporais de Investimentos e Evolução Patrimonial */}
+      {/* Gráfico de Séries Temporais de Evolução do Saldo */}
       {accounts.length > 0 && (
         <InvestmentTimeSeriesChart
-          title="Evolução Patrimonial"
-          subtitle="Histórico consolidado dos saldos de contas e ativos ao longo do tempo"
+          title="Evolução de Saldo"
+          subtitle="Histórico consolidado do saldo de todas as suas contas ao longo do tempo"
           seriesType="area"
           data={patrimonySeries}
           height={260}
