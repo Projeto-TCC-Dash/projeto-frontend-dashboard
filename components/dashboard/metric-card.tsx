@@ -203,8 +203,8 @@ export function MetricCard({
               className={cn(
                 "gap-0.5 border-0 px-2 py-0.5 text-[11px] font-semibold",
                 trend.isPositive
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                  : "bg-rose-500/10 text-rose-700 dark:text-rose-400"
               )}
             >
               {trend.direction === "up" ? (

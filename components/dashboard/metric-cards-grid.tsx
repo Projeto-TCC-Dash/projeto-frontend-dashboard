@@ -38,7 +38,7 @@ export function MetricCardsGrid({
   if (isLoading) {
     return (
       <div
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
         data-testid="metric-cards-grid-loading"
       >
         <MetricCard title="Receitas Totais" value="" isLoading={true} />
@@ -118,7 +118,7 @@ export function MetricCardsGrid({
 
   return (
     <div
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
       data-testid="metric-cards-grid"
     >
       {/* 1. Receitas Totais */}

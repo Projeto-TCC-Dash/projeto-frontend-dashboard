@@ -183,6 +183,7 @@ export function TransactionExportCard({
                 <div className="pt-1">
                   <Input
                     type="month"
+                    aria-label="Mês de referência"
                     data-testid="month-input"
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
@@ -198,6 +199,7 @@ export function TransactionExportCard({
                 >
                   <Input
                     type="date"
+                    aria-label="Data inicial"
                     data-testid="start-date-input"
                     placeholder="Início"
                     value={startDate}
@@ -206,6 +208,7 @@ export function TransactionExportCard({
                   />
                   <Input
                     type="date"
+                    aria-label="Data final"
                     data-testid="end-date-input"
                     placeholder="Fim"
                     value={endDate}
@@ -284,7 +287,7 @@ export function TransactionExportCard({
             <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-xs transition-colors hover:border-primary/50">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                     CSV
                   </div>
                   <div>
@@ -368,7 +371,7 @@ export function TransactionExportCard({
             <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-xs transition-colors hover:border-primary/50">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-8 items-center justify-center rounded-lg bg-rose-500/10 text-xs font-bold text-rose-600 dark:text-rose-400">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-rose-500/10 text-xs font-bold text-rose-700 dark:text-rose-400">
                     PDF
                   </div>
                   <div>
