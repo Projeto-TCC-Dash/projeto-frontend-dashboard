@@ -58,6 +58,22 @@ export default function InvestmentsPage() {
     : "Não definido"
   const isAdherent = portfolio?.allocationDiagnosis?.adherentToRiskProfile ?? true
   const classesCount = portfolio?.holdings.filter((h) => h.amount > 0).length ?? 0
+  const hasInvestments =
+    totalInvested > 0 || classesCount > 0 || patrimonySeries.length > 0
+  const showInvestmentChartAbove =
+    !isAccountsLoading && !isPortfolioLoading && !hasInvestments
+
+  const investmentChart = (
+    <InvestmentTimeSeriesChart
+      title="Evolução das Contas de Investimento"
+      subtitle="Histórico consolidado apenas das contas do tipo investimento ao longo do tempo"
+      seriesType="area"
+      data={patrimonySeries}
+      height={260}
+      emptyTitle="Sem movimentações em contas de investimento"
+      emptyDescription="Cadastre uma conta de investimentos e vincule aportes ou movimentações para acompanhar a evolução ao longo do tempo."
+    />
+  )
 
   return (
     <div data-testid="investments-page" className="space-y-6">
@@ -89,6 +105,8 @@ export default function InvestmentsPage() {
           <span>{feedbackMessage}</span>
         </div>
       )}
+
+      {showInvestmentChartAbove && investmentChart}
 
       {/* KPIs Consolidados da Carteira */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -198,15 +216,7 @@ export default function InvestmentsPage() {
       )}
 
       {/* Gráfico de Evolução das Contas de Investimento */}
-      <InvestmentTimeSeriesChart
-        title="Evolução das Contas de Investimento"
-        subtitle="Histórico consolidado apenas das contas do tipo investimento ao longo do tempo"
-        seriesType="area"
-        data={patrimonySeries}
-        height={260}
-        emptyTitle="Sem movimentações em contas de investimento"
-        emptyDescription="Cadastre uma conta de investimentos e vincule aportes ou movimentações para acompanhar a evolução ao longo do tempo."
-      />
+      {!showInvestmentChartAbove && investmentChart}
     </div>
   )
 }
