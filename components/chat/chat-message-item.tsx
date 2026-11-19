@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { User, AlertCircle, RefreshCw, Square } from "lucide-react"
+import Link from "next/link"
+import { User, AlertCircle, RefreshCw, Square, Key } from "lucide-react"
+import { classifyAiError } from "@/lib/ai-error-helper"
 import { ChatMessage } from "@/src/types/api"
 import { MarkdownRenderer } from "@/lib/markdown-renderer"
 import { cn } from "@/lib/utils"
@@ -105,31 +107,49 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
           </div>
         )}
 
-        {/* Alerta Inline de Erro com Botão "Tentar novamente" */}
-        {isError && (
-          <div
-            className="mt-3 flex flex-col gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive"
-            data-testid="message-error-box"
-          >
-            <div className="flex min-w-0 items-start gap-1.5">
-              <AlertCircle className="mt-0.5 size-4 shrink-0" />
-              <span className="min-w-0 flex-1 [overflow-wrap:anywhere] break-words">
-                {message.error || "Ocorreu uma falha na geração da resposta."}
-              </span>
-            </div>
-            {onRetry && (
-              <button
-                type="button"
-                onClick={onRetry}
-                className="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-md bg-destructive px-2.5 py-1 font-medium text-white shadow-xs transition-colors hover:bg-destructive/90"
-                data-testid="message-retry-button"
+        {/* Alerta Inline de Erro com Ação Específica */}
+        {isError &&
+          (() => {
+            const classified = classifyAiError(message.error)
+            return (
+              <div
+                className="mt-3 flex flex-col gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive"
+                data-testid="message-error-box"
               >
-                <RefreshCw className="size-3" />
-                <span>Tentar novamente</span>
-              </button>
-            )}
-          </div>
-        )}
+                <div className="flex min-w-0 items-start gap-1.5">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <p className="font-semibold">{classified.title}</p>
+                    <p className="[overflow-wrap:anywhere] break-words">
+                      {classified.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {classified.actionType === "open_key_modal" && (
+                    <Link
+                      href="/settings/security"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-background px-2.5 py-1 font-medium text-destructive shadow-xs transition-colors hover:bg-destructive/10"
+                    >
+                      <Key className="size-3" />
+                      <span>Configurar Chave</span>
+                    </Link>
+                  )}
+                  {onRetry && (
+                    <button
+                      type="button"
+                      onClick={onRetry}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-destructive px-2.5 py-1 font-medium text-white shadow-xs transition-colors hover:bg-destructive/90"
+                      data-testid="message-retry-button"
+                    >
+                      <RefreshCw className="size-3" />
+                      <span>Tentar novamente</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
       </div>
 
       {/* Ícone do Usuário */}
