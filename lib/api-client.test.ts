@@ -7,6 +7,7 @@ import {
   clearStoredAuth,
   apiClient,
   ApiClientError,
+  AUTH_EXPIRED_EVENT,
 } from "./api-client"
 
 describe("apiClient Storage Utilities", () => {
@@ -106,5 +107,53 @@ describe("apiClient HTTP Request Execution", () => {
       expect((err as ApiClientError).status).toBe(400)
       expect((err as ApiClientError).message).toBe("Credenciais inválidas")
     }
+  })
+
+  it("deve limpar credenciais e disparar AUTH_EXPIRED_EVENT quando receber 401 com token ativo", async () => {
+    setStoredToken("token-expirado")
+    setStoredUser({ id: "1", email: "a@b.com", hasAiKey: true })
+
+    const eventListener = vi.fn()
+    window.addEventListener(AUTH_EXPIRED_EVENT, eventListener)
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => ({ message: "Sessão expirada" }),
+      })
+    )
+
+    await expect(apiClient.get("/api/accounts")).rejects.toThrow(ApiClientError)
+    expect(getStoredToken()).toBeNull()
+    expect(getStoredUser()).toBeNull()
+    expect(eventListener).toHaveBeenCalledTimes(1)
+
+    window.removeEventListener(AUTH_EXPIRED_EVENT, eventListener)
+  })
+
+  it("não deve disparar AUTH_EXPIRED_EVENT quando /api/auth/logout retornar 401", async () => {
+    setStoredToken("token-expirado")
+    const eventListener = vi.fn()
+    window.addEventListener(AUTH_EXPIRED_EVENT, eventListener)
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => ({ message: "Sessão expirada" }),
+      })
+    )
+
+    await expect(apiClient.post("/api/auth/logout", {})).rejects.toThrow(
+      ApiClientError
+    )
+    expect(eventListener).not.toHaveBeenCalled()
+
+    window.removeEventListener(AUTH_EXPIRED_EVENT, eventListener)
   })
 })

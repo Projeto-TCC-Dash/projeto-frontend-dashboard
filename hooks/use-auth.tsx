@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import type { User, AuthResponse, AuthCredentialsDTO } from "@/src/types/api"
 import {
+  AUTH_EXPIRED_EVENT,
   apiClient,
   getStoredToken,
   setStoredToken,
@@ -106,13 +107,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [queryClient]
   )
 
-  const logout = React.useCallback(() => {
+  const clearLocalSession = React.useCallback(() => {
     clearStoredAuth()
     setToken(null)
     setUser(null)
     queryClient.clear()
     router.push("/login")
   }, [queryClient, router])
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return
+    const handleAuthExpired = () => clearLocalSession()
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired)
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired)
+  }, [clearLocalSession])
+
+  const logout = React.useCallback(() => {
+    if (getStoredToken()) {
+      void apiClient.post("/api/auth/logout", {}).catch(() => {})
+    }
+    clearLocalSession()
+  }, [clearLocalSession])
 
   const value = React.useMemo<AuthContextValue>(
     () => ({

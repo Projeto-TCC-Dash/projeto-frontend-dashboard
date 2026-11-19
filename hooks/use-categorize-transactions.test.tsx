@@ -81,6 +81,12 @@ describe("useCategorizeTransactions Hook", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["transactions"],
     })
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: ["analysis"],
+    })
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: ["budgets"],
+    })
   })
 
   it("indicates hasAiKey is false and prevents API call when key is missing", async () => {

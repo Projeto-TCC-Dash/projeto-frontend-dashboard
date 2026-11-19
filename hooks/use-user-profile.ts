@@ -158,7 +158,7 @@ export function useUpdateFinancialProfile() {
       queryClient.invalidateQueries({ queryKey: ["user-profile"] })
 
       // Invalida o cache de análises financeiras da IA (recalibra recomendações)
-      queryClient.invalidateQueries({ queryKey: ["financial-analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
     },
   })
 

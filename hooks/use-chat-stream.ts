@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { ChatMessage, ChatMessageStatus } from "@/src/types/api"
-import { getStoredToken } from "@/lib/api-client"
+import { rawApiFetch } from "@/lib/api-client"
 import { parseChatStream } from "@/lib/chat-stream-parser"
 
 const CHAT_STORAGE_KEY = "@finai:chat_session"
@@ -163,20 +163,11 @@ export function useChatStream(): UseChatStreamReturn {
       abortControllerRef.current = controller
 
       try {
-        const token = getStoredToken()
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-        }
-
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`
-        }
-
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || ""
-        const response = await fetch(`${baseUrl}/api/chat/stream`, {
+        const response = await rawApiFetch("/api/chat/stream", {
           method: "POST",
-          headers,
+          headers: {
+            Accept: "text/event-stream",
+          },
           body: JSON.stringify({
             message: cleanPrompt,
             sessionId: session.sessionId,
