@@ -25,6 +25,8 @@ export function useCategorizeTransactions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["budgets"] })
     },
   })
 

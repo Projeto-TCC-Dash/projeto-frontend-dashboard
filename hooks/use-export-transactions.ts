@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { getStoredToken } from "@/lib/api-client"
+import { rawApiFetch } from "@/lib/api-client"
 import { triggerBlobDownload } from "@/lib/export-utils"
 import type { ExportFilterParams, ExportFormat } from "@/src/types/api"
 
@@ -19,25 +19,16 @@ export function useExportTransactions() {
       setError(null)
 
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || ""
-        const searchParams = new URLSearchParams()
-        searchParams.set("format", params.format)
-        if (params.month) searchParams.set("month", params.month)
-        if (params.startDate) searchParams.set("startDate", params.startDate)
-        if (params.endDate) searchParams.set("endDate", params.endDate)
-        if (params.accountId) searchParams.set("accountId", params.accountId)
-        if (params.category) searchParams.set("category", params.category)
-
-        const token = getStoredToken()
-        const headers = new Headers()
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`)
-        }
-
-        const url = `${baseUrl}/api/transactions/export?${searchParams.toString()}`
-        const response = await fetch(url, {
+        const response = await rawApiFetch("/api/transactions/export", {
           method: "GET",
-          headers,
+          params: {
+            format: params.format,
+            month: params.month,
+            startDate: params.startDate,
+            endDate: params.endDate,
+            accountId: params.accountId,
+            category: params.category,
+          },
         })
 
         if (!response.ok) {

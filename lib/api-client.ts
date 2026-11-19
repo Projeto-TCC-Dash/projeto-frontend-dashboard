@@ -63,14 +63,16 @@ export function clearStoredAuth(): void {
   setStoredUser(null)
 }
 
-interface RequestOptions extends RequestInit {
+export const AUTH_EXPIRED_EVENT = "finai:auth-expired"
+
+export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>
 }
 
-export async function apiRequest<T>(
+export async function rawApiFetch(
   endpoint: string,
   options: RequestOptions = {}
-): Promise<T> {
+): Promise<Response> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || ""
   let url = `${baseUrl}${endpoint}`
 
@@ -107,6 +109,27 @@ export async function apiRequest<T>(
     ...options,
     headers,
   })
+
+  if (
+    response.status === 401 &&
+    token &&
+    !endpoint.startsWith("/api/auth/login") &&
+    !endpoint.startsWith("/api/auth/logout")
+  ) {
+    clearStoredAuth()
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT))
+    }
+  }
+
+  return response
+}
+
+export async function apiRequest<T>(
+  endpoint: string,
+  options: RequestOptions = {}
+): Promise<T> {
+  const response = await rawApiFetch(endpoint, options)
 
   const contentType = response.headers.get("content-type") || ""
   const isJson = contentType.includes("application/json")

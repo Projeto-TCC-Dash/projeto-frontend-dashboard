@@ -76,12 +76,19 @@ describe("useAuth Hook", () => {
     expect(localStorage.getItem("auth_token")).toBe("jwt-token-login-456")
   })
 
-  it("deve realizar logout e limpar estado e localStorage", async () => {
+  it("deve realizar logout, revogar sessão no servidor e limpar estado e localStorage", async () => {
     localStorage.setItem("auth_token", "token-ativo")
     localStorage.setItem(
       "auth_user",
       JSON.stringify({ id: "1", email: "a@b.com", hasAiKey: true })
     )
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ "content-type": "application/json" }),
+      json: async () => ({ success: true }),
+    })
+    vi.stubGlobal("fetch", fetchMock)
 
     const { result } = renderHook(() => useAuth(), { wrapper })
 
@@ -89,6 +96,10 @@ describe("useAuth Hook", () => {
       result.current.logout()
     })
 
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/logout"),
+      expect.objectContaining({ method: "POST" })
+    )
     expect(result.current.isAuthenticated).toBe(false)
     expect(result.current.user).toBeNull()
     expect(localStorage.getItem("auth_token")).toBeNull()

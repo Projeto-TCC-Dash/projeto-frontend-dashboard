@@ -18,6 +18,9 @@ export function useUpdateTransaction() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["accounts"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["budgets"] })
     },
   })
 

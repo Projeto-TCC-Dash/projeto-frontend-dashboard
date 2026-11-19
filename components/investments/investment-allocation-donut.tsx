@@ -136,7 +136,7 @@ export function InvestmentAllocationDonut({
             visualizar a distribuição da carteira.
           </div>
         ) : (
-          <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-center gap-5 md:grid-cols-2 xl:grid-cols-1">
             <DonutChart
               data={aggregated.chartData}
               activeKey={activeDatum ? String(activeDatum.category) : null}
@@ -154,7 +154,7 @@ export function InvestmentAllocationDonut({
                   ? formatPercentage(activeDatum.percentage)
                   : `${aggregated.chartData.length} classes`
               }
-              height={220}
+              height={240}
             />
 
             <BarList

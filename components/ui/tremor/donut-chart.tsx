@@ -150,12 +150,12 @@ export function DonutChart({
           className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-4 text-center"
         >
           {centerSubLabel ? (
-            <span className="max-w-[9rem] truncate text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
+            <span className="max-w-[7.5rem] truncate text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
               {centerSubLabel}
             </span>
           ) : null}
           {centerLabel ? (
-            <span className="mt-0.5 max-w-[10.5rem] truncate text-sm font-bold text-foreground tabular-nums sm:text-base">
+            <span className="mt-0.5 max-w-[8.75rem] truncate text-sm font-bold text-foreground tabular-nums sm:text-base">
               {centerLabel}
             </span>
           ) : null}

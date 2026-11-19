@@ -121,7 +121,7 @@ describe("useUserProfile & useUpdateFinancialProfile Hooks", () => {
     expect(response).toEqual(updatedProfile)
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["user-profile"] })
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: ["financial-analysis"],
+      queryKey: ["analysis"],
     })
   })
 
