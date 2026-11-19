@@ -217,5 +217,7 @@ describe("Navbar Component", () => {
     const desktopNav = container.querySelector("header nav")
     expect(desktopNav).not.toBeNull()
     expect(desktopNav?.querySelectorAll("svg").length).toBe(7)
+    expect(desktopNav?.className).toContain("2xl:max-w-7xl")
+    expect(desktopNav?.className).toContain("2xl:px-8")
   })
 })

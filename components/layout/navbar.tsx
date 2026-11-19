@@ -93,55 +93,54 @@ export function Navbar() {
       ref={headerRef}
       className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
     >
-      <div className="mx-auto flex h-14 w-full items-center justify-between gap-3 px-3 sm:px-5 lg:px-8">
-        {/* Lado Esquerdo: Marca (somente texto) e Navegação Desktop */}
-        <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5 xl:gap-7">
-          <Link
-            href="/"
-            className="shrink-0 whitespace-nowrap font-bold tracking-tight text-foreground"
-          >
-            <span className="text-sm font-bold tracking-tight sm:text-base">
-              FinAI Dashboard
-            </span>
-          </Link>
+      <div className="relative mx-auto flex h-14 w-full items-center justify-between gap-4 px-3 sm:px-5 lg:px-8">
+        {/* Marca (somente texto) na extremidade esquerda */}
+        <Link
+          href="/"
+          className="relative z-10 shrink-0 whitespace-nowrap font-bold tracking-tight text-foreground"
+        >
+          <span className="text-sm font-bold tracking-tight sm:text-base">
+            FinAI Dashboard
+          </span>
+        </Link>
 
-          <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto text-sm font-medium lg:flex xl:gap-1">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative z-10 flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1.5 text-xs transition-colors xl:gap-2 xl:px-2.5 xl:text-sm",
-                    isActive
-                      ? "font-semibold text-foreground"
-                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                  )}
-                >
-                  {isActive ? (
-                    <motion.span
-                      layoutId="navbar-active-pill"
-                      data-testid="navbar-active-pill"
-                      transition={
-                        prefersReducedMotion
-                          ? { duration: 0 }
-                          : { type: "spring", stiffness: 380, damping: 32 }
-                      }
-                      className="absolute inset-0 -z-10 rounded-md bg-secondary"
-                    />
-                  ) : null}
-                  <Icon className="size-3.5 shrink-0 xl:size-4" />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
+        {/* Links de navegação alinhados à borda de max-w-7xl do corpo em telas amplas (2xl+) */}
+        <nav className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto text-sm font-medium lg:flex xl:gap-1 2xl:pointer-events-none 2xl:absolute 2xl:inset-y-0 2xl:inset-x-0 2xl:mx-auto 2xl:max-w-7xl 2xl:flex-none 2xl:overflow-visible 2xl:px-8">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative z-10 flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1.5 text-xs transition-colors xl:gap-2 xl:px-2.5 xl:text-sm 2xl:pointer-events-auto",
+                  isActive
+                    ? "font-semibold text-foreground"
+                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                )}
+              >
+                {isActive ? (
+                  <motion.span
+                    layoutId="navbar-active-pill"
+                    data-testid="navbar-active-pill"
+                    transition={
+                      prefersReducedMotion
+                        ? { duration: 0 }
+                        : { type: "spring", stiffness: 380, damping: 32 }
+                    }
+                    className="absolute inset-0 -z-10 rounded-md bg-secondary"
+                  />
+                ) : null}
+                <Icon className="size-3.5 shrink-0 xl:size-4" />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
         {/* Lado Direito: Status da IA, Tema e Usuário */}
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+        <div className="relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-3">
           <AiKeyStatusBadge />
           <ThemeToggle />
           <UserNav />
