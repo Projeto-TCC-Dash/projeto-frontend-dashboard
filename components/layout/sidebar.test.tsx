@@ -16,12 +16,20 @@ describe("Sidebar Component", () => {
     expect(screen.getByText("FinAI Dashboard")).toBeDefined()
     expect(screen.getByText("Dashboard")).toBeDefined()
     expect(screen.getByText("Contas e Cartões")).toBeDefined()
+    expect(screen.getByText("Investimentos")).toBeDefined()
     expect(screen.getByText("Extratos & Transações")).toBeDefined()
+    expect(screen.getByText("Planejamento Fiscal")).toBeDefined()
     expect(screen.getByText("Perfil e Metas")).toBeDefined()
     expect(screen.getByText("Consultor IA")).toBeDefined()
 
     const accountsLink = screen.getByRole("link", { name: /Contas e Cartões/i })
     expect(accountsLink.getAttribute("href")).toBe("/accounts")
+
+    const investmentsLink = screen.getByRole("link", { name: /Investimentos/i })
+    expect(investmentsLink.getAttribute("href")).toBe("/investments")
+
+    const fiscalLink = screen.getByRole("link", { name: /Planejamento Fiscal/i })
+    expect(fiscalLink.getAttribute("href")).toBe("/fiscal")
 
     const goalsLink = screen.getByRole("link", { name: /Perfil e Metas/i })
     expect(goalsLink.getAttribute("href")).toBe("/settings/metas")

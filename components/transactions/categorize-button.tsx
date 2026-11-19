@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Sparkles, Loader2, Key } from "lucide-react"
+import { Loader2, Key } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export interface CategorizeButtonProps {
@@ -48,10 +48,7 @@ export function CategorizeButton({
           Categorizando...
         </>
       ) : (
-        <>
-          <Sparkles className="mr-1.5 size-4" />
-          Categorizar com IA
-        </>
+        "Categorizar com IA"
       )}
     </Button>
   )

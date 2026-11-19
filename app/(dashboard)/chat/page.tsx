@@ -1,5 +1,4 @@
 import { Metadata } from "next"
-import { Sparkles } from "lucide-react"
 import { ChatPanel } from "@/components/chat/chat-panel"
 
 export const metadata: Metadata = {
@@ -18,8 +17,7 @@ export default function ChatPage() {
             <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Consultor Financeiro Virtual
             </h1>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-              <Sparkles className="size-3" />
+            <span className="inline-flex shrink-0 items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
               Gemini Streaming
             </span>
           </div>

@@ -9,7 +9,11 @@ import {
   Inbox,
   Loader2,
 } from "lucide-react"
-import { Transaction } from "@/src/types/api"
+import {
+  Account,
+  Transaction,
+  TransactionAccountSummary,
+} from "@/src/types/api"
 import { formatCurrencyBRL, formatDateBR } from "@/lib/formatters"
 import { Button } from "@/components/ui/button"
 import { TransactionDeleteDialog } from "./transaction-delete-dialog"
@@ -19,6 +23,7 @@ import { useSafeAutoAnimate } from "@/hooks/use-safe-auto-animate"
 
 export interface TransactionTableProps {
   transactions: Transaction[]
+  accounts?: Account[]
   isLoading?: boolean
   onEdit?: (transaction: Transaction) => void
   onDelete?: (transaction: Transaction) => void
@@ -54,6 +59,7 @@ export function getCategoryBadgeClass(category: string): string {
 
 export function TransactionTable({
   transactions,
+  accounts = [],
   isLoading = false,
   onEdit,
   onDelete,
@@ -63,6 +69,46 @@ export function TransactionTable({
   const isMobile = useMediaQuery("(max-width: 767px)")
   const [mobileListRef] = useSafeAutoAnimate<HTMLDivElement>()
   const [desktopTbodyRef] = useSafeAutoAnimate<HTMLTableSectionElement>()
+
+  const accountsMap = React.useMemo(() => {
+    const map = new Map<string, TransactionAccountSummary>()
+    for (const acc of accounts) {
+      map.set(acc.id, {
+        id: acc.id,
+        name: acc.name,
+        color: acc.color,
+        institution: acc.institution,
+      })
+    }
+    return map
+  }, [accounts])
+
+  const resolveAccount = (tx: Transaction): TransactionAccountSummary | undefined =>
+    tx.account ?? (tx.accountId ? accountsMap.get(tx.accountId) : undefined)
+
+  const renderAccountBadge = (
+    accountInfo: TransactionAccountSummary | undefined,
+    maxWidthClass?: string
+  ) => {
+    if (!accountInfo) {
+      return (
+        <span className="text-xs text-zinc-400 dark:text-zinc-600">—</span>
+      )
+    }
+
+    return (
+      <span className="inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+        <span
+          className="size-2 shrink-0 rounded-full"
+          style={{ backgroundColor: accountInfo.color || "#64748B" }}
+          aria-hidden="true"
+        />
+        <span className={maxWidthClass ? `${maxWidthClass} truncate` : "truncate"}>
+          {accountInfo.name || accountInfo.institution}
+        </span>
+      </span>
+    )
+  }
 
   const handleDeleteConfirm = async (id: string) => {
     await deleteTransaction(id)
@@ -164,24 +210,7 @@ export function TransactionTable({
                       {tx.category}
                     </span>
 
-                    {tx.account ? (
-                      <span className="inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-                        <span
-                          className="size-2 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor: tx.account.color || "#64748B",
-                          }}
-                          aria-hidden="true"
-                        />
-                        <span className="truncate">
-                          {tx.account.name || tx.account.institution}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="text-xs text-zinc-400 dark:text-zinc-600">
-                        —
-                      </span>
-                    )}
+                    {renderAccountBadge(resolveAccount(tx))}
                   </div>
 
                   <div className="flex shrink-0 items-center gap-1">
@@ -294,23 +323,9 @@ export function TransactionTable({
 
                     {/* Conta */}
                     <td className="px-4 py-3.5 whitespace-nowrap sm:px-6">
-                      {tx.account ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-                          <span
-                            className="size-2 shrink-0 rounded-full"
-                            style={{
-                              backgroundColor: tx.account.color || "#64748B",
-                            }}
-                            aria-hidden="true"
-                          />
-                          <span className="max-w-[120px] truncate">
-                            {tx.account.name || tx.account.institution}
-                          </span>
-                        </span>
-                      ) : (
-                        <span className="text-xs text-zinc-400 dark:text-zinc-600">
-                          —
-                        </span>
+                      {renderAccountBadge(
+                        resolveAccount(tx),
+                        "max-w-[120px]"
                       )}
                     </td>
 

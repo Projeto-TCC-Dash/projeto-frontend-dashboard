@@ -13,12 +13,26 @@ import { MetricCardsGrid } from "@/components/dashboard/metric-cards-grid"
 import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart"
 import { PeriodCashflowCard } from "@/components/dashboard/period-cashflow-card"
 import { AiDiagnosisCard } from "@/components/dashboard/ai-diagnosis-card"
+import { MonthlyBudgetCard } from "@/components/dashboard/monthly-budget-card"
+import { MultiMonthEvolutionChart } from "@/components/dashboard/multi-month-evolution-chart"
 import { AiKeyModal } from "@/components/ai-key/ai-key-modal"
+import { useBudget, useUpsertBudget } from "@/hooks/use-budgets"
+import { useMultiMonthAnalysis } from "@/hooks/use-multi-month-analysis"
+import { useTransactions } from "@/hooks/use-transactions"
+import type { MultiMonthRange } from "@/src/types/api"
+import {
+  buildMultiMonthEvolutionSeries,
+  calculateEmergencyFundTarget,
+  calculateFinancialMetricsFromTransactions,
+  subtractMonths,
+} from "@/lib/dashboard-charts"
+import type { MultiMonthHorizon } from "@/src/types/charts"
 
 export default function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = React.useState<string>(
     getCurrentYearMonth()
   )
+  const [horizon, setHorizon] = React.useState<MultiMonthHorizon>("6M")
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState<boolean>(false)
   const { user } = useAuth()
   const { data: userProfile } = useUserProfile()
@@ -30,8 +44,90 @@ export default function DashboardPage() {
   )
 
   const { metrics, analysis, isLoading, isRefreshing, error, refreshAnalysis } =
-    useFinancialAnalysis(selectedMonth)
+    useFinancialAnalysis(selectedMonth, {
+      enabled: Boolean(selectedMonth) && (user?.hasAiKey ?? true),
+    })
+  const {
+    budget,
+    isLoading: isBudgetLoading,
+    isError: isBudgetError,
+    refetch: refetchBudget,
+  } = useBudget(selectedMonth)
+  const { upsertBudget, isSaving: isBudgetSaving } = useUpsertBudget()
+
+  const multiMonthRange: MultiMonthRange =
+    horizon === "3M" ? "3" : horizon === "6M" ? "6" : "12"
+  const { analysis: multiMonthServerAnalysis } =
+    useMultiMonthAnalysis(multiMonthRange)
+  const {
+    transactions: monthTransactions,
+    isLoading: isMonthTransactionsLoading,
+  } = useTransactions({ month: selectedMonth })
+  const { transactions: allTransactions, isLoading: isAllTransactionsLoading } =
+    useTransactions({})
   const prefersReducedMotion = usePrefersReducedMotion()
+
+  const fallbackMetrics = React.useMemo(
+    () => calculateFinancialMetricsFromTransactions(monthTransactions),
+    [monthTransactions]
+  )
+
+  const effectiveMetrics =
+    metrics ?? (!isMonthTransactionsLoading ? fallbackMetrics : null)
+  const isMetricsLoading =
+    !effectiveMetrics && (isLoading || isMonthTransactionsLoading)
+
+  const emergencyFundTarget = React.useMemo(
+    () =>
+      calculateEmergencyFundTarget(
+        userProfile?.financialProfile?.incomeType,
+        userProfile?.financialProfile?.declaredMonthlyIncome,
+        effectiveMetrics?.totalExpenses
+      ),
+    [
+      userProfile?.financialProfile?.incomeType,
+      userProfile?.financialProfile?.declaredMonthlyIncome,
+      effectiveMetrics?.totalExpenses,
+    ]
+  )
+
+  const multiMonthSeries = React.useMemo(
+    () =>
+      buildMultiMonthEvolutionSeries(
+        allTransactions,
+        horizon,
+        selectedMonth
+      ),
+    [allTransactions, horizon, selectedMonth]
+  )
+
+  const previousMonth = React.useMemo(
+    () => subtractMonths(selectedMonth, 1),
+    [selectedMonth]
+  )
+
+  const previousMetrics = React.useMemo(() => {
+    const prevPoint = multiMonthSeries.find((p) => p.month === previousMonth)
+    if (!prevPoint) return null
+    return {
+      totalIncome: prevPoint.receitas,
+      totalExpenses: prevPoint.despesas,
+      invoiceSettlements: prevPoint.faturas,
+      netBalance: prevPoint.netBalance,
+      savingsRate: 0,
+      topCategories: [],
+    }
+  }, [multiMonthSeries, previousMonth])
+
+  const historicalTrends = React.useMemo(() => {
+    if (multiMonthSeries.length < 2) return undefined
+    return {
+      incomeSeries: multiMonthSeries.map((p) => p.receitas),
+      expensesSeries: multiMonthSeries.map((p) => p.despesas),
+      invoiceSeries: multiMonthSeries.map((p) => p.faturas),
+      netBalanceSeries: multiMonthSeries.map((p) => p.netBalance),
+    }
+  }, [multiMonthSeries])
 
   return (
     <div className="space-y-6">
@@ -39,7 +135,7 @@ export default function DashboardPage() {
       <DashboardHeader
         currentMonth={selectedMonth}
         onMonthChange={setSelectedMonth}
-        isLoading={isLoading || isRefreshing}
+        isLoading={isMetricsLoading || isRefreshing}
         hasAiKey={user?.hasAiKey ?? true}
       />
 
@@ -47,7 +143,12 @@ export default function DashboardPage() {
       <ProfileOnboardingBanner hasProfile={hasFinancialProfile} />
 
       {/* Grid de Resumo Financeiro (KPIs Consolidados) */}
-      <MetricCardsGrid metrics={metrics} isLoading={isLoading} />
+      <MetricCardsGrid
+        metrics={effectiveMetrics}
+        previousMetrics={previousMetrics}
+        historicalTrends={historicalTrends}
+        isLoading={isMetricsLoading}
+      />
 
       <div
         data-testid="dashboard-bento-grid"
@@ -65,14 +166,14 @@ export default function DashboardPage() {
         >
           {/* Cards analíticos empilhados (Distribuição por Categorias + Fluxo do Período) */}
           <CategoryDonutChart
-            categories={metrics?.topCategories ?? []}
+            categories={effectiveMetrics?.topCategories ?? []}
             month={selectedMonth}
-            isLoading={isLoading}
+            isLoading={isMetricsLoading}
           />
           <PeriodCashflowCard
-            metrics={metrics}
+            metrics={effectiveMetrics}
             month={selectedMonth}
-            isLoading={isLoading}
+            isLoading={isMonthTransactionsLoading}
           />
         </motion.div>
 
@@ -97,11 +198,54 @@ export default function DashboardPage() {
             onRefresh={() => void refreshAnalysis()}
             onOpenAiKeyModal={() => setAiKeyModalOpen(true)}
             financialProfile={userProfile?.financialProfile}
-            monthlyExpenses={metrics?.totalExpenses}
+            monthlyExpenses={effectiveMetrics?.totalExpenses}
             matchedDesktopHeight
           />
         </motion.div>
       </div>
+
+      {/* Orçamentos do Mês (Tetos Globais e por Categoria) */}
+      <motion.div
+        data-testid="monthly-budget-slot"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: prefersReducedMotion ? 0 : 0.22,
+          delay: 0.16,
+        }}
+      >
+        <MonthlyBudgetCard
+          month={selectedMonth}
+          budget={budget}
+          isLoading={isBudgetLoading}
+          isError={isBudgetError}
+          onRetry={() => void refetchBudget()}
+          onSaveBudget={(data) =>
+            upsertBudget({ month: selectedMonth, data })
+          }
+          isSaving={isBudgetSaving}
+        />
+      </motion.div>
+
+      {/* Gráfico Histórico Consolidado Multi-Mês (Trajetória e Subida Acumulada) */}
+      <motion.div
+        data-testid="multi-month-evolution-slot"
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: prefersReducedMotion ? 0 : 0.22,
+          delay: 0.18,
+        }}
+      >
+        <MultiMonthEvolutionChart
+          data={multiMonthSeries}
+          horizon={horizon}
+          onHorizonChange={setHorizon}
+          serverAnalysis={multiMonthServerAnalysis}
+          emergencyFundTarget={emergencyFundTarget}
+          isLoading={isAllTransactionsLoading}
+        />
+      </motion.div>
 
       {/* Modal de Configuração de Chave Gemini (BYOK) */}
       <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />

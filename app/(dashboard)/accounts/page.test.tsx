@@ -3,14 +3,32 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import * as React from "react"
 import AccountsPage from "./page"
 import * as useAccountsModule from "@/hooks/use-accounts"
-import type { Account } from "@/src/types/api"
+import * as useInvestmentsModule from "@/hooks/use-investments"
+import * as useTransactionsModule from "@/hooks/use-transactions"
+import type { Account, InvestmentPortfolioSummary } from "@/src/types/api"
 
 vi.mock("@/hooks/use-accounts")
+vi.mock("@/hooks/use-investments")
+vi.mock("@/hooks/use-transactions")
 
 describe("AccountsPage", () => {
   const mockCreateAccount = vi.fn().mockResolvedValue({})
   const mockUpdateAccount = vi.fn().mockResolvedValue({})
   const mockDeleteAccount = vi.fn().mockResolvedValue({})
+  const mockUpsertHolding = vi.fn().mockResolvedValue({})
+
+  const mockPortfolio: InvestmentPortfolioSummary = {
+    totalInvested: 25000,
+    riskProfile: "MODERATE",
+    holdings: [
+      { macroClass: "FIXED_INCOME", amount: 15000, percentage: 60 },
+      { macroClass: "EQUITIES", amount: 10000, percentage: 40 },
+    ],
+    allocationDiagnosis: {
+      adherentToRiskProfile: true,
+      recommendations: ["Carteira equilibrada."],
+    },
+  }
 
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -26,6 +44,28 @@ describe("AccountsPage", () => {
       deleteAccount: mockDeleteAccount,
       isPending: false,
     } as unknown as ReturnType<typeof useAccountsModule.useDeleteAccount>)
+    vi.spyOn(useInvestmentsModule, "useInvestmentPortfolio").mockReturnValue({
+      portfolio: mockPortfolio,
+      totalInvested: 25000,
+      holdings: mockPortfolio.holdings,
+      allocationDiagnosis: mockPortfolio.allocationDiagnosis,
+      isLoading: false,
+    } as unknown as ReturnType<
+      typeof useInvestmentsModule.useInvestmentPortfolio
+    >)
+    vi.spyOn(
+      useInvestmentsModule,
+      "useUpsertInvestmentHolding"
+    ).mockReturnValue({
+      upsertHolding: mockUpsertHolding,
+      isPending: false,
+    } as unknown as ReturnType<
+      typeof useInvestmentsModule.useUpsertInvestmentHolding
+    >)
+    vi.spyOn(useTransactionsModule, "useTransactions").mockReturnValue({
+      transactions: [],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useTransactionsModule.useTransactions>)
   })
 
   const mockAccounts: Account[] = [
@@ -81,6 +121,16 @@ describe("AccountsPage", () => {
     expect(screen.getByText(/1\.500,00/)).toBeDefined()
     expect(screen.getByText("Nubank")).toBeDefined()
     expect(screen.getByText("Cartão XP")).toBeDefined()
+
+    // Allocation bar, InvestmentTimeSeriesChart empty state, shortcut and InvestmentPortfolioCard
+    expect(screen.getByTestId("account-allocation-bar")).toBeDefined()
+    expect(screen.getByTestId("investment-chart-empty")).toBeDefined()
+    expect(screen.getByTestId("investment-portfolio-card")).toBeDefined()
+    expect(screen.getByText("Carteira equilibrada.")).toBeDefined()
+    expect(screen.getByTestId("accounts-investments-shortcut")).toHaveAttribute(
+      "href",
+      "/investments"
+    )
   })
 
   it("deve abrir o modal de nova conta ao clicar em 'Nova Conta'", () => {

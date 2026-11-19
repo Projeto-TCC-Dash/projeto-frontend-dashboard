@@ -101,8 +101,14 @@ describe("Navbar Component", () => {
       mobileMenu?.querySelector('a[href="/accounts"]')?.textContent
     ).toContain("Contas")
     expect(
+      mobileMenu?.querySelector('a[href="/investments"]')?.textContent
+    ).toContain("Investimentos")
+    expect(
       mobileMenu?.querySelector('a[href="/transactions"]')?.textContent
     ).toContain("Extratos")
+    expect(
+      mobileMenu?.querySelector('a[href="/fiscal"]')?.textContent
+    ).toContain("Fiscal")
     expect(
       mobileMenu?.querySelector('a[href="/settings/metas"]')?.textContent
     ).toContain("Metas")
@@ -196,5 +202,22 @@ describe("Navbar Component", () => {
 
     const movedPill = screen.getByTestId("navbar-active-pill")
     expect(movedPill.parentElement).toHaveAttribute("href", "/accounts")
+  })
+
+  it("renders FinAI Dashboard brand without sparkle icon while keeping page icons and full-width bar", () => {
+    const { container } = render(<Navbar />)
+
+    const brandLink = screen.getByRole("link", { name: "FinAI Dashboard" })
+    expect(brandLink.querySelector("svg")).toBeNull()
+
+    const headerInner = container.querySelector("header > div")
+    expect(headerInner?.className).toContain("w-full")
+    expect(headerInner?.className).not.toContain("max-w-7xl")
+
+    const desktopNav = container.querySelector("header nav")
+    expect(desktopNav).not.toBeNull()
+    expect(desktopNav?.querySelectorAll("svg").length).toBe(7)
+    expect(desktopNav?.className).toContain("2xl:max-w-7xl")
+    expect(desktopNav?.className).toContain("2xl:px-8")
   })
 })

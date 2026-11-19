@@ -33,6 +33,7 @@ export interface BarChartProps {
   yAxisFormatter?: (value: number) => string
   showLegend?: boolean
   height?: number
+  maxBarSize?: number
   className?: string
   ariaLabel?: string
 }
@@ -60,6 +61,25 @@ function BarChartTooltip({
   if (!active || !payload || payload.length === 0) return null
 
   const categoryMap = new Map(categories.map((cat) => [cat.key, cat]))
+
+  let receitasVal: number | null = null
+  let despesasVal: number | null = null
+  let faturasVal: number | null = null
+
+  for (const entry of payload) {
+    const key = String(entry.dataKey ?? entry.name ?? "")
+    const numericVal =
+      typeof entry.value === "number" ? entry.value : Number(entry.value ?? 0)
+
+    if (key === "receitas") receitasVal = numericVal
+    else if (key === "despesas") despesasVal = numericVal
+    else if (key === "faturas") faturasVal = numericVal
+  }
+
+  const hasNetCalculation = receitasVal !== null || despesasVal !== null
+  const netBalance = hasNetCalculation
+    ? (receitasVal ?? 0) - (despesasVal ?? 0) - (faturasVal ?? 0)
+    : null
 
   return (
     <div className="min-w-[11rem] rounded-lg border border-border bg-popover/95 px-3 py-2 text-xs shadow-md backdrop-blur-sm">
@@ -96,6 +116,23 @@ function BarChartTooltip({
             </div>
           )
         })}
+
+        {netBalance !== null && (payload.length > 1 || receitasVal !== null) ? (
+          <div className="mt-1.5 border-t border-border/50 pt-1 flex items-center justify-between gap-4">
+            <span className="font-medium text-muted-foreground">Saldo Líquido</span>
+            <span
+              data-testid="cashflow-tooltip-net"
+              className={cn(
+                "font-bold",
+                netBalance >= 0
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-rose-600 dark:text-rose-400"
+              )}
+            >
+              {(netBalance >= 0 ? "+" : "") + valueFormatter(netBalance)}
+            </span>
+          </div>
+        ) : null}
       </div>
     </div>
   )
@@ -109,6 +146,7 @@ export function BarChart({
   yAxisFormatter = formatCompactCurrencyBRL,
   showLegend = true,
   height = 260,
+  maxBarSize = 28,
   className,
   ariaLabel = "Gráfico de barras comparativo do período",
 }: BarChartProps) {
@@ -222,6 +260,7 @@ export function BarChart({
                     name={cat.label}
                     fill={tokens.hex}
                     radius={[6, 6, 0, 0]}
+                    maxBarSize={maxBarSize}
                     isAnimationActive={!prefersReducedMotion}
                     animationDuration={400}
                   />

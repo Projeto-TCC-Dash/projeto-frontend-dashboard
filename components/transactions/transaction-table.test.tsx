@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import * as React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { TransactionTable } from "./transaction-table"
-import { Transaction } from "@/src/types/api"
+import { Transaction, Account } from "@/src/types/api"
 
 describe("TransactionTable component", () => {
   let queryClient: QueryClient
@@ -235,5 +235,39 @@ describe("TransactionTable component", () => {
 
     fireEvent.click(deleteBtn)
     expect(onDelete).toHaveBeenCalledWith(txWithAccount[0])
+  })
+
+  it("resolves account badge from accounts list using accountId when tx.account is omitted", () => {
+    const accounts: Account[] = [
+      {
+        id: "acc-itau",
+        name: "Itaú Uniclass",
+        type: "CHECKING",
+        balance: 5000,
+        initialBalance: 0,
+        institution: "Itaú",
+        color: "#EC7000",
+        createdAt: "2026-10-01T00:00:00Z",
+        updatedAt: "2026-10-01T00:00:00Z",
+      },
+    ]
+
+    const txWithAccountIdOnly: Transaction[] = [
+      {
+        ...mockTransactions[0],
+        accountId: "acc-itau",
+        account: undefined,
+      },
+    ]
+
+    renderWithProviders(
+      <TransactionTable
+        transactions={txWithAccountIdOnly}
+        accounts={accounts}
+        isLoading={false}
+      />
+    )
+
+    expect(screen.getByText("Itaú Uniclass")).toBeInTheDocument()
   })
 })

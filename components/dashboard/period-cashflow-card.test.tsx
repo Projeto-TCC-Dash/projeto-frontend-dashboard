@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import * as React from "react"
 import { PeriodCashflowCard } from "./period-cashflow-card"
 import type { FinancialMetrics, Transaction } from "@/src/types/api"
@@ -78,6 +78,33 @@ describe("PeriodCashflowCard", () => {
     expect(screen.getByText("Receitas")).toBeInTheDocument()
     expect(screen.getByText("Despesas")).toBeInTheDocument()
     expect(screen.getByText("Faturas")).toBeInTheDocument()
+  })
+
+  it("toggles between daily bar chart and cumulative area chart seamlessly", () => {
+    render(<PeriodCashflowCard metrics={sampleMetrics} month="2026-10" />)
+
+    const toggle = screen.getByTestId("cashflow-view-mode-toggle")
+    expect(toggle).toBeInTheDocument()
+
+    const btnDaily = screen.getByTestId("view-mode-daily")
+    const btnCumulative = screen.getByTestId("view-mode-cumulative")
+
+    expect(btnDaily).toHaveAttribute("aria-pressed", "true")
+    expect(btnCumulative).toHaveAttribute("aria-pressed", "false")
+    expect(screen.getByTestId("tremor-bar-chart")).toBeInTheDocument()
+
+    // Switch to cumulative
+    fireEvent.click(btnCumulative)
+    expect(btnCumulative).toHaveAttribute("aria-pressed", "true")
+    expect(btnDaily).toHaveAttribute("aria-pressed", "false")
+    expect(
+      screen.getByTestId("cumulative-cashflow-area-chart")
+    ).toBeInTheDocument()
+
+    // Switch back to daily
+    fireEvent.click(btnDaily)
+    expect(btnDaily).toHaveAttribute("aria-pressed", "true")
+    expect(screen.getByTestId("tremor-bar-chart")).toBeInTheDocument()
   })
 
   it("omits Faturas series when invoice settlements are zero", () => {

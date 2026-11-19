@@ -10,9 +10,15 @@ import {
   ShieldCheck,
   Compass,
   Lightbulb,
+  Scale,
+  Target,
   type LucideIcon,
 } from "lucide-react"
-import { FinancialAnalysis } from "@/src/types/api"
+import {
+  BudgetOverview,
+  FinancialAnalysis,
+  InvestmentPortfolioSummary,
+} from "@/src/types/api"
 import { cn } from "@/lib/utils"
 
 export interface QuickSuggestionChipItem {
@@ -47,10 +53,18 @@ export function QuickSuggestionChips({
     return `${year}-${month}`
   }, [currentMonth])
 
-  // Recupera os dados da análise financeira cacheados pelo TanStack Query
+  // Recupera os dados da análise financeira, orçamento e carteira cacheados
   const cachedAnalysis = queryClient.getQueryData<FinancialAnalysis>([
     "analysis",
     monthKey,
+  ])
+  const cachedBudget = queryClient.getQueryData<BudgetOverview | null>([
+    "budgets",
+    monthKey,
+  ])
+  const cachedPortfolio = queryClient.getQueryData<InvestmentPortfolioSummary>([
+    "investments",
+    "portfolio",
   ])
 
   const chips = React.useMemo<QuickSuggestionChipItem[]>(() => {
@@ -59,9 +73,20 @@ export function QuickSuggestionChips({
     if (metrics && (metrics.totalExpenses > 0 || metrics.totalIncome > 0)) {
       const result: QuickSuggestionChipItem[] = []
 
-      // 1. Maior categoria de despesa
+      // 1. Maior categoria de despesa ou categoria em alerta no orçamento
+      const warningBudgetCat = cachedBudget?.categories.find(
+        (c) => c.status === "EXCEEDED" || c.status === "WARNING"
+      )
       const topCat = metrics.topCategories?.[0]
-      if (topCat && topCat.amount > 0) {
+      if (warningBudgetCat) {
+        result.push({
+          id: "budget-alert-category",
+          label: `Orçamento: ${warningBudgetCat.category}`,
+          prompt: `Estou em ${warningBudgetCat.percentConsumed.toFixed(0)}% do meu teto em ${warningBudgetCat.category}. Como fechar o mês dentro do orçamento?`,
+          icon: Target,
+          badge: "Orçamento",
+        })
+      } else if (topCat && topCat.amount > 0) {
         result.push({
           id: "top-expense",
           label: `Gastos em ${topCat.category}`,
@@ -71,8 +96,20 @@ export function QuickSuggestionChips({
         })
       }
 
-      // 2. Taxa de poupança
-      if (metrics.savingsRate < 20) {
+      // 2. Taxa de poupança ou rebalanceamento da carteira
+      if (
+        cachedPortfolio &&
+        cachedPortfolio.allocationDiagnosis &&
+        !cachedPortfolio.allocationDiagnosis.adherentToRiskProfile
+      ) {
+        result.push({
+          id: "portfolio-rebalance",
+          label: "Rebalancear Carteira",
+          prompt: `Minha carteira está desalinhada ao perfil ${cachedPortfolio.riskProfile}. Como rebalancear meus aportes entre macroclasses?`,
+          icon: Coins,
+          badge: "Investimentos",
+        })
+      } else if (metrics.savingsRate < 20) {
         result.push({
           id: "savings-goal",
           label: "Meta de Poupança",
@@ -92,7 +129,17 @@ export function QuickSuggestionChips({
         })
       }
 
-      // 3. Gastos atípicos ou saldo
+      // 3. Planejamento Fiscal (IRPF / Deduções)
+      result.push({
+        id: "fiscal-deductions",
+        label: "Deduções IRPF & MEI",
+        prompt:
+          "Quais das minhas despesas de saúde, educação ou previdência podem ajudar a abater meu IRPF e como organizar meu dossiê fiscal?",
+        icon: Scale,
+        badge: "Fiscal",
+      })
+
+      // 4. Gastos atípicos ou saldo
       if (metrics.netBalance < 0) {
         result.push({
           id: "deficit-alert",
@@ -112,16 +159,6 @@ export function QuickSuggestionChips({
           badge: "Auditoria",
         })
       }
-
-      // 4. Viabilidade de aporte
-      result.push({
-        id: "investment-capacity",
-        label: "Simulação de Aporte",
-        prompt:
-          "Com base no meu saldo e despesas atuais, consigo poupar R$ 500 este mês?",
-        icon: Coins,
-        badge: "Meta",
-      })
 
       return result
     }
@@ -143,23 +180,23 @@ export function QuickSuggestionChips({
         badge: "Planejamento",
       },
       {
-        id: "debt-payoff",
-        label: "Estratégia de Dívidas",
+        id: "fiscal-deductions",
+        label: "Deduções IRPF & MEI",
         prompt:
-          "Qual a melhor estratégia financeira para quitar dívidas caras?",
-        icon: TrendingDown,
-        badge: "Finanças",
+          "Como organizar despesas dedutíveis no IRPF e acompanhar o teto anual do MEI?",
+        icon: Scale,
+        badge: "Fiscal",
       },
       {
-        id: "first-investments",
-        label: "Primeiros Aportes",
+        id: "portfolio-rebalance",
+        label: "Carteira & Perfil de Risco",
         prompt:
-          "Quais os conceitos básicos de renda fixa para quem quer começar a investir?",
+          "Como distribuir meus investimentos entre Renda Fixa, Ações, FIIs e Exterior conforme meu perfil de risco?",
         icon: Coins,
         badge: "Investimentos",
       },
     ]
-  }, [cachedAnalysis])
+  }, [cachedAnalysis, cachedBudget, cachedPortfolio])
 
   return (
     <div className={cn("mx-auto w-full max-w-lg min-w-0 py-2", className)}>

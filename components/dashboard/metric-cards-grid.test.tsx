@@ -114,4 +114,39 @@ describe("MetricCardsGrid Component", () => {
     expect(progressBar).toHaveAttribute("aria-valuemin", "0")
     expect(progressBar).toHaveAttribute("aria-valuemax", "100")
   })
+
+  it("calculates and passes MoM trend badges and sparkline series when previousMetrics are supplied", () => {
+    const previousMetrics: FinancialMetrics = {
+      totalIncome: 10000,
+      totalExpenses: 5000,
+      invoiceSettlements: 1500,
+      netBalance: 3500,
+      savingsRate: 50.0,
+      topCategories: [],
+    }
+
+    render(
+      <MetricCardsGrid
+        metrics={sampleMetrics}
+        previousMetrics={previousMetrics}
+        historicalTrends={{
+          incomeSeries: [9000, 10000, 12000],
+          expensesSeries: [4500, 5000, 6000],
+          invoiceSeries: [1000, 1500, 2000],
+          netBalanceSeries: [3500, 3500, 4000],
+        }}
+      />
+    )
+
+    const badges = screen.getAllByTestId("metric-trend-badge")
+    expect(badges.length).toBeGreaterThanOrEqual(3)
+
+    // Income: 12000 vs 10000 = +20%
+    expect(badges[0].textContent).toContain("+20,0% vs mês ant.")
+    // Expenses: 6000 vs 5000 = +20% (expense increase is red/alert)
+    expect(badges[1].textContent).toContain("+20,0% vs mês ant.")
+
+    const sparklines = screen.getAllByTestId("metric-sparkline")
+    expect(sparklines.length).toBeGreaterThanOrEqual(3)
+  })
 })
