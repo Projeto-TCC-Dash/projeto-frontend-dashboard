@@ -38,7 +38,7 @@ const MONTH_NAMES_SHORT = [
   "Dez",
 ] as const
 
-function formatYearMonthShortLabel(yearMonth: string): string {
+export function formatYearMonthShortLabel(yearMonth: string): string {
   const parts = yearMonth.split("-")
   if (parts.length !== 2) return yearMonth
   const year = parts[0]

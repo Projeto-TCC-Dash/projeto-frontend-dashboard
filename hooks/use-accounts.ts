@@ -39,7 +39,7 @@ export function useCreateAccount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] })
-      queryClient.invalidateQueries({ queryKey: ["financial-analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
     },
   })
 
@@ -66,7 +66,7 @@ export function useUpdateAccount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] })
-      queryClient.invalidateQueries({ queryKey: ["financial-analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
     },
   })
 
@@ -97,7 +97,7 @@ export function useDeleteAccount() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] })
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
-      queryClient.invalidateQueries({ queryKey: ["financial-analysis"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
     },
   })
 

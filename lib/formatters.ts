@@ -132,11 +132,14 @@ export function parseBrlToNumber(
   const trimmed = value.trim()
   if (!trimmed) return undefined
 
-  // Remove símbolos de moeda, espaços e pontos separadores de milhar
-  const sanitized = trimmed
-    .replace(/[R$\s]/g, "")
-    .replace(/\./g, "")
-    .replace(",", ".")
+  // Remove símbolos de moeda e espaços; só remove '.' quando houver ',' ou agrupamento de milhar (ex: 1.500)
+  const cleaned = trimmed.replace(/[R$\s]/g, "")
+  const hasComma = cleaned.includes(",")
+  const isDotThousandsOnly = /^-?\d{1,3}(\.\d{3})+$/.test(cleaned)
+  const sanitized =
+    hasComma || isDotThousandsOnly
+      ? cleaned.replace(/\./g, "").replace(",", ".")
+      : cleaned
 
   const num = parseFloat(sanitized)
   return isNaN(num) ? undefined : num
