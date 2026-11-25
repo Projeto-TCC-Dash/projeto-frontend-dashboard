@@ -257,4 +257,15 @@ describe("formatters", () => {
       process.env.NEXT_PUBLIC_API_URL = prev
     })
   })
+
+  describe("parseBrlToNumber", () => {
+    it("parses Brazilian currency and dot-decimal inputs without inflating by 100x", () => {
+      expect(parseBrlToNumber("1.500,50")).toBe(1500.5)
+      expect(parseBrlToNumber("R$ 1.500,50")).toBe(1500.5)
+      expect(parseBrlToNumber("1500.50")).toBe(1500.5)
+      expect(parseBrlToNumber("1.500")).toBe(1500)
+      expect(parseBrlToNumber("-250.75")).toBe(-250.75)
+      expect(parseBrlToNumber("")).toBeUndefined()
+    })
+  })
 })

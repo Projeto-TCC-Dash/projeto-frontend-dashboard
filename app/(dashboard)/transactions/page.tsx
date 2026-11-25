@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams } from "next/navigation"
 import { ReceiptText, AlertCircle } from "lucide-react"
 import { getCurrentYearMonth } from "@/lib/formatters"
 import {
@@ -27,10 +28,15 @@ import {
   CategorizeResponse,
 } from "@/src/types/api"
 
-export default function TransactionsPage() {
+function TransactionsPageContent() {
+  const searchParams = useSearchParams()
+  const initialMonth = searchParams.get("month") || getCurrentYearMonth()
+  const initialCategory =
+    (searchParams.get("category") as Category | null) ?? undefined
+
   const [filters, setFilters] = React.useState<ITransactionFilters>({
-    month: getCurrentYearMonth(),
-    category: undefined,
+    month: initialMonth,
+    category: initialCategory,
     source: undefined,
     accountId: undefined,
   })
@@ -239,5 +245,13 @@ export default function TransactionsPage() {
       {/* Modal de Configuração de Chave de IA (BYOK) */}
       <AiKeyModal open={aiKeyModalOpen} onOpenChange={setAiKeyModalOpen} />
     </div>
+  )
+}
+
+export default function TransactionsPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <TransactionsPageContent />
+    </React.Suspense>
   )
 }

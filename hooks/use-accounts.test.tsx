@@ -133,7 +133,7 @@ describe("useAccounts & Account Mutations Hooks", () => {
     expect(response).toEqual(newAccount)
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["accounts"] })
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: ["financial-analysis"],
+      queryKey: ["analysis"],
     })
   })
 
@@ -176,7 +176,7 @@ describe("useAccounts & Account Mutations Hooks", () => {
     expect(response).toEqual(updatedAccount)
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["accounts"] })
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: ["financial-analysis"],
+      queryKey: ["analysis"],
     })
   })
 
@@ -214,7 +214,7 @@ describe("useAccounts & Account Mutations Hooks", () => {
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["accounts"] })
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["transactions"] })
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: ["financial-analysis"],
+      queryKey: ["analysis"],
     })
   })
 })

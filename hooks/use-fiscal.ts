@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { apiClient, apiRequest, getStoredToken } from "@/lib/api-client"
+import { apiClient, apiRequest, rawApiFetch } from "@/lib/api-client"
 import { triggerBlobDownload } from "@/lib/export-utils"
 import { useAuth } from "@/hooks/use-auth"
 import type {
@@ -50,6 +50,7 @@ export function useUpdateTransactionFiscal() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fiscal"] })
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["analysis"] })
     },
   })
 
@@ -102,21 +103,10 @@ export function useExportFiscalDossier() {
       setError(null)
 
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || ""
-        const params = new URLSearchParams({ year, format })
-        const token = getStoredToken()
-        const headers = new Headers()
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`)
-        }
-
-        const response = await fetch(
-          `${baseUrl}/api/fiscal/dossier?${params.toString()}`,
-          {
-            method: "GET",
-            headers,
-          }
-        )
+        const response = await rawApiFetch("/api/fiscal/dossier", {
+          method: "GET",
+          params: { year, format },
+        })
 
         if (!response.ok) {
           let message = `Erro HTTP ${response.status}`
