@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useChatStream, type UseChatStreamReturn } from "@/hooks/use-chat-stream"
 
 interface ChatDrawerContextValue {
   isOpen: boolean
   openDrawer: () => void
   closeDrawer: () => void
   toggleDrawer: () => void
+  chat?: UseChatStreamReturn
 }
 
 const ChatDrawerContext = React.createContext<
@@ -19,6 +21,7 @@ export function ChatDrawerProvider({
   children: React.ReactNode
 }) {
   const [isOpen, setIsOpen] = React.useState(false)
+  const chat = useChatStream()
 
   const openDrawer = React.useCallback(() => setIsOpen(true), [])
   const closeDrawer = React.useCallback(() => setIsOpen(false), [])
@@ -30,8 +33,9 @@ export function ChatDrawerProvider({
       openDrawer,
       closeDrawer,
       toggleDrawer,
+      chat,
     }),
-    [isOpen, openDrawer, closeDrawer, toggleDrawer]
+    [isOpen, openDrawer, closeDrawer, toggleDrawer, chat]
   )
 
   return (

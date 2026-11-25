@@ -21,9 +21,9 @@ import { useMultiMonthAnalysis } from "@/hooks/use-multi-month-analysis"
 import { useTransactions } from "@/hooks/use-transactions"
 import type { MultiMonthRange } from "@/src/types/api"
 import {
-  buildMultiMonthEvolutionSeries,
   calculateEmergencyFundTarget,
   calculateFinancialMetricsFromTransactions,
+  formatYearMonthShortLabel,
   subtractMonths,
 } from "@/lib/dashboard-charts"
 import type { MultiMonthHorizon } from "@/src/types/charts"
@@ -57,14 +57,12 @@ export default function DashboardPage() {
 
   const multiMonthRange: MultiMonthRange =
     horizon === "3M" ? "3" : horizon === "6M" ? "6" : "12"
-  const { analysis: multiMonthServerAnalysis } =
+  const { analysis: multiMonthServerAnalysis, isLoading: isMultiMonthLoading } =
     useMultiMonthAnalysis(multiMonthRange)
   const {
     transactions: monthTransactions,
     isLoading: isMonthTransactionsLoading,
   } = useTransactions({ month: selectedMonth })
-  const { transactions: allTransactions, isLoading: isAllTransactionsLoading } =
-    useTransactions({})
   const prefersReducedMotion = usePrefersReducedMotion()
 
   const fallbackMetrics = React.useMemo(
@@ -91,15 +89,34 @@ export default function DashboardPage() {
     ]
   )
 
-  const multiMonthSeries = React.useMemo(
-    () =>
-      buildMultiMonthEvolutionSeries(
-        allTransactions,
-        horizon,
-        selectedMonth
-      ),
-    [allTransactions, horizon, selectedMonth]
-  )
+  const multiMonthSeries = React.useMemo(() => {
+    const history = multiMonthServerAnalysis?.monthlyHistory ?? []
+    return history.reduce<
+      Array<{
+        month: string
+        label: string
+        receitas: number
+        despesas: number
+        faturas: number
+        netBalance: number
+        cumulativeBalance: number
+      }>
+    >((acc, item) => {
+      const prevCumulative = acc[acc.length - 1]?.cumulativeBalance ?? 0
+      const cumulativeBalance =
+        Math.round((prevCumulative + item.netBalance) * 100) / 100
+      acc.push({
+        month: item.month,
+        label: formatYearMonthShortLabel(item.month),
+        receitas: item.totalIncome,
+        despesas: item.totalExpenses,
+        faturas: 0,
+        netBalance: item.netBalance,
+        cumulativeBalance,
+      })
+      return acc
+    }, [])
+  }, [multiMonthServerAnalysis])
 
   const previousMonth = React.useMemo(
     () => subtractMonths(selectedMonth, 1),
@@ -243,7 +260,7 @@ export default function DashboardPage() {
           onHorizonChange={setHorizon}
           serverAnalysis={multiMonthServerAnalysis}
           emergencyFundTarget={emergencyFundTarget}
-          isLoading={isAllTransactionsLoading}
+          isLoading={isMultiMonthLoading}
         />
       </motion.div>
 

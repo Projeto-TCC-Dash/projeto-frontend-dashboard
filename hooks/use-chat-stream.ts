@@ -339,21 +339,15 @@ export function useChatStream(): UseChatStreamReturn {
   )
 
   const retryLastMessage = useCallback(async () => {
-    // Localiza a última mensagem do usuário
-    const lastUserMsg = [...session.messages]
-      .reverse()
-      .find((m) => m.role === "user")
-    if (lastUserMsg) {
-      // Remove a última mensagem com erro do assistente, se houver
-      setSession((prev) => {
-        const lastMsg = prev.messages[prev.messages.length - 1]
-        if (lastMsg && lastMsg.role === "model" && lastMsg.status === "error") {
-          return { ...prev, messages: prev.messages.slice(0, -1) }
-        }
-        return prev
-      })
-      await sendMessage(lastUserMsg.content)
-    }
+    const lastUserIndex = session.messages.findLastIndex((m) => m.role === "user")
+    if (lastUserIndex === -1) return
+
+    const lastUserMsg = session.messages[lastUserIndex]
+    setSession((prev) => ({
+      ...prev,
+      messages: prev.messages.slice(0, lastUserIndex),
+    }))
+    await sendMessage(lastUserMsg.content)
   }, [sendMessage, session.messages])
 
   return {

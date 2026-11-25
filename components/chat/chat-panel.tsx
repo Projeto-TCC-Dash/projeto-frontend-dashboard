@@ -3,7 +3,8 @@
 import * as React from "react"
 import { Trash2, KeyRound, ExternalLink, X } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
-import { useChatStream } from "@/hooks/use-chat-stream"
+import { useChatStream, type UseChatStreamReturn } from "@/hooks/use-chat-stream"
+import { useChatDrawer } from "./chat-drawer-context"
 import { ChatMessageList } from "./chat-message-list"
 import { ChatInput } from "./chat-input"
 import { QuickSuggestionChips } from "./quick-suggestion-chips"
@@ -18,13 +19,27 @@ export interface ChatPanelProps {
   emptyState?: React.ReactNode
 }
 
-export function ChatPanel({
+export function ChatPanel(props: ChatPanelProps) {
+  const { chat } = useChatDrawer()
+  if (chat) {
+    return <ChatPanelInner {...props} chat={chat} />
+  }
+  return <ChatPanelWithLocalStream {...props} />
+}
+
+function ChatPanelWithLocalStream(props: ChatPanelProps) {
+  const chat = useChatStream()
+  return <ChatPanelInner {...props} chat={chat} />
+}
+
+function ChatPanelInner({
   className,
   showHeader = true,
   onClose,
   headerAction,
   emptyState,
-}: ChatPanelProps) {
+  chat,
+}: ChatPanelProps & { chat: UseChatStreamReturn }) {
   const { user } = useAuth()
   const [aiKeyModalOpen, setAiKeyModalOpen] = React.useState(false)
 
@@ -35,7 +50,7 @@ export function ChatPanel({
     stopStream,
     clearChat,
     retryLastMessage,
-  } = useChatStream()
+  } = chat
 
   const hasKey = user?.hasAiKey !== false
 
